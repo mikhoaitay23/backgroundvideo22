@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_main_graph"
+    app:startDestination="@id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.hola360.backgroundvideorecoder.ui.home.HomeFragment"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_confirm_privacy"
+        android:name="com.hola360.backgroundvideorecoder.ui.privacy.ConfirmPrivacy"
+        tools:layout="@layout/fragment_confirm_privacy"/>
+
+    <fragment
+        android:id="@+id/nav_privacy"
+        android:name="com.hola360.backgroundvideorecoder.ui.privacy.PrivacyFragment"
+        tools:layout="@layout/fragment_privacy">
+        <argument
+            android:name="isPrivacy"
+            app:argType="boolean" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_to_nav_privacy"
+        app:destination="@id/nav_privacy"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"/>
+
+
+</navigation>

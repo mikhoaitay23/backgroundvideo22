@@ -8,6 +8,7 @@ import com.hola360.backgroundvideorecoder.databinding.LayoutToolbarBinding
 
 class Toolbar: FrameLayout {
     private var binding: LayoutToolbarBinding?= null
+    private var callback:CustomToolbarCallback?=null
 
     constructor(context: Context?) : super(context!!) {
         init()
@@ -27,5 +28,28 @@ class Toolbar: FrameLayout {
 
     private fun init(){
         binding= LayoutToolbarBinding.inflate(LayoutInflater.from(context), this, true)
+        binding!!.menuCode=0
+        binding!!.back.setOnClickListener {
+            callback!!.onBack()
+        }
+    }
+
+
+    fun setupToolbarCallback(callback: CustomToolbarCallback){
+        this.callback= callback
+    }
+
+    fun showToolbarMenu(menuCode:Int){
+        binding!!.menuCode= menuCode
+    }
+
+    fun setToolbarTitle(title:String?){
+        title?.let {
+            binding!!.title.text= it
+        }
+    }
+
+    interface CustomToolbarCallback{
+        fun onBack()
     }
 }

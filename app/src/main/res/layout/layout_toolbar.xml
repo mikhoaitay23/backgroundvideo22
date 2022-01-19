@@ -2,20 +2,38 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-
+        <variable
+            name="menuCode"
+            type="Integer" />
+        <import type="android.view.View"/>
     </data>
 
-    <FrameLayout
+    <LinearLayout
         android:background="@color/colorAccent"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize">
 
         <ImageView
+            android:id="@+id/back"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_back"
             android:layout_marginStart="10dp"
             android:layout_gravity="center_vertical"/>
 
-    </FrameLayout>
+        <TextView
+            android:id="@+id/title"
+            android:text="Toolbar Title"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <FrameLayout
+            android:layout_gravity="center_vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
 </layout>
