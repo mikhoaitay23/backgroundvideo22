@@ -11,4 +11,8 @@ class RecordVideo: BaseRecordPageFragment<LayoutRecordVideoBinding>() {
     override fun initView() {
 
     }
+
+    override fun initViewModel() {
+
+    }
 }

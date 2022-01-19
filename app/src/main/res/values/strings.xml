@@ -13,5 +13,8 @@
 
 
     <string name="video_record_title">Video Record</string>
+    
+    //Audio Record
+    <string name="record">Record</string>
 
 </resources>

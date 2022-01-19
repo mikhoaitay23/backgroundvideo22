@@ -20,4 +20,8 @@ class HomeFragment: BaseFragment<FragmentHomeBinding>() {
             findNavController().navigate(R.id.nav_audio_record)
         }
     }
+
+    override fun initViewModel() {
+
+    }
 }

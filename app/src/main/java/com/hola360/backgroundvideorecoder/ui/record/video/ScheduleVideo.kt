@@ -11,4 +11,8 @@ class ScheduleVideo: BaseRecordPageFragment<LayoutScheduleVideoBinding>() {
     override fun initView() {
 
     }
+
+    override fun initViewModel() {
+
+    }
 }

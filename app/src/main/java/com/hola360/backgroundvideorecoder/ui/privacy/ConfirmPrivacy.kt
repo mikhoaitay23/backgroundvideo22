@@ -26,4 +26,8 @@ class ConfirmPrivacy: BaseFragment<FragmentConfirmPrivacyBinding>() {
             findNavController().popBackStack()
         }
     }
+
+    override fun initViewModel() {
+
+    }
 }
