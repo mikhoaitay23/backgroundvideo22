@@ -2,4 +2,16 @@
     <string name="app_name">BackgroundVideoRecoder</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="home_camera">Camera</string>
+    <string name="home_audio">Audio</string>
+
+    <string name="term_of_service">Term of service</string>
+    <string name="privacy_policy">Privacy policy</string>
+
+    <string name="audio_record_title">Audio Record</string>
+
+
+    <string name="video_record_title">Video Record</string>
+
 </resources>

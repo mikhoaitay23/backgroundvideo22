@@ -8,17 +8,18 @@ class PrivacyFragment :BaseFragment<FragmentPrivacyBinding>() {
 
     override val layoutId: Int = R.layout.fragment_privacy
     override val showToolbar: Boolean = true
-    override var toolbarTitle: String?= null
+    override val toolbarTitle: String? by lazy {
+        if(args.isPrivacy){
+            resources.getString(R.string.privacy_policy)
+        }else{
+            resources.getString(R.string.term_of_service)
+        }
+    }
     override val menuCode: Int = 0
     private val args: PrivacyFragmentArgs by lazy {
         PrivacyFragmentArgs.fromBundle(requireArguments())
     }
 
     override fun initView() {
-        toolbarTitle= if(args.isPrivacy){
-             "Privacy Policy"
-        }else{
-            "Term of Service"
-        }
     }
 }

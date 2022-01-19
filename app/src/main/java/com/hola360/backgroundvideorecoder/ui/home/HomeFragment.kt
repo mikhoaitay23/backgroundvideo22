@@ -9,7 +9,7 @@ class HomeFragment: BaseFragment<FragmentHomeBinding>() {
 
     override val layoutId: Int = R.layout.fragment_home
     override val showToolbar: Boolean= false
-    override var toolbarTitle: String? = null
+    override val toolbarTitle: String? = null
     override val menuCode: Int = 0
 
     override fun initView() {

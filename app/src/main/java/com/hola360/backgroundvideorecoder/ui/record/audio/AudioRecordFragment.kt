@@ -10,7 +10,9 @@ class AudioRecordFragment: BaseFragment<FragmentAudioRecordBinding>(){
 
     override val layoutId: Int = R.layout.fragment_audio_record
     override val showToolbar: Boolean = true
-    override var toolbarTitle: String? = "Audio Record"
+    override val toolbarTitle: String? by lazy {
+        resources.getString(R.string.audio_record_title)
+    }
     override val menuCode: Int= 0
     private val adapter: RecordViewPagerAdapter by lazy {
         RecordViewPagerAdapter(childFragmentManager, lifecycle).apply {

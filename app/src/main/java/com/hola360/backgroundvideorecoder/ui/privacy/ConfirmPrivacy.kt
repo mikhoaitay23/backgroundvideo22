@@ -11,7 +11,7 @@ class ConfirmPrivacy: BaseFragment<FragmentConfirmPrivacyBinding>() {
 
     override val layoutId: Int = R.layout.fragment_confirm_privacy
     override val showToolbar: Boolean = false
-    override var toolbarTitle: String? = null
+    override val toolbarTitle: String? = null
     override val menuCode: Int = 0
 
     override fun initView() {

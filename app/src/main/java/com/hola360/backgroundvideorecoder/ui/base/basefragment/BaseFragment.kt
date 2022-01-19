@@ -18,7 +18,7 @@ abstract class BaseFragment<V : ViewDataBinding?> : Fragment() {
     var binding: V? = null
     protected abstract val layoutId: Int
     protected abstract val showToolbar:Boolean
-    protected abstract var toolbarTitle: String?
+    protected abstract val toolbarTitle: String?
     protected abstract val menuCode: Int
 
     override fun onCreate(savedInstanceState: Bundle?) {

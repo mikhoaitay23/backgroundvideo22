@@ -10,7 +10,9 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
 
     override val layoutId: Int= R.layout.fragment_video_record
     override val showToolbar: Boolean = true
-    override var toolbarTitle: String? = "Video Record"
+    override val toolbarTitle: String? by lazy {
+        resources.getString(R.string.video_record_title)
+    }
     override val menuCode: Int = 0
     private val adapter: RecordViewPagerAdapter by lazy {
         RecordViewPagerAdapter(childFragmentManager, lifecycle).apply {
