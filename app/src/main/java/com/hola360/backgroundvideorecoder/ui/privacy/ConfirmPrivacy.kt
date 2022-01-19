@@ -1,5 +1,6 @@
 package com.hola360.backgroundvideorecoder.ui.privacy
 
+import android.text.SpannableString
 import androidx.navigation.fragment.findNavController
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.NavMainGraphDirections
@@ -25,5 +26,6 @@ class ConfirmPrivacy: BaseFragment<FragmentConfirmPrivacyBinding>() {
             dataPref!!.putBooleanValue(MainActivity.PRIVACY, true)
             findNavController().popBackStack()
         }
+
     }
 }

@@ -3,11 +3,16 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+
+
     <string name="home_camera">Camera</string>
     <string name="home_audio">Audio</string>
 
+    <string name="term_of_service_title">Video Audio Recording\nWhen Screen is Off</string>
     <string name="term_of_service">Term of service</string>
     <string name="privacy_policy">Privacy policy</string>
+    <string name="privacy_policy_text">Before using Video Audio Record, you agree to our\nTerm of service and Privacy policy</string>
+    <string name="privacy_policy_agree">AGREE AND CONTINUE</string>
 
     <string name="audio_record_title">Audio Record</string>
 

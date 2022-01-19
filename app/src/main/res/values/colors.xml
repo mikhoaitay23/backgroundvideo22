@@ -9,7 +9,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="colorAccent">#275459</color>
-    <color name="colorLightAccent">#803A81FA</color>
+    <color name="colorLightAccent">#137C88</color>
     <color name="colorBackground">@color/md_white_1000</color>
     <color name="colorOnBackground">@color/md_black_1000</color>
 
