@@ -32,5 +32,15 @@
         app:popEnterAnim="@anim/nav_default_pop_enter_anim"
         app:popExitAnim="@anim/nav_default_pop_exit_anim"/>
 
+    <fragment
+        android:id="@+id/nav_video_record"
+        android:name="com.hola360.backgroundvideorecoder.ui.record.video.VideoRecordFragment"
+        tools:layout="@layout/fragment_video_record"/>
+
+    <fragment
+        android:id="@+id/nav_audio_record"
+        android:name="com.hola360.backgroundvideorecoder.ui.record.audio.AudioRecordFragment"
+        tools:layout="@layout/fragment_audio_record"/>
+
 
 </navigation>
