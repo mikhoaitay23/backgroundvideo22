@@ -28,4 +28,8 @@ class ConfirmPrivacy: BaseFragment<FragmentConfirmPrivacyBinding>() {
         }
 
     }
+
+    override fun initViewModel() {
+
+    }
 }

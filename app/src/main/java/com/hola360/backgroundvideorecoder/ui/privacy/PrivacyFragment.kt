@@ -22,4 +22,8 @@ class PrivacyFragment :BaseFragment<FragmentPrivacyBinding>() {
 
     override fun initView() {
     }
+
+    override fun initViewModel() {
+
+    }
 }

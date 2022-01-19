@@ -29,4 +29,8 @@ class RecordVideo: BaseRecordPageFragment<LayoutRecordVideoBinding>() {
         val intent= Intent(requireContext(), RecordService::class.java)
         requireContext().stopService(intent)
     }
+
+    override fun initViewModel() {
+
+    }
 }

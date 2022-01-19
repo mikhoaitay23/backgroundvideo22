@@ -11,4 +11,8 @@ class ScheduleAudio: BaseRecordPageFragment<LayoutScheduleAudioBinding>() {
     override fun initView() {
 
     }
+
+    override fun initViewModel() {
+
+    }
 }
