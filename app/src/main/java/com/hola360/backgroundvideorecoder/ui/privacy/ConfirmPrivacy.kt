@@ -29,7 +29,9 @@ class ConfirmPrivacy: BaseFragment<FragmentConfirmPrivacyBinding>() {
             dataPref!!.putBooleanValue(MainActivity.PRIVACY, true)
             findNavController().popBackStack()
         }
-
+        binding!!.close.setOnClickListener {
+            requireActivity().finish()
+        }
     }
 
     private fun setupTextViewClick(){
