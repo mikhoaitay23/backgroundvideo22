@@ -47,7 +47,6 @@
         <item name="android:elevation">@dimen/home_v_padding</item>
         <item name="android:layout_marginTop">@dimen/home_v_margin</item>
         <item name="android:layout_marginBottom">@dimen/home_v_margin</item>
-        <item name="android:padding">@dimen/home_mall_icon_padding</item>
     </style>
 
 </resources>
