@@ -7,73 +7,71 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:gravity="center">
 
         <ImageView
             android:id="@+id/close"
             android:layout_width="@dimen/privacy_cancel_icon_height"
             android:layout_height="@dimen/privacy_cancel_icon_height"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_margin="@dimen/privacy_cancel_icon_margin"
             android:src="@drawable/ic_close"
-            android:layout_margin="@dimen/privacy_cancel_icon_margin"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/banner"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/ic_picture_confirm_privacy"
             android:layout_marginTop="@dimen/privacy_item_margin_top"
-            app:layout_constraintWidth_percent="0.7"
+            android:src="@drawable/ic_picture_confirm_privacy"
             app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintTop_toBottomOf="@id/close"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@id/close"
+            app:layout_constraintWidth_percent="0.7" />
 
         <TextView
             android:id="@+id/bannerTitle"
-            app:layout_constraintStart_toStartOf="@id/banner"
-            app:layout_constraintEnd_toEndOf="@id/banner"
-            app:layout_constraintTop_toBottomOf="@id/banner"
-            android:layout_marginTop="@dimen/privacy_item_margin_top"
-            android:layout_width="0dp"
-            android:gravity="center"
             style="@style/TextAppearancePrivacy1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/privacy_item_margin_top"
+            android:gravity="center"
             android:text="@string/term_of_service_title"
-            android:layout_height="wrap_content"/>
+            app:layout_constraintEnd_toEndOf="@id/banner"
+            app:layout_constraintStart_toStartOf="@id/banner"
+            app:layout_constraintTop_toBottomOf="@id/banner" />
 
         <TextView
-            android:id="@+id/term_of_service"
-            android:text="Term of service"
-            android:padding="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <TextView
-            android:layout_marginTop="10dp"
             android:id="@+id/privacy_policy"
-            android:text="Privacy policy"
-            android:padding="10dp"
+            style="@style/TextAppearancePrivacy3"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="@string/privacy_policy_text"
+            app:layout_constraintBottom_toTopOf="@id/agree"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/agree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="@string/privacy_policy_agree"
-            android:background="@drawable/bg_confirm_privacy_button"
             android:layout_marginBottom="30dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@drawable/bg_confirm_privacy_button"
             android:paddingHorizontal="30dp"
             android:paddingVertical="10dp"
+            android:text="@string/privacy_policy_agree"
             android:textAppearance="@style/TextAppearancePrivacy2"
             android:textColor="@color/md_white_1000"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

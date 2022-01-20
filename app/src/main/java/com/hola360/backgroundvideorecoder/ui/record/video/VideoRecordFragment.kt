@@ -21,6 +21,10 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
     }
     private var curPagerPage= 0
 
+    override fun initViewModel() {
+
+    }
+
     override fun initView() {
         binding!!.viewPager.adapter= adapter
         binding!!.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){

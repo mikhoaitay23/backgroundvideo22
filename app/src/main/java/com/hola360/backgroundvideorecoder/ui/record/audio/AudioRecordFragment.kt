@@ -21,6 +21,10 @@ class AudioRecordFragment: BaseFragment<FragmentAudioRecordBinding>(){
     }
     private var curPagerPage= 0
 
+    override fun initViewModel() {
+
+    }
+
     override fun initView() {
         binding!!.viewPager.adapter= adapter
         binding!!.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
@@ -28,15 +32,5 @@ class AudioRecordFragment: BaseFragment<FragmentAudioRecordBinding>(){
                 curPagerPage= position
             }
         })
-        binding!!.record.setOnClickListener {
-            if(curPagerPage != 0){
-                binding!!.viewPager.setCurrentItem(0, true)
-            }
-        }
-        binding!!.schedule.setOnClickListener {
-            if(curPagerPage != 1){
-                binding!!.viewPager.setCurrentItem(1, true)
-            }
-        }
     }
 }
