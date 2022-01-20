@@ -1,9 +1,13 @@
 package com.hola360.backgroundvideorecoder.ui.home
 
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.fragment.findNavController
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.FragmentHomeBinding
 import com.hola360.backgroundvideorecoder.ui.base.basefragment.BaseFragment
+import com.hola360.backgroundvideorecoder.utils.Constants
+import com.hola360.backgroundvideorecoder.utils.SystemUtils
 
 class HomeFragment: BaseFragment<FragmentHomeBinding>() {
 
@@ -26,7 +30,11 @@ class HomeFragment: BaseFragment<FragmentHomeBinding>() {
 
         }
         binding!!.camera.setOnClickListener {
-            findNavController().navigate(R.id.nav_video_record)
+            if(SystemUtils.hasPermissions(requireContext(), *Constants.TAKE_PICTURE_PERMISSION)){
+                findNavController().navigate(R.id.nav_video_record)
+            }else{
+                getCameraPermission.launch(Constants.TAKE_PICTURE_PERMISSION)
+            }
         }
         binding!!.audio.setOnClickListener {
             findNavController().navigate(R.id.nav_audio_record)
@@ -36,4 +44,15 @@ class HomeFragment: BaseFragment<FragmentHomeBinding>() {
     override fun initViewModel() {
 
     }
+
+    private val getCameraPermission = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+        ActivityResultCallback<Map<String?, Boolean?>> { result: Map<String?, Boolean?>? ->
+            if (SystemUtils.hasPermissions(requireContext(), *Constants.TAKE_PICTURE_PERMISSION)) {
+                findNavController().navigate(R.id.nav_video_record)
+            } else {
+                SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+            }
+        }
+    )
 }
