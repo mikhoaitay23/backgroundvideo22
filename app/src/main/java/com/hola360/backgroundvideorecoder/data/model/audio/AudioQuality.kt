@@ -8,13 +8,13 @@ enum class AudioQuality {
         fun obtainQuality(audioQuality: AudioQuality): Float {
             return when (audioQuality) {
                 LOW -> {
-                    0.3f
+                    8000f
                 }
                 MEDIUM -> {
-                    0.6f
+                    44100f
                 }
                 HIGH -> {
-                    0.75f
+                    48000f
                 }
             }
         }
