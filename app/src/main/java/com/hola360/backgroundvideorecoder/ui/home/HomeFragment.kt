@@ -13,6 +13,18 @@ class HomeFragment: BaseFragment<FragmentHomeBinding>() {
     override val menuCode: Int = 0
 
     override fun initView() {
+        binding!!.setting.setOnClickListener {
+            findNavController().navigate(R.id.nav_setting)
+        }
+        binding!!.myFile.setOnClickListener {
+            findNavController().navigate(R.id.nav_my_file)
+        }
+        binding!!.share.setOnClickListener {
+
+        }
+        binding!!.rateApp.setOnClickListener {
+
+        }
         binding!!.camera.setOnClickListener {
             findNavController().navigate(R.id.nav_video_record)
         }

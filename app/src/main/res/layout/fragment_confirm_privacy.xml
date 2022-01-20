@@ -25,7 +25,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/privacy_item_margin_top"
-            android:src="@drawable/ic_picture_confirm_privacy"
+            android:src="@drawable/ic_privacy_picture"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -23,5 +23,31 @@
         <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
 
+    <style name="TextAppearanceHome1">
+        <item name="android:textSize">16dp</item>
+        <item name="android:fontFamily">@font/roboto_light</item>
+        <item name="android:textColor">@color/md_white_1000</item>
+    </style>
+
+    <style name="TextAppearanceHome2">
+        <item name="android:textSize">20dp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textColor">@color/md_white_1000</item>
+    </style>
+
+    <style name="TextAppearanceHome3">
+        <item name="android:textSize">18dp</item>
+    </style>
+
+    <style name="HomeSmallIcon">
+        <item name="android:layout_width">@dimen/home_mall_icon_height</item>
+        <item name="android:layout_height">@dimen/home_mall_icon_height</item>
+        <item name="android:background">@drawable/bg_banner_home</item>
+        <item name="android:foreground">?selectableItemBackground</item>
+        <item name="android:elevation">@dimen/home_v_padding</item>
+        <item name="android:layout_marginTop">@dimen/home_v_margin</item>
+        <item name="android:layout_marginBottom">@dimen/home_v_margin</item>
+        <item name="android:padding">@dimen/home_mall_icon_padding</item>
+    </style>
 
 </resources>
