@@ -1,50 +1,233 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
     </data>
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:gravity="center"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/home_background">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="My File"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:layout_marginTop="10dp"
-            android:text="Share"/>
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:src="@drawable/ic_home_background"
+                app:layout_constraintDimensionRatio="360:218"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:layout_marginTop="10dp"
-            android:text="Rate app"/>
+            <TextView
+                android:id="@+id/txtWelcome"
+                style="@style/TextAppearanceHome1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/home_h_margin"
+                android:text="@string/home_welcome"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/camera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:layout_marginTop="10dp"
-            android:text="Camera"/>
+            <TextView
+                android:id="@+id/txtAppName"
+                style="@style/TextAppearanceHome2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/home_h_margin"
+                android:layout_marginTop="5dp"
+                android:text="@string/home_app_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/txtWelcome" />
 
-        <TextView
-            android:id="@+id/audio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:layout_marginTop="10dp"
-            android:text="Audio"/>
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/setting"
+                android:layout_width="@dimen/home_icon_setting_height"
+                android:layout_height="@dimen/home_icon_setting_height"
+                android:layout_marginEnd="@dimen/home_v_margin"
+                android:padding="@dimen/home_v_padding"
+                android:src="@drawable/ic_home_setting"
+                app:layout_constraintBottom_toBottomOf="@id/txtAppName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/txtWelcome" />
+
+            <ImageView
+                android:id="@+id/banner"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="@dimen/home_h_margin"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_banner_home"
+                android:elevation="@dimen/home_v_padding"
+                android:padding="@dimen/home_v_margin"
+                android:src="@drawable/ic_home_banner"
+                app:layout_constraintDimensionRatio="363:208"
+                app:layout_constraintTop_toBottomOf="@id/txtAppName" />
+
+            <LinearLayout
+                android:id="@+id/smallIcon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/home_h_margin"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/banner">
+
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/myFile"
+                    style="@style/HomeSmallIcon"
+                    app:riv_corner_radius="@dimen/home_h_margin"
+                    android:layout_marginEnd="@dimen/home_small_icon_margin_end"
+                    android:src="@drawable/ic_home_my_file" />
+
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/share"
+                    style="@style/HomeSmallIcon"
+                    app:riv_corner_radius="@dimen/home_h_margin"
+                    android:layout_marginEnd="@dimen/home_small_icon_margin_end"
+                    android:src="@drawable/ic_home_share" />
+
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/rateApp"
+                    style="@style/HomeSmallIcon"
+                    app:riv_corner_radius="@dimen/home_h_margin"
+                    android:src="@drawable/ic_home_rate" />
+
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/largeIcon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/smallIcon">
+
+                <LinearLayout
+                    android:id="@+id/camera"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="@dimen/home_v_margin"
+                    android:layout_marginStart="@dimen/home_h_margin"
+                    android:background="@drawable/bg_banner_home"
+                    android:elevation="@dimen/home_v_padding"
+                    android:foreground="?selectableItemBackground"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:0.9"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="0.43">
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:layout_width="@dimen/home_mall_icon_height"
+                        android:layout_height="@dimen/home_mall_icon_height"
+                        android:background="@drawable/bg_banner_home"
+                        android:elevation="@dimen/home_v_padding"
+                        android:src="@drawable/ic_home_camera"
+                        app:riv_corner_radius="@dimen/home_h_margin" />
+
+                    <TextView
+                        style="@style/TextAppearanceHome3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/home_v_margin"
+                        android:text="@string/home_camera" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/audio"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="@dimen/home_v_margin"
+                    android:layout_marginEnd="@dimen/home_h_margin"
+                    android:background="@drawable/bg_banner_home"
+                    android:elevation="@dimen/home_v_padding"
+                    android:foreground="?selectableItemBackground"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:0.9"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="0.43">
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:layout_width="@dimen/home_mall_icon_height"
+                        android:layout_height="@dimen/home_mall_icon_height"
+                        android:background="@drawable/bg_banner_home"
+                        android:elevation="@dimen/home_v_padding"
+                        android:src="@drawable/ic_home_audio"
+                        app:riv_corner_radius="@dimen/home_h_margin" />
+
+                    <TextView
+                        style="@style/TextAppearanceHome3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/home_v_margin"
+                        android:text="@string/home_audio" />
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                style="@style/TextAppearanceHome3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/home_h_margin"
+                android:fontFamily="@font/roboto_medium"
+                android:text="@string/home_app_suggest"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/largeIcon" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+
+    <!--    <LinearLayout-->
+    <!--        android:orientation="vertical"-->
+    <!--        android:gravity="center"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent">-->
+
+    <!--        <TextView-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:padding="10dp"-->
+    <!--            android:text="My File"/>-->
+
+    <!--        <TextView-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:padding="10dp"-->
+    <!--            android:layout_marginTop="10dp"-->
+    <!--            android:text="Share"/>-->
+
+    <!--        <TextView-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:padding="10dp"-->
+    <!--            android:layout_marginTop="10dp"-->
+    <!--            android:text="Rate app"/>-->
+
+    <!--        <TextView-->
+    <!--            android:id="@+id/camera"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:padding="10dp"-->
+    <!--            android:layout_marginTop="10dp"-->
+    <!--            android:text="Camera"/>-->
+
+    <!--        <TextView-->
+    <!--            android:id="@+id/audio"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:padding="10dp"-->
+    <!--            android:layout_marginTop="10dp"-->
+    <!--            android:text="Audio"/>-->
+    <!--    </LinearLayout>-->
 </layout>
