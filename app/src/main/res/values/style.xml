@@ -3,6 +3,11 @@
 
     <style name="Theme.Background_Video_Record" parent="Base.Theme.MyApp"/>
 
+    <style name="TextAppearanceToolbar">
+        <item name="android:textSize">20dp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+    </style>
+
     <style name="TextAppearancePrivacy1">
         <item name="android:textSize">26dp</item>
         <item name="android:fontFamily">@font/roboto_medium</item>

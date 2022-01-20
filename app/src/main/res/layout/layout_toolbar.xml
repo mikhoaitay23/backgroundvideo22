@@ -16,15 +16,17 @@
 
         <ImageView
             android:id="@+id/back"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/toolbar_back_icon_height"
+            android:layout_height="@dimen/toolbar_back_icon_height"
             android:src="@drawable/ic_back"
             android:layout_marginStart="10dp"
             android:layout_gravity="center_vertical"/>
 
         <TextView
             android:id="@+id/title"
-            android:text="Toolbar Title"
+            style="@style/TextAppearanceToolbar"
+            android:textColor="@color/md_white_1000"
+            android:layout_marginStart="20dp"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
