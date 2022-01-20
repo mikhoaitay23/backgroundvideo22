@@ -21,5 +21,7 @@
     
     //Audio Record
     <string name="record">Record</string>
+    <string name="audio_information">Audio information</string>
+    <string name="record_quality">Record quality</string>
 
 </resources>
