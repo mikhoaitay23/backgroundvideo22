@@ -24,7 +24,7 @@
 
             <ImageView
                 android:id="@+id/record"
-                android:src="@drawable/ic_record"
+                android:src="@drawable/ic_record_normal"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"

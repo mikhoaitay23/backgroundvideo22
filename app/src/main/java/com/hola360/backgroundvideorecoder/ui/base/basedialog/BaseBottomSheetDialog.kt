@@ -12,7 +12,6 @@ import com.hola360.backgroundvideorecoder.R
 abstract class BaseBottomSheetDialog<V: ViewDataBinding?>: BottomSheetDialogFragment() {
 
     protected var binding: V?= null
-    protected abstract val layoutId: Int
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,12 +22,13 @@ abstract class BaseBottomSheetDialog<V: ViewDataBinding?>: BottomSheetDialogFrag
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
+        binding = DataBindingUtil.inflate(inflater, getLayout(), container, false)
         initView()
         return binding!!.root
     }
 
-    protected abstract fun initView()
+    abstract fun initView()
+    abstract fun getLayout(): Int
 
     override fun onDestroy() {
         super.onDestroy()

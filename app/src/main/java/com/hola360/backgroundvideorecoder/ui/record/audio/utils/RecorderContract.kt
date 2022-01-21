@@ -5,22 +5,10 @@ import java.io.File
 
 interface RecorderContract {
 
-    interface RecorderCallback {
-        fun onStartRecord(output: File?)
+        fun onStartRecord(audioModel: AudioModel)
         fun onPauseRecord()
         fun onResumeRecord()
         fun onRecordProgress(mills: Long, amp: Int)
         fun onStopRecord(output: File?)
         fun onError(throwable: Exception?)
-    }
-
-    interface Recorder {
-        fun setRecorderCallback(callback: RecorderCallback?)
-        fun startRecording(audioModel: AudioModel)
-        fun resumeRecording()
-        fun pauseRecording()
-        fun stopRecording()
-        fun isRecording(): Boolean
-        fun isPaused(): Boolean
-    }
 }
