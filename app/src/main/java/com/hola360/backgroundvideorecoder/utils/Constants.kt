@@ -10,8 +10,9 @@ object Constants {
     var STORAGE_PERMISSION_STORAGE_SCOPE = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE
     )
-    val TAKE_PICTURE_PERMISSION = arrayOf(
-        Manifest.permission.CAMERA
+    val CAMERA_RECORD_PERMISSION = arrayOf(
+        Manifest.permission.CAMERA,
+        Manifest.permission.RECORD_AUDIO
     )
 
     val TIME_ZONE_OFFSET= TimeZone.getDefault().getOffset(Date().time)
