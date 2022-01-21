@@ -4,8 +4,14 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+<<<<<<< HEAD
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+=======
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+>>>>>>> bffd59682b200d2571815e6207cfa39206399212
     <uses-feature android:name="android.hardware.camera2.full" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -25,9 +31,9 @@
 
         <service
             android:name=".ui.service.RecordService"
-            android:foregroundServiceType="camera|microphone"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:foregroundServiceType="camera|microphone" />
 
         <activity
             android:name=".SplashActivity"

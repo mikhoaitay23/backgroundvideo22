@@ -12,6 +12,7 @@
     <color name="colorLightAccent">#137C88</color>
     <color name="colorBackground">@color/md_white_1000</color>
     <color name="colorOnBackground">@color/md_black_1000</color>
+    <color name="signature_color">#40676C</color>
 
     <color name="home_background">#F7F7F7</color>
 

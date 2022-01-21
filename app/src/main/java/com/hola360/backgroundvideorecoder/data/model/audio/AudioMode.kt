@@ -1,7 +1,5 @@
 package com.hola360.backgroundvideorecoder.data.model.audio
 
-import android.media.AudioFormat
-
 enum class AudioMode {
     MONO, STEREO;
 
@@ -10,10 +8,10 @@ enum class AudioMode {
         fun obtainMode(audioMode: AudioMode): Int {
             return when (audioMode) {
                 MONO -> {
-                    AudioFormat.CHANNEL_IN_MONO
+                    1
                 }
                 STEREO -> {
-                    AudioFormat.CHANNEL_IN_STEREO
+                    2
                 }
             }
         }

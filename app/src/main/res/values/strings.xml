@@ -27,6 +27,10 @@
     <string name="record">Record</string>
     <string name="audio_information">Audio information</string>
     <string name="record_quality">Record quality</string>
+    <string name="abort">Abort</string>
+    <string name="save">Save</string>
+    <string name="stop">Stop</string>
+    <string name="pause">Pause</string>
 
     <string name="setting_title">Settings</string>
 

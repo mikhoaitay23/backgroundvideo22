@@ -15,6 +15,9 @@ object Constants {
         Manifest.permission.RECORD_AUDIO
     )
 
+    val RECORD_AUDIO_PERMISSION = Manifest.permission.RECORD_AUDIO
+
+
     val TIME_ZONE_OFFSET= TimeZone.getDefault().getOffset(Date().time)
     const val  DELETE_DIALOG= "DeleteDialog"
     const val ASSETS_PATH: String= "file:///android_asset/"
