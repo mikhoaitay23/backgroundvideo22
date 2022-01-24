@@ -1,18 +1,34 @@
 package com.hola360.backgroundvideorecoder.utils
 
+import android.annotation.SuppressLint
+import android.content.ContentValues
+import android.content.Context
+import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.video.Quality
-import androidx.camera.video.QualitySelector
+import androidx.camera.video.*
+import androidx.camera.view.PreviewView
+import androidx.core.content.ContextCompat
+import androidx.core.util.Consumer
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LifecycleOwner
+import com.hola360.backgroundvideorecoder.R
+import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
+import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
+import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
+import java.lang.Exception
+import java.text.SimpleDateFormat
+import java.util.*
 
 object VideoRecordUtils {
 
-    fun getCameraCapabilities(activity:FragmentActivity): MutableList<CameraCapability>{
-        val cameraProviderFuture= ProcessCameraProvider.getInstance(activity)
+    fun getCameraCapabilities(context: Context, lifeCycleOwner: LifecycleOwner): MutableList<CameraCapability>{
+        val cameraProviderFuture= ProcessCameraProvider.getInstance(context)
         val provider= cameraProviderFuture.get()
         provider.unbindAll()
         val cameraCapabilities= mutableListOf<CameraCapability>()
@@ -24,7 +40,7 @@ object VideoRecordUtils {
                 // just get the camera.cameraInfo to query capabilities
                 // we are not binding anything here.
                 if (provider.hasCamera(camSelector)) {
-                    val camera = provider.bindToLifecycle(activity, camSelector)
+                    val camera = provider.bindToLifecycle(lifeCycleOwner, camSelector)
                     QualitySelector
                         .getSupportedQualities(camera.cameraInfo)
                         .filter { quality ->
@@ -61,5 +77,73 @@ object VideoRecordUtils {
             (quality ==  Quality.SD) -> AspectRatio.RATIO_4_3
             else -> throw UnsupportedOperationException()
         }
+    }
+
+    fun bindRecordUserCase(context: Context, lifeCycleOwner: LifecycleOwner,
+                           videoRecordConfiguration: VideoRecordConfiguration):VideoCapture<Recorder>? {
+        val cameraCapabilities= getCameraCapabilities(context, lifeCycleOwner)
+        val cameraProvider = ProcessCameraProvider.getInstance(context).get()
+        val cameraIndex= if(videoRecordConfiguration.isBack){
+            0
+        }else{
+            1
+        }
+        val cameraSelector = cameraCapabilities[cameraIndex].camSelector
+        val quality: Quality = cameraCapabilities[cameraIndex].qualities[videoRecordConfiguration.cameraQuality]
+        val qualitySelector = QualitySelector.from(quality)
+
+        val recorder = Recorder.Builder()
+            .setQualitySelector(qualitySelector)
+            .build()
+
+        val videoCapture = VideoCapture.withOutput(recorder)
+
+        try {
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(
+                lifeCycleOwner,
+                cameraSelector,
+                videoCapture
+            )
+            return videoCapture
+        } catch (exc: Exception) {
+            // we are on main thread, let's reset the controls on the UI.
+            Log.e("CameraTest", "Use case binding failed", exc)
+        }
+        return null
+    }
+
+    @SuppressLint("MissingPermission")
+    fun startRecordVideo(context: Context, videoCapture: VideoCapture<Recorder>,
+                         videoRecordConfiguration: VideoRecordConfiguration): Recording {
+        val name = "CameraX-recording-" +
+                SimpleDateFormat(PreviewVideoWindow.FILENAME_FORMAT, Locale.US)
+                    .format(System.currentTimeMillis()) + ".mp4"
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Video.Media.DISPLAY_NAME, name)
+        }
+        val mediaStoreOutput = MediaStoreOutputOptions.Builder(
+            context.contentResolver,
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
+            .setContentValues(contentValues)
+            .build()
+
+        val mainThreadExecutor= ContextCompat.getMainExecutor(context)
+
+        val captureListener = Consumer<VideoRecordEvent> { event ->
+            // cache the recording state
+            if (event !is VideoRecordEvent.Status)
+//                recordingState = event
+
+            if (event is VideoRecordEvent.Finalize) {
+                // display the captured video
+                Toast.makeText(context, "Finish", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        return videoCapture.output
+            .prepareRecording(context, mediaStoreOutput)
+            .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
+            .start(mainThreadExecutor, captureListener)
     }
 }

@@ -27,11 +27,12 @@ import androidx.core.util.Consumer
 import androidx.lifecycle.LifecycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
+import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils.getAspectRatio
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PreviewVideoWindow(val context: Context, val cameraCapabilities: MutableList<CameraCapability>, val lifecycleOwner: LifecycleOwner) {
+class PreviewVideoWindow(val context: Context) {
 
     private var view: View?= null
     private var windowManager: WindowManager?= null
@@ -44,10 +45,13 @@ class PreviewVideoWindow(val context: Context, val cameraCapabilities: MutableLi
     private var audioEnabled = false
     private lateinit var recordingState:VideoRecordEvent
     private val customLifeCycleOwner= CustomLifeCycleOwner()
+    private val cameraCapabilities: MutableList<CameraCapability> by lazy {
+        VideoRecordUtils.getCameraCapabilities(context, customLifeCycleOwner)
+    }
 
     init {
         val layoutFlag =if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-             WindowManager.LayoutParams.TYPE_APPLICATION_PANEL;
+             WindowManager.LayoutParams.TYPE_APPLICATION_PANEL
         } else {
             WindowManager.LayoutParams.TYPE_PHONE;
         }
@@ -56,9 +60,10 @@ class PreviewVideoWindow(val context: Context, val cameraCapabilities: MutableLi
             layoutFlag,
             WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT)
-
-        params!!.gravity= Gravity.BOTTOM
-        windowManager= context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        params!!.gravity= Gravity.BOTTOM or Gravity.START
+        params!!.x= 0
+        params!!.y= 0
+        windowManager= context.getSystemService(WINDOW_SERVICE) as WindowManager
         val layoutInflater= context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         view= layoutInflater.inflate(R.layout.layout_preview_video, null)
         val start =  view?.findViewById<TextView>(R.id.start)
@@ -99,8 +104,7 @@ class PreviewVideoWindow(val context: Context, val cameraCapabilities: MutableLi
             cameraProvider.bindToLifecycle(
                 customLifeCycleOwner,
                 cameraSelector,
-                videoCapture,
-                preview
+                videoCapture
             )
         } catch (exc: Exception) {
             // we are on main thread, let's reset the controls on the UI.
@@ -132,7 +136,6 @@ class PreviewVideoWindow(val context: Context, val cameraCapabilities: MutableLi
             .prepareRecording(context, mediaStoreOutput)
             .apply { if (audioEnabled) withAudioEnabled() }
             .start(mainThreadExecutor, captureListener)
-
     }
 
     private val captureListener = Consumer<VideoRecordEvent> { event ->
@@ -166,6 +169,7 @@ class PreviewVideoWindow(val context: Context, val cameraCapabilities: MutableLi
                 if (view?.parent == null) {
                     windowManager?.addView(view, params!!)
                     bindCaptureUserCase()
+                    startRecording()
                 }
             }
         } catch (e: Exception) {
