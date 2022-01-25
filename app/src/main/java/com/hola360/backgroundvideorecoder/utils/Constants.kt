@@ -17,6 +17,8 @@ object Constants {
 
     val RECORD_AUDIO_PERMISSION = Manifest.permission.RECORD_AUDIO
 
+    const val FOLDER_NAME = "BackgroundRecorder"
+
 
     val TIME_ZONE_OFFSET= TimeZone.getDefault().getOffset(Date().time)
     const val  DELETE_DIALOG= "DeleteDialog"

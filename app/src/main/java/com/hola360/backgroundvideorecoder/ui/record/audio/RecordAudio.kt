@@ -2,6 +2,7 @@ package com.hola360.backgroundvideorecoder.ui.record.audio
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
