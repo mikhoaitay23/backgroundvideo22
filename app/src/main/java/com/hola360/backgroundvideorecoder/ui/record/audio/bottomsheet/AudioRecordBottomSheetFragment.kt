@@ -1,31 +1,26 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.bottomsheet
 
-import android.content.ContentValues
-import android.content.Context
-import android.media.MediaRecorder
+import android.media.AudioFormat
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.video.MediaStoreOutputOptions
 import androidx.lifecycle.ViewModelProvider
+import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
-import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
-import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.databinding.FragmentBottomSheetRecordAudioBinding
 import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDialog
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
 import com.hola360.backgroundvideorecoder.utils.Constants
-import com.hola360.backgroundvideorecoder.utils.PathUtils
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
-import com.hola360.backgroundvideorecoder.utils.Utils
-import com.hola360.backgroundvideorecoder.utils.Utils.isAndroidQ
-import java.io.File
-import java.lang.RuntimeException
-import java.text.SimpleDateFormat
+import com.zlw.main.recorderlib.BuildConfig
+import com.zlw.main.recorderlib.RecordManager
+import com.zlw.main.recorderlib.recorder.RecordConfig
+import com.zlw.main.recorderlib.recorder.RecordHelper.RecordState
+import com.zlw.main.recorderlib.recorder.listener.RecordStateListener
 import java.util.*
 
 class AudioRecordBottomSheetFragment :
@@ -34,12 +29,13 @@ class AudioRecordBottomSheetFragment :
     private lateinit var viewModel: AudioRecordBottomSheetViewModel
     private var audioRecordUtils: AudioRecordUtils? = null
     private var audioModel: AudioModel? = null
-    private var recorder: MediaRecorder? = null
     private var isPaused = false
     private var isRecording = false
     private var updateTime: Long = 0
     private var durationMills: Long = 0
-    private var recordFile: File? = null
+
+    private var recordManager = RecordManager.getInstance()
+    private lateinit var mainActivity: MainActivity
 
     override fun getLayout() = R.layout.fragment_bottom_sheet_record_audio
 
@@ -49,6 +45,7 @@ class AudioRecordBottomSheetFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mainActivity = activity as MainActivity
         val factory = AudioRecordBottomSheetViewModel.Factory(requireActivity().application)
         viewModel =
             ViewModelProvider(this, factory)[AudioRecordBottomSheetViewModel::class.java]
@@ -56,26 +53,32 @@ class AudioRecordBottomSheetFragment :
         audioModel = AudioModel()
 
         initClick()
+        initRecord()
 
-//        audioRecordUtils!!.onStartRecording(audioModel!!)
         if (SystemUtils.hasPermissions(
                 requireContext(),
                 *Constants.STORAGE_PERMISSION_UNDER_STORAGE_SCOPE
             )
         ) {
-            onStartRecording(requireContext(), audioModel!!)
+            onStartRecording(audioModel!!)
         } else {
             resultLauncher.launch(Constants.STORAGE_PERMISSION_UNDER_STORAGE_SCOPE)
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        initRecordEvent()
+    }
+
+    override fun onStop() {
+        super.onStop()
+    }
+
     override fun onClick(view: View?) {
         when (view) {
             binding!!.btnPause -> {
-                when {
-                    audioRecordUtils!!.isPaused() -> audioRecordUtils!!.onResumeRecording()
-                    audioRecordUtils!!.isRecording() -> audioRecordUtils!!.onPauseRecording()
-                }
+                onStartRecording(audioModel!!)
             }
             binding!!.btnAbort -> {
 
@@ -92,100 +95,85 @@ class AudioRecordBottomSheetFragment :
         binding!!.btnSave.setOnClickListener(this)
     }
 
-    private fun onStartRecording(context: Context, audioModel: AudioModel) {
-        recorder = MediaRecorder()
-        val simpleDateFormat = SimpleDateFormat("yyyy.MM.DD.hh.mm.ss")
-        val date = simpleDateFormat.format(Date())
-        val pdfCollection = if (isAndroidQ()) {
-            MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+    private fun initRecord() {
+        recordManager!!.init(mainActivity.application, BuildConfig.DEBUG)
+        val recordDir = String.format(
+            Locale.getDefault(), "%s/Record/backgroundrecord/",
+            Environment.getExternalStorageDirectory().absolutePath
+        )
+        recordManager.changeRecordDir(recordDir)
+        initRecordEvent()
+    }
+
+    private fun initRecordEvent() {
+        recordManager.setRecordStateListener(object : RecordStateListener {
+            override fun onStateChange(state: RecordState) {
+//                when (state) {
+//                    RecordState.PAUSE -> tvState.setText("")
+//                    RecordState.IDLE -> tvState.setText("")
+//                    RecordState.RECORDING -> tvState.setText("")
+//                    RecordState.STOP -> tvState.setText("")
+//                    RecordState.FINISH -> {
+//                        tvState.setText("")
+//                        tvSoundSize.setText("---")
+//                    }
+//                    else -> {
+//                    }
+//                }
+            }
+
+            override fun onError(error: String) {
+                Log.d("TAG", "onError: $error")
+            }
+        })
+        recordManager.setRecordSoundSizeListener { soundSize ->
+
+        }
+
+        recordManager.setRecordResultListener {
+            Toast.makeText(
+                requireContext(),
+                "Save Successful： " + it.absolutePath,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+//        recordManager.setRecordFftDataListener { data -> audioView.setWaveData(data) }
+    }
+
+
+    private fun onStartRecording(audioModel: AudioModel) {
+        recordManager.changeFormat(RecordConfig.RecordFormat.MP3)
+        recordManager.changeRecordConfig(
+            recordManager.recordConfig.setSampleRate(
+                8000
+            )
+        )
+        recordManager.changeRecordConfig(
+            recordManager.recordConfig.setEncodingConfig(
+                AudioFormat.ENCODING_PCM_16BIT
+            )
+        )
+        if (isRecording) {
+            recordManager.pause()
+            isPaused = true
+            isRecording = false
         } else {
-            MediaStore.Files.getContentUri("external")
-        }
-        val fileName = "/bg_audio_$date"
-        val parentFolder = (Environment.DIRECTORY_DOCUMENTS).plus(File.separator)
-            .plus(Constants.FOLDER_NAME)
-        val now = Date()
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Files.FileColumns.DISPLAY_NAME, fileName)
-            put(MediaStore.Files.FileColumns.TITLE, fileName)
-            put(MediaStore.Files.FileColumns.MIME_TYPE, "audio/mpeg")
-            put(MediaStore.Files.FileColumns.DATE_ADDED, now.time / 1000)
-            put(MediaStore.Files.FileColumns.DATE_MODIFIED, now.time / 1000)
-            if (isAndroidQ()) {
-                put(
-                    MediaStore.Files.FileColumns.RELATIVE_PATH,
-                    parentFolder
-                )
+            if (isPaused) {
+                recordManager.resume()
             } else {
-                val finalPdfFile = File(
-                    Utils.getDocumentationFolder(),
-                    "/bg_audio_$date"
-                )
-                put(MediaStore.Files.FileColumns.DATA, finalPdfFile.absolutePath.toString())
+                recordManager.start()
             }
-
+            isPaused = false
+            isRecording = true
         }
-        try {
-            val uri = requireContext().contentResolver.insert(pdfCollection, contentValues)
-            if (uri != null) {
-                Log.d("TAG", "onStartRecording: ${PathUtils.getPath(requireContext(), uri)}")
-                recorder!!.apply {
-                    setAudioSource(MediaRecorder.AudioSource.MIC)
-                    setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-                    setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-                    setAudioChannels(AudioMode.obtainMode(audioModel.mode))
-                    setAudioSamplingRate(AudioQuality.obtainQuality(audioModel.quality).toInt())
-                    setMaxDuration(audioModel.duration) //Duration unlimited use RECORD_MAX_DURATION or -1
-                    setOutputFile(PathUtils.getPath(requireContext(), uri))
-                }
-                try {
-                    recorder!!.prepare()
-                    recorder!!.start()
-                    updateTime = System.currentTimeMillis()
-                    isRecording = true
-//                scheduleRecordingTimeUpdate()
-                    isPaused = false
-                } catch (e: Exception) {
-
-                }
-            } else {
-                Log.d("TAG", "onStartRecording: ")
-            }
-        } catch (e: Exception) {
-            Log.d("TAG", "onStartRecording: ${e.message}")
-        }
-
     }
 
     private fun onStopRecording() {
         if (isRecording) {
-            stopRecordingTimer()
-            try {
-                recorder!!.stop()
-            } catch (e: RuntimeException) {
-
-            }
-            recorder!!.release()
-            durationMills = 0
-            recordFile = null
+            recordManager.stop()
             isRecording = false
             isPaused = false
-            recorder = null
-        } else {
-
         }
-    }
-
-    fun isRecording() = isRecording
-
-    fun isPaused() = isPaused
-
-    private fun stopRecordingTimer() {
-        updateTime = 0
-    }
-
-    private fun pauseRecordingTimer() {
-        updateTime = 0
     }
 
     private fun scheduleRecordingTimeUpdate() {
@@ -199,7 +187,7 @@ class AudioRecordBottomSheetFragment :
                     *Constants.STORAGE_PERMISSION_UNDER_STORAGE_SCOPE
                 )
             ) {
-                onStartRecording(requireContext(), audioModel!!)
+                onStartRecording(audioModel!!)
             } else {
                 SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
             }

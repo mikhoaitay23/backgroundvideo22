@@ -38,15 +38,10 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>() {
         audioRecordBottomSheetFragment = AudioRecordBottomSheetFragment()
         imgRecord.setOnClickListener {
             if (SystemUtils.hasPermissions(requireContext(), Constants.RECORD_AUDIO_PERMISSION)) {
-//                when {
                 audioRecordBottomSheetFragment!!.show(
                     requireActivity().supportFragmentManager,
                     "bottomSheetAudioRecord"
                 )
-//                    isPaused -> audioRecordUtils?.onResumeRecording()
-//                    isRecording -> audioRecordUtils?.onPauseRecording()
-//                    else -> audioRecordUtils?.onStartRecording(audioModel!!)
-//                }
             } else {
                 resultLauncher.launch(Constants.RECORD_AUDIO_PERMISSION)
             }

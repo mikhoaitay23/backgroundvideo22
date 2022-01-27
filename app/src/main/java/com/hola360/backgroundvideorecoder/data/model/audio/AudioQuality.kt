@@ -11,10 +11,10 @@ enum class AudioQuality {
                     8000f
                 }
                 MEDIUM -> {
-                    44100f
+                    16000f
                 }
                 HIGH -> {
-                    48000f
+                    44100f
                 }
             }
         }
