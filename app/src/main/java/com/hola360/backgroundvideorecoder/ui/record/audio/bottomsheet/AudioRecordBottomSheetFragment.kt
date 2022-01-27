@@ -1,8 +1,9 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.bottomsheet
 
-import android.media.AudioFormat
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -18,7 +19,6 @@ import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.zlw.main.recorderlib.BuildConfig
 import com.zlw.main.recorderlib.RecordManager
-import com.zlw.main.recorderlib.recorder.RecordConfig
 import com.zlw.main.recorderlib.recorder.RecordHelper.RecordState
 import com.zlw.main.recorderlib.recorder.listener.RecordStateListener
 import java.util.*
@@ -29,13 +29,12 @@ class AudioRecordBottomSheetFragment :
     private lateinit var viewModel: AudioRecordBottomSheetViewModel
     private var audioRecordUtils: AudioRecordUtils? = null
     private var audioModel: AudioModel? = null
-    private var isPaused = false
-    private var isRecording = false
     private var updateTime: Long = 0
     private var durationMills: Long = 0
 
     private var recordManager = RecordManager.getInstance()
     private lateinit var mainActivity: MainActivity
+    private var handler = Handler(Looper.getMainLooper())
 
     override fun getLayout() = R.layout.fragment_bottom_sheet_record_audio
 
@@ -60,7 +59,7 @@ class AudioRecordBottomSheetFragment :
                 *Constants.STORAGE_PERMISSION_UNDER_STORAGE_SCOPE
             )
         ) {
-            onStartRecording(audioModel!!)
+            audioRecordUtils?.onStartRecording(audioModel!!)
         } else {
             resultLauncher.launch(Constants.STORAGE_PERMISSION_UNDER_STORAGE_SCOPE)
         }
@@ -78,13 +77,13 @@ class AudioRecordBottomSheetFragment :
     override fun onClick(view: View?) {
         when (view) {
             binding!!.btnPause -> {
-                onStartRecording(audioModel!!)
+                audioRecordUtils?.onStartRecording(audioModel!!)
             }
             binding!!.btnAbort -> {
 
             }
             binding!!.btnSave -> {
-                onStopRecording()
+                audioRecordUtils?.onStopRecording()
             }
         }
     }
@@ -108,18 +107,16 @@ class AudioRecordBottomSheetFragment :
     private fun initRecordEvent() {
         recordManager.setRecordStateListener(object : RecordStateListener {
             override fun onStateChange(state: RecordState) {
-//                when (state) {
-//                    RecordState.PAUSE -> tvState.setText("")
-//                    RecordState.IDLE -> tvState.setText("")
-//                    RecordState.RECORDING -> tvState.setText("")
-//                    RecordState.STOP -> tvState.setText("")
-//                    RecordState.FINISH -> {
-//                        tvState.setText("")
-//                        tvSoundSize.setText("---")
-//                    }
-//                    else -> {
-//                    }
-//                }
+                when (state) {
+                    RecordState.PAUSE -> {
+                        binding!!.btnRecord.setImageResource(R.drawable.ic_record_normal)
+                        binding!!.tvRecord.text = getString(R.string.resume)
+                    }
+                    RecordState.RECORDING -> {
+                        binding!!.btnRecord.setImageResource(R.drawable.ic_record_pause)
+                        binding!!.tvRecord.text = getString(R.string.pause)
+                    }
+                }
             }
 
             override fun onError(error: String) {
@@ -137,47 +134,22 @@ class AudioRecordBottomSheetFragment :
                 Toast.LENGTH_SHORT
             ).show()
         }
-//        recordManager.setRecordFftDataListener { data -> audioView.setWaveData(data) }
-    }
-
-
-    private fun onStartRecording(audioModel: AudioModel) {
-        recordManager.changeFormat(RecordConfig.RecordFormat.MP3)
-        recordManager.changeRecordConfig(
-            recordManager.recordConfig.setSampleRate(
-                8000
-            )
-        )
-        recordManager.changeRecordConfig(
-            recordManager.recordConfig.setEncodingConfig(
-                AudioFormat.ENCODING_PCM_16BIT
-            )
-        )
-        if (isRecording) {
-            recordManager.pause()
-            isPaused = true
-            isRecording = false
-        } else {
-            if (isPaused) {
-                recordManager.resume()
-            } else {
-                recordManager.start()
-            }
-            isPaused = false
-            isRecording = true
-        }
-    }
-
-    private fun onStopRecording() {
-        if (isRecording) {
-            recordManager.stop()
-            isRecording = false
-            isPaused = false
-        }
+        recordManager.setRecordFftDataListener { data -> binding!!.audioVisualizer.setWaveData(data) }
     }
 
     private fun scheduleRecordingTimeUpdate() {
-
+        handler.postDelayed({
+            if (recordManager != null) {
+                try {
+                    val curTime = System.currentTimeMillis()
+                    durationMills += curTime - updateTime
+                    updateTime = curTime
+                } catch (e: IllegalStateException) {
+                    Toast.makeText(requireContext(), "${e.message}", Toast.LENGTH_SHORT).show()
+                }
+                scheduleRecordingTimeUpdate()
+            }
+        }, 1000)
     }
 
     private var resultLauncher =
@@ -187,7 +159,7 @@ class AudioRecordBottomSheetFragment :
                     *Constants.STORAGE_PERMISSION_UNDER_STORAGE_SCOPE
                 )
             ) {
-                onStartRecording(audioModel!!)
+                audioRecordUtils?.onStartRecording(audioModel!!)
             } else {
                 SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
             }

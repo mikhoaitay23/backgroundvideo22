@@ -14,11 +14,15 @@ import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
+import android.app.Activity
+import android.content.Context
+
 
 class RecordService : Service() {
 
-    private val customLifeCycleOwner= CustomLifeCycleOwner()
-    private var videoRecording: Recording?= null
+    private val customLifeCycleOwner = CustomLifeCycleOwner()
+    private var videoRecording: Recording? = null
+    private lateinit var listener: Listener
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -30,8 +34,8 @@ class RecordService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-            recordVideo(intent)
-            sendNotification()
+        recordVideo(intent)
+        sendNotification()
         return START_NOT_STICKY
     }
 
@@ -63,14 +67,14 @@ class RecordService : Service() {
         }
     }
 
-    private fun sendNotification(){
-        val pendingIntent= NavDeepLinkBuilder(this)
+    private fun sendNotification() {
+        val pendingIntent = NavDeepLinkBuilder(this)
             .setComponentName(MainActivity::class.java)
             .setGraph(R.navigation.nav_main_graph)
             .setDestination(R.id.nav_video_record)
             .createPendingIntent()
 
-        val notification= NotificationCompat.Builder(this, App.CHANNEL_SERVICE_ID)
+        val notification = NotificationCompat.Builder(this, App.CHANNEL_SERVICE_ID)
             .setContentTitle("Record")
             .setContentText("test")
             .setContentIntent(pendingIntent)
@@ -80,8 +84,16 @@ class RecordService : Service() {
         startForeground(1, notification)
     }
 
+    fun registerListener(activity: Activity) {
+        this.listener = activity as Listener
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         customLifeCycleOwner.doOnDestroy()
+    }
+
+    interface Listener{
+        fun updateData()
     }
 }

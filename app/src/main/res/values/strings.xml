@@ -31,6 +31,7 @@
     <string name="save">Save</string>
     <string name="stop">Stop</string>
     <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
 
     <string name="setting_title">Settings</string>
 
