@@ -29,6 +29,12 @@
             android:textAppearance="?textAppearanceSubtitle1"
             android:textColor="@color/signature_color" />
 
+        <com.hola360.backgroundvideorecoder.widget.AudioView
+            android:id="@+id/audioVisualizer"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_120"
+            android:layout_marginTop="@dimen/dp_6" />
+
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,11 +71,13 @@
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/btnRecord"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:srcCompat="@drawable/ic_record_pause" />
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvRecord"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/pause"
