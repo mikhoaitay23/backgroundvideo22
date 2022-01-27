@@ -113,37 +113,17 @@ object VideoRecordUtils {
         return null
     }
 
-    @SuppressLint("MissingPermission")
-    fun startRecordVideo(context: Context, videoCapture: VideoCapture<Recorder>,
-                         videoRecordConfiguration: VideoRecordConfiguration): Recording {
+    fun generateMediaStoreOutput(context: Context):MediaStoreOutputOptions{
         val name = "CameraX-recording-" +
                 SimpleDateFormat(PreviewVideoWindow.FILENAME_FORMAT, Locale.US)
                     .format(System.currentTimeMillis()) + ".mp4"
         val contentValues = ContentValues().apply {
             put(MediaStore.Video.Media.DISPLAY_NAME, name)
         }
-        val mediaStoreOutput = MediaStoreOutputOptions.Builder(
+        return MediaStoreOutputOptions.Builder(
             context.contentResolver,
             MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
             .setContentValues(contentValues)
             .build()
-
-        val mainThreadExecutor= ContextCompat.getMainExecutor(context)
-
-        val captureListener = Consumer<VideoRecordEvent> { event ->
-            // cache the recording state
-            if (event !is VideoRecordEvent.Status)
-//                recordingState = event
-
-            if (event is VideoRecordEvent.Finalize) {
-                // display the captured video
-                Toast.makeText(context, "Finish", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        return videoCapture.output
-            .prepareRecording(context, mediaStoreOutput)
-            .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
-            .start(mainThreadExecutor, captureListener)
     }
 }

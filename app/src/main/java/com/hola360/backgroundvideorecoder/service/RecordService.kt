@@ -17,8 +17,7 @@ import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
 class RecordService : Service() {
 
-    private val customLifeCycleOwner= CustomLifeCycleOwner()
-    private var videoRecording: Recording?= null
+
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -26,41 +25,11 @@ class RecordService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        customLifeCycleOwner.doOnResume()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-            recordVideo(intent)
             sendNotification()
         return START_NOT_STICKY
-    }
-
-    private fun recordVideo(intent: Intent?) {
-        val status = intent?.getIntExtra("Record_video", 0)
-        if (status != null) {
-            if (status == RecordVideo.START) {
-                val videoRecordConfiguration = VideoRecordConfiguration()
-                val videoCapture = VideoRecordUtils.bindRecordUserCase(
-                    this,
-                    customLifeCycleOwner,
-                    videoRecordConfiguration
-                )
-                videoRecording = videoCapture?.let {
-                    VideoRecordUtils.startRecordVideo(
-                        this,
-                        it, videoRecordConfiguration
-                    )
-                }
-
-            } else {
-                val recording = videoRecording
-                recording?.let {
-                    it.stop()
-                    videoRecording = null
-                }
-                stopSelf()
-            }
-        }
     }
 
     private fun sendNotification(){
@@ -82,6 +51,5 @@ class RecordService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        customLifeCycleOwner.doOnDestroy()
     }
 }
