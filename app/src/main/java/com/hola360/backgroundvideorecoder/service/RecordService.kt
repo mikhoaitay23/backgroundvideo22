@@ -16,12 +16,13 @@ import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfi
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import android.app.Activity
 import android.content.Context
+import android.os.Binder
 
 
 class RecordService : Service() {
 
     private lateinit var listener: Listener
-    private val previewVideoWindow:PreviewVideoWindow by lazy {
+    private val previewVideoWindow: PreviewVideoWindow by lazy {
         PreviewVideoWindow(this)
     }
 
@@ -39,22 +40,23 @@ class RecordService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun recordVideo(intent: Intent?){
+    private fun recordVideo(intent: Intent?) {
         intent?.let {
-            val configuration= it.getParcelableExtra<VideoRecordConfiguration>("Video_configuration")
-            when(it.getIntExtra("Video_status", 0)){
-                RecordVideo.START->{
+            val configuration =
+                it.getParcelableExtra<VideoRecordConfiguration>("Video_configuration")
+            when (it.getIntExtra("Video_status", 0)) {
+                RecordVideo.START -> {
                     if (configuration != null) {
                         previewVideoWindow.setupVideoConfiguration(configuration)
                         previewVideoWindow.open()
                         previewVideoWindow.startRecording()
                     }
                 }
-                RecordVideo.CLEAR->{
+                RecordVideo.CLEAR -> {
                     previewVideoWindow.close()
                     stopSelf()
                 }
-                RecordVideo.PAUSE->{
+                RecordVideo.PAUSE -> {
                     previewVideoWindow.pauseAndResume()
                 }
             }
@@ -78,6 +80,11 @@ class RecordService : Service() {
         startForeground(1, notification)
     }
 
+    inner class LocalBinder : Binder() {
+        val serviceInstance: RecordService
+            get() = this@RecordService
+    }
+
     fun registerListener(activity: Activity) {
         this.listener = activity as Listener
     }
@@ -86,7 +93,7 @@ class RecordService : Service() {
         super.onDestroy()
     }
 
-    interface Listener{
+    interface Listener {
         fun updateData()
     }
 }

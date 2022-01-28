@@ -32,6 +32,9 @@
     <string name="stop">Stop</string>
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
+    <string name="mode">Mode</string>
+    <string name="record_duration">Record duration</string>
+    <string name="mute_ring_msg">Mute ring when recording</string>
 
     <string name="setting_title">Settings</string>
 

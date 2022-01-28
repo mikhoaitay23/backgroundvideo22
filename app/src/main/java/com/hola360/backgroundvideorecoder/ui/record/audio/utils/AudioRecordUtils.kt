@@ -1,38 +1,24 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.utils
 
-import android.content.ContentValues
-import android.content.Context
 import android.media.AudioFormat
-import android.media.MediaRecorder
-import android.os.Build
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.provider.MediaStore
 import android.util.Log
-import android.widget.Toast
-import androidx.camera.video.MediaStoreOutputOptions
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.zlw.main.recorderlib.RecordManager
 import com.zlw.main.recorderlib.recorder.RecordConfig
-import java.io.File
-import java.io.IOException
-import java.lang.IllegalStateException
-import java.lang.RuntimeException
-import java.text.SimpleDateFormat
-import java.util.*
 
 class AudioRecordUtils {
 
     private var isRecording: Boolean = false
     private var isPaused: Boolean = false
     private var updateTime: Long = 0
-    private var durationMills: Long = 0
+    var durationMills: Long = 0
     private var recordManager = RecordManager.getInstance()
     private var handler = Handler(Looper.getMainLooper())
+    private lateinit var listener: Listener
 
     fun onStartRecording(audioModel: AudioModel) {
         recordManager.changeFormat(RecordConfig.RecordFormat.MP3)
@@ -71,7 +57,7 @@ class AudioRecordUtils {
     }
 
     fun onStopRecording() {
-        if (isRecording) {
+        if (isRecording || isPaused) {
             stopRecordingTimer()
             recordManager.stop()
             isRecording = false
@@ -79,12 +65,13 @@ class AudioRecordUtils {
         }
     }
 
-    fun scheduleRecordingTimeUpdate() {
+    private fun scheduleRecordingTimeUpdate() {
         handler.postDelayed({
             if (recordManager != null) {
                 try {
                     val curTime = System.currentTimeMillis()
                     durationMills += curTime - updateTime
+                    listener.updateTimer(durationMills)
                     updateTime = curTime
                 } catch (e: IllegalStateException) {
 
@@ -106,6 +93,14 @@ class AudioRecordUtils {
     private fun pauseRecordingTimer() {
         handler.removeCallbacksAndMessages(null)
         updateTime = 0
+    }
+
+    fun registerListener(listener: Listener){
+        this.listener = listener
+    }
+
+    interface Listener {
+        fun updateTimer(time: Long)
     }
 
 }

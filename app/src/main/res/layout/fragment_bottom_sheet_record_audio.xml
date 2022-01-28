@@ -17,11 +17,12 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Audio record 1"
+            android:text="Audio record"
             android:textAppearance="?textAppearanceHeadline6"
             android:textColor="@color/signature_color" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_6"

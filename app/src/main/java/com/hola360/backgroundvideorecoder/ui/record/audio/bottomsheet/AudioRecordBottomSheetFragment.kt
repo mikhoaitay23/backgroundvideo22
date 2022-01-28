@@ -2,8 +2,6 @@ package com.hola360.backgroundvideorecoder.ui.record.audio.bottomsheet
 
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -17,6 +15,7 @@ import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDial
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
+import com.hola360.backgroundvideorecoder.utils.Utils
 import com.zlw.main.recorderlib.BuildConfig
 import com.zlw.main.recorderlib.RecordManager
 import com.zlw.main.recorderlib.recorder.RecordHelper.RecordState
@@ -24,17 +23,13 @@ import com.zlw.main.recorderlib.recorder.listener.RecordStateListener
 import java.util.*
 
 class AudioRecordBottomSheetFragment :
-    BaseBottomSheetDialog<FragmentBottomSheetRecordAudioBinding>(), View.OnClickListener {
+    BaseBottomSheetDialog<FragmentBottomSheetRecordAudioBinding>(), View.OnClickListener, AudioRecordUtils.Listener {
 
     private lateinit var viewModel: AudioRecordBottomSheetViewModel
     private var audioRecordUtils: AudioRecordUtils? = null
     private var audioModel: AudioModel? = null
-    private var updateTime: Long = 0
-    private var durationMills: Long = 0
-
     private var recordManager = RecordManager.getInstance()
     private lateinit var mainActivity: MainActivity
-    private var handler = Handler(Looper.getMainLooper())
 
     override fun getLayout() = R.layout.fragment_bottom_sheet_record_audio
 
@@ -49,6 +44,7 @@ class AudioRecordBottomSheetFragment :
         viewModel =
             ViewModelProvider(this, factory)[AudioRecordBottomSheetViewModel::class.java]
         audioRecordUtils = AudioRecordUtils()
+        audioRecordUtils?.registerListener(this)
         audioModel = AudioModel()
 
         initClick()
@@ -63,6 +59,7 @@ class AudioRecordBottomSheetFragment :
         } else {
             resultLauncher.launch(Constants.STORAGE_PERMISSION_UNDER_STORAGE_SCOPE)
         }
+
     }
 
     override fun onResume() {
@@ -84,6 +81,7 @@ class AudioRecordBottomSheetFragment :
             }
             binding!!.btnSave -> {
                 audioRecordUtils?.onStopRecording()
+                dismissAllowingStateLoss()
             }
         }
     }
@@ -123,7 +121,7 @@ class AudioRecordBottomSheetFragment :
                 Log.d("TAG", "onError: $error")
             }
         })
-        recordManager.setRecordSoundSizeListener { soundSize ->
+        recordManager.setRecordSoundSizeListener {
 
         }
 
@@ -135,21 +133,6 @@ class AudioRecordBottomSheetFragment :
             ).show()
         }
         recordManager.setRecordFftDataListener { data -> binding!!.audioVisualizer.setWaveData(data) }
-    }
-
-    private fun scheduleRecordingTimeUpdate() {
-        handler.postDelayed({
-            if (recordManager != null) {
-                try {
-                    val curTime = System.currentTimeMillis()
-                    durationMills += curTime - updateTime
-                    updateTime = curTime
-                } catch (e: IllegalStateException) {
-                    Toast.makeText(requireContext(), "${e.message}", Toast.LENGTH_SHORT).show()
-                }
-                scheduleRecordingTimeUpdate()
-            }
-        }, 1000)
     }
 
     private var resultLauncher =
@@ -164,5 +147,10 @@ class AudioRecordBottomSheetFragment :
                 SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
             }
         }
+
+    override fun updateTimer(time: Long) {
+        binding!!.tvTime.text = Utils.formatTimeIntervalHourMinSec(time)
+    }
+
 
 }
