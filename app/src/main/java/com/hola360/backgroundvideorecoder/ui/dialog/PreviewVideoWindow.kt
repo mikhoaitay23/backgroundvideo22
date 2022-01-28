@@ -62,7 +62,7 @@ class PreviewVideoWindow(val context: Context) {
 //           startRecording()
 //           start.isEnabled= false
 //        }
-        customLifeCycleOwner.doOnResume()
+
     }
 
     fun setupVideoConfiguration(videoRecordConfiguration: VideoRecordConfiguration){
@@ -91,6 +91,7 @@ class PreviewVideoWindow(val context: Context) {
             1
         }
         qualityIndex= videoRecordConfiguration.cameraQuality
+        customLifeCycleOwner.doOnResume()
     }
 
     private fun bindCaptureUserCase() {
@@ -127,12 +128,12 @@ class PreviewVideoWindow(val context: Context) {
 
     @SuppressLint("MissingPermission")
     fun startRecording() {
-        val mediaStoreOutput = VideoRecordUtils.generateMediaStoreOutput(context)
         // configure Recorder and Start recording to the mediaStoreOutput.
         if(currentRecording!= null){
             currentRecording!!.stop()
             currentRecording = null
         }
+        val mediaStoreOutput = VideoRecordUtils.generateMediaStoreOutput(context)
         currentRecording = videoCapture.output
             .prepareRecording(context, mediaStoreOutput)
             .apply { if (videoRecordConfiguration!!.sound) withAudioEnabled() }
@@ -169,6 +170,7 @@ class PreviewVideoWindow(val context: Context) {
             }
             is VideoRecordEvent.Finalize->{
                 if(event.recordingStats.recordedDurationNanos==0L){
+                    Log.d("abcVideo", "Final status: ${event.recordingStats.recordedDurationNanos/1000000}")
                     totalTimeRecord+= videoRecordConfiguration!!.timePerVideo
                     Toast.makeText(context, "Finish", Toast.LENGTH_SHORT).show()
                 }
@@ -187,6 +189,7 @@ class PreviewVideoWindow(val context: Context) {
         if (recording != null) {
             recording.stop()
             currentRecording = null
+            recordingState= null
         }
     }
 
@@ -208,7 +211,7 @@ class PreviewVideoWindow(val context: Context) {
     fun close(){
         try {
             // remove the view from the window
-                    customLifeCycleOwner.doOnDestroy()
+            customLifeCycleOwner.doOnDestroy()
             (context.getSystemService(WINDOW_SERVICE) as WindowManager).removeView(view!!)
             // invalidate the view
             view?.invalidate()

@@ -17,24 +17,22 @@ import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfi
 class RecordVideo : BaseRecordPageFragment<LayoutRecordVideoBinding>() {
 
     override val layoutId: Int = R.layout.layout_record_video
-    private val previewVideoWindow: PreviewVideoWindow by lazy {
-        PreviewVideoWindow(requireContext())
-    }
+    private var startRecord=false
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun initView() {
         binding!!.start.setOnClickListener {
-            if(previewVideoWindow.recordingState==null){
-                previewVideoWindow.setupVideoConfiguration(fakeVideoConfiguration())
-                previewVideoWindow.open()
-                previewVideoWindow.startRecording()
+            if(!startRecord){
+                runRecordService(START)
+                startRecord=true
             }else{
-                previewVideoWindow.pauseAndResume()
+                runRecordService(PAUSE)
             }
             binding!!.isRecording= !binding!!.isRecording
         }
         binding!!.cancel.setOnClickListener {
-            previewVideoWindow.close()
+            runRecordService(CLEAR)
+            startRecord= false
         }
         binding!!.overlay.setOnClickListener {
             if (!Settings.canDrawOverlays(requireContext())) {
@@ -48,13 +46,9 @@ class RecordVideo : BaseRecordPageFragment<LayoutRecordVideoBinding>() {
 
     fun runRecordService(status: Int) {
         val intent = Intent(requireContext(), RecordService::class.java)
-        intent.putExtra("Record_video", status)
+        intent.putExtra("Video_status", status)
+        intent.putExtra("Video_configuration", fakeVideoConfiguration())
         requireContext().startService(intent)
-    }
-
-    fun stopService() {
-//        val intent = Intent(requireContext(), RecordService::class.java)
-//        requireContext().stopService(intent)
     }
 
     override fun initViewModel() {
@@ -71,7 +65,7 @@ class RecordVideo : BaseRecordPageFragment<LayoutRecordVideoBinding>() {
 
     companion object{
         const val START= 0
-        const val STOP=1
+        const val PAUSE=1
         const val RESUME=2
         const val CLEAR=3
     }

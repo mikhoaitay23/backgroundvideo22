@@ -20,13 +20,10 @@ import android.content.Context
 
 class RecordService : Service() {
 
-<<<<<<< HEAD
-
-=======
-    private val customLifeCycleOwner = CustomLifeCycleOwner()
-    private var videoRecording: Recording? = null
     private lateinit var listener: Listener
->>>>>>> fd3785dace77ab613ae0b5222b844822f2a99626
+    private val previewVideoWindow:PreviewVideoWindow by lazy {
+        PreviewVideoWindow(this)
+    }
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -37,50 +34,35 @@ class RecordService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-<<<<<<< HEAD
-            sendNotification()
-        return START_NOT_STICKY
-    }
-
-    private fun sendNotification(){
-        val pendingIntent= NavDeepLinkBuilder(this)
-=======
         recordVideo(intent)
         sendNotification()
         return START_NOT_STICKY
     }
 
-    private fun recordVideo(intent: Intent?) {
-        val status = intent?.getIntExtra("Record_video", 0)
-        if (status != null) {
-            if (status == RecordVideo.START) {
-                val videoRecordConfiguration = VideoRecordConfiguration()
-                val videoCapture = VideoRecordUtils.bindRecordUserCase(
-                    this,
-                    customLifeCycleOwner,
-                    videoRecordConfiguration
-                )
-                videoRecording = videoCapture?.let {
-                    VideoRecordUtils.startRecordVideo(
-                        this,
-                        it, videoRecordConfiguration
-                    )
+    private fun recordVideo(intent: Intent?){
+        intent?.let {
+            val configuration= it.getParcelableExtra<VideoRecordConfiguration>("Video_configuration")
+            when(it.getIntExtra("Video_status", 0)){
+                RecordVideo.START->{
+                    if (configuration != null) {
+                        previewVideoWindow.setupVideoConfiguration(configuration)
+                        previewVideoWindow.open()
+                        previewVideoWindow.startRecording()
+                    }
                 }
-
-            } else {
-                val recording = videoRecording
-                recording?.let {
-                    it.stop()
-                    videoRecording = null
+                RecordVideo.CLEAR->{
+                    previewVideoWindow.close()
+                    stopSelf()
                 }
-                stopSelf()
+                RecordVideo.PAUSE->{
+                    previewVideoWindow.pauseAndResume()
+                }
             }
         }
     }
 
     private fun sendNotification() {
         val pendingIntent = NavDeepLinkBuilder(this)
->>>>>>> fd3785dace77ab613ae0b5222b844822f2a99626
             .setComponentName(MainActivity::class.java)
             .setGraph(R.navigation.nav_main_graph)
             .setDestination(R.id.nav_video_record)
