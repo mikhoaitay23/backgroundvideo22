@@ -22,7 +22,11 @@ class RecordService : Service() {
 
     private lateinit var listener: Listener
     private val previewVideoWindow:PreviewVideoWindow by lazy {
-        PreviewVideoWindow(this)
+        PreviewVideoWindow(this, object: PreviewVideoWindow.RecordAction{
+            override fun onFinishRecord() {
+                stopSelf()
+            }
+        })
     }
 
     override fun onBind(intent: Intent): IBinder? {
