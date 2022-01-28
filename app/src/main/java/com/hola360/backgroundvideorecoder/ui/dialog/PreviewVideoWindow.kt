@@ -32,10 +32,11 @@ import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleO
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils.getAspectRatio
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PreviewVideoWindow(val context: Context) {
+class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
 
     private var view: View?= null
     private var windowManager: WindowManager?= null
@@ -133,9 +134,11 @@ class PreviewVideoWindow(val context: Context) {
             currentRecording!!.stop()
             currentRecording = null
         }
-        val mediaStoreOutput = VideoRecordUtils.generateMediaStoreOutput(context)
+//        val mediaStoreOutput = VideoRecordUtils.generateMediaStoreOutput(context)
+        val file= File(context.cacheDir, "Record_video_${System.currentTimeMillis()}.mp4")
+        val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
         currentRecording = videoCapture.output
-            .prepareRecording(context, mediaStoreOutput)
+            .prepareRecording(context, fileOutputOptions)
             .apply { if (videoRecordConfiguration!!.sound) withAudioEnabled() }
             .start(mainThreadExecutor, captureListener)
     }
@@ -163,6 +166,7 @@ class PreviewVideoWindow(val context: Context) {
                     stopRecording()
                     Toast.makeText(context, "Finish", Toast.LENGTH_SHORT).show()
                     close()
+                    callback.onFinishRecord()
                 }
                 if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration!!.timePerVideo){
                     startRecording()
@@ -227,6 +231,10 @@ class PreviewVideoWindow(val context: Context) {
 
     companion object{
         const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+    }
+
+    interface RecordAction{
+        fun onFinishRecord()
     }
 
 }
