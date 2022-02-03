@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
@@ -17,31 +19,21 @@ import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfi
 class RecordVideo : BaseRecordPageFragment<LayoutRecordVideoBinding>() {
 
     override val layoutId: Int = R.layout.layout_record_video
+    private var videoConfiguration: VideoRecordConfiguration?= null
     private var startRecord=false
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun initView() {
-        binding!!.start.setOnClickListener {
-            if(!startRecord){
-                runRecordService(START)
-                startRecord=true
-            }else{
-                runRecordService(PAUSE)
-            }
-            binding!!.isRecording= !binding!!.isRecording
+        generateVideoConfiguration()
+    }
+
+    private fun generateVideoConfiguration(){
+        videoConfiguration=if(dataPref!!.getVideoConfiguration() != ""){
+            Gson().fromJson(dataPref!!.getVideoConfiguration()!!, VideoRecordConfiguration::class.java)
+        }else{
+            VideoRecordConfiguration()
         }
-        binding!!.cancel.setOnClickListener {
-            runRecordService(CLEAR)
-            startRecord= false
-        }
-        binding!!.overlay.setOnClickListener {
-            if (!Settings.canDrawOverlays(requireContext())) {
-                val REQUEST_CODE = 101
-                val myIntent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-                myIntent.data = Uri.parse("package:" + requireContext().packageName)
-                startActivityForResult(myIntent, REQUEST_CODE)
-            }
-        }
+        binding!!.configuration= videoConfiguration!!
     }
 
     fun runRecordService(status: Int) {

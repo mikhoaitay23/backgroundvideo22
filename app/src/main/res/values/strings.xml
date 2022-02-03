@@ -22,6 +22,23 @@
 
 
     <string name="video_record_title">Video Record</string>
+    <string name="video_record_configuration_title">Camera Information</string>
+    <string name="video_record_configuration_camera">Camera</string>
+    <string name="video_record_configuration_front">Front</string>
+    <string name="video_record_configuration_back">Back</string>
+    <string name="video_record_configuration_duration">Record Duration</string>
+    <string name="video_record_configuration_video_time">Time per video</string>
+    <string name="video_record_configuration_preview">Preview mode</string>
+    <string name="video_record_configuration_flash">Flash</string>
+    <string name="video_record_configuration_sound">Sound</string>
+    <string name="video_record_configuration_start">Start</string>
+    <string name="video_record_configuration_stop">Stop</string>
+    <string name="video_record_configuration_un_limit">Unlimit</string>
+    <string name="video_record_configuration_no_split">No split</string>
+    <plurals name="video_record_configuration_minute">
+        <item quantity="one">%d Minute</item>
+        <item quantity="other">%d Minutes</item>
+    </plurals>
     
     //Audio Record
     <string name="record">Record</string>

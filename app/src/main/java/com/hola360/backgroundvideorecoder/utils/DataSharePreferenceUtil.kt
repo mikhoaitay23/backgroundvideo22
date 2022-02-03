@@ -16,12 +16,12 @@ class DataSharePreferenceUtil private constructor(context: Context) {
         return sharedPreferences.getString(key, "")
     }
 
-    fun setDarkMode(value: Boolean) {
-        putBooleanValue("Key_DarkMode", value)
+    fun setVideoRecordConfiguration(value: String) {
+        putStringValue("Video_configuration", value)
     }
 
-    fun getDarkMode(): Boolean {
-        return getBooleanValue("Key_DarkMode")
+    fun getVideoConfiguration(): String? {
+        return getStringValue("Video_configuration")
     }
 
     fun putBooleanValue(key: String, value: Boolean) {

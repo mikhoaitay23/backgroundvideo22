@@ -6,46 +6,210 @@
         <variable
             name="isRecording"
             type="boolean" />
+        <variable
+            name="configuration"
+            type="com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        
+
         <LinearLayout
-            android:gravity="center"
             android:orientation="vertical"
+            android:padding="@dimen/home_v_margin"
+            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
-            <ImageView
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/video_record_configuration_title"
+                style="@style/TextRecordTitle"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/camera"
+                    android:layout_marginTop="@dimen/home_v_margin"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/video_record_configuration_camera"/>
+
+                    <TextView
+                        style="@style/TextRecordProperties2"
+                        android:text="@{configuration.back? @string/video_record_configuration_front: @string/video_record_configuration_back}"/>
+
+                </LinearLayout>
+
+                <View
+                    style="@style/RecordDivineStyle"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/recordDuration"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_marginTop="@dimen/home_v_margin"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/video_record_configuration_duration"/>
+
+                    <TextView
+                        style="@style/TextRecordProperties2"
+                        videoRecordDuration="@{configuration.totalTime}"/>
+
+                </LinearLayout>
+
+                <View
+                    style="@style/RecordDivineStyle"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/videoTime"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_marginTop="@dimen/home_v_margin"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/video_record_configuration_video_time"/>
+
+                    <TextView
+                        style="@style/TextRecordProperties2"
+                        timePerVideo="@{configuration.timePerVideo}"/>
+
+                </LinearLayout>
+
+                <View
+                    style="@style/RecordDivineStyle"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/previewMode"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_marginTop="@dimen/home_v_margin"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/video_record_configuration_preview"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:checked="@{configuration.previewMode}"
+                        app:track="@drawable/bg_switch"
+                        android:thumb="@drawable/bg_switch_thumb"/>
+
+                </LinearLayout>
+
+                <View
+                    style="@style/RecordDivineStyle"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/flash"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_marginTop="@dimen/home_v_margin"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/video_record_configuration_flash" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:checked="@{configuration.flash}"
+                        app:track="@drawable/bg_switch"
+                        android:thumb="@drawable/bg_switch_thumb"/>
+
+                </LinearLayout>
+
+                <View
+                    style="@style/RecordDivineStyle"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sound"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_marginTop="@dimen/home_v_margin"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/video_record_configuration_sound"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:checked="@{configuration.sound}"
+                        app:track="@drawable/bg_switch"
+                        android:thumb="@drawable/bg_switch_thumb"/>
+
+                </LinearLayout>
+
+                <View
+                    style="@style/RecordDivineStyle"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/recordTime"
+                android:text="00:00:00"
+                style="@style/TextRecordDuration"/>
+
+            <TextView
                 android:id="@+id/start"
-                android:src="@{isRecording ? @drawable/ic_stop_24: @drawable/ic_started_24}"
-                android:layout_marginTop="10dp"
-                android:padding="10dp"
-                android:layout_width="50dp"
-                android:layout_height="50dp"/>
-
-            <ImageView
-                android:id="@+id/cancel"
-                android:src="@drawable/ic_close"
-                android:layout_marginTop="10dp"
-                android:padding="10dp"
-                android:layout_width="50dp"
-                android:layout_height="50dp"/>
-
-            <ImageView
-                android:id="@+id/overlay"
-                android:src="@drawable/ic_home_setting"
-                android:layout_marginTop="10dp"
-                android:padding="10dp"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                app:tint="@color/colorAccent" />
+                android:text="@string/video_record_configuration_start"
+                style="@style/TextRecordButton" />
 
         </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </ScrollView>
 
 </layout>

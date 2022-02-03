@@ -13,7 +13,7 @@ import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 
 abstract class BaseRecordPageFragment<V : ViewDataBinding?> : Fragment() {
-    private var dataPref: DataSharePreferenceUtil?= null
+    protected var dataPref: DataSharePreferenceUtil?= null
     @JvmField
     protected var binding: V? = null
     protected abstract val layoutId: Int

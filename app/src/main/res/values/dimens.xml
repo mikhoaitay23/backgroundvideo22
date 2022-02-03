@@ -15,6 +15,8 @@
     <dimen name="home_mall_icon_padding">20dp</dimen>
     <dimen name="home_small_icon_margin_end">25dp</dimen>
 
+    <dimen name="record_switch_padding">3dp</dimen>
+
     <dimen name="dp_1">1dp</dimen>
     <dimen name="dp_3">3dp</dimen>
     <dimen name="dp_2">2dp</dimen>

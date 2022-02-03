@@ -15,6 +15,9 @@
     <color name="signature_color">#40676C</color>
 
     <color name="home_background">#F7F7F7</color>
+    <color name="record_divine_color">#777777</color>
+    <color name="bg_switch">#AFAFAF</color>
+    <color name="bg_switch_disable">#C4C4C4</color>
 
     <!-- Common -->
     <color name="transparent">#00000000</color>
