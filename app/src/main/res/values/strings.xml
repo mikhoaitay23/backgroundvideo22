@@ -39,6 +39,10 @@
         <item quantity="one">%d Minute</item>
         <item quantity="other">%d Minutes</item>
     </plurals>
+    <array name="camera_facing">
+        <item>Front</item>
+        <item>Back</item>
+    </array>
     
     //Audio Record
     <string name="record">Record</string>
