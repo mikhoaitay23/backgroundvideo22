@@ -13,6 +13,7 @@ import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.widget.Toolbar
 import android.content.ComponentName
+import android.content.Intent
 
 import android.os.IBinder
 
@@ -24,6 +25,8 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     private var binding: ActivityMainBinding? = null
     private var navController: NavController? = null
     private var navHostFragment: Fragment? = null
+    private var recordService: RecordService? = null
+    var intentService: Intent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,6 +81,9 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         ) {
             Toast.makeText(this@MainActivity, "onServiceConnected", Toast.LENGTH_SHORT)
                 .show()
+            val binder: RecordService.LocalBinder = service as RecordService.LocalBinder
+            recordService = binder.getServiceInstance()
+            recordService!!.registerListener(this@MainActivity)
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {

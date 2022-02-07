@@ -43,15 +43,17 @@
         <item>Front</item>
         <item>Back</item>
     </array>
+
     <string name="video_record_schedule_title">Schedule automatically video recording</string>
     <string name="video_record_schedule_date">Date</string>
     <string name="video_record_schedule_time">Time</string>
     <string name="video_record_schedule_set">Set Schedule</string>
-    
+
     //Audio Record
     <string name="record">Record</string>
     <string name="audio_information">Audio information</string>
     <string name="record_quality">Record quality</string>
+    <string name="record_mode">Record mode</string>
     <string name="abort">Abort</string>
     <string name="save">Save</string>
     <string name="stop">Stop</string>
@@ -60,6 +62,24 @@
     <string name="mode">Mode</string>
     <string name="record_duration">Record duration</string>
     <string name="mute_ring_msg">Mute ring when recording</string>
+    <string name="confirm">Confirm</string>
+    <string name="abort_msg">Abort recording will not be saved.</string>
+    <string name="high">High</string>
+    <string name="medium">Medium</string>
+    <string name="low">Low</string>
+    <string name="mode_mono">Voice (mono)</string>
+    <string name="mode_stereo">Music (stereo)</string>
+    
+    <array name="record_quality">
+        <item>@string/high</item>
+        <item>@string/medium</item>
+        <item>@string/low</item>
+    </array>
+
+    <array name="record_mode">
+        <item>@string/mode_mono</item>
+        <item>@string/mode_stereo</item>
+    </array>
 
     <string name="setting_title">Settings</string>
 

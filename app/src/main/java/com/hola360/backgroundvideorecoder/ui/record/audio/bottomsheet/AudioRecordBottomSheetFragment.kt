@@ -16,6 +16,7 @@ import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
+import com.hola360.backgroundvideorecoder.widget.bottomsheet.confirm.ConfirmBottomSheetFragment
 import com.zlw.main.recorderlib.BuildConfig
 import com.zlw.main.recorderlib.RecordManager
 import com.zlw.main.recorderlib.recorder.RecordHelper.RecordState
@@ -23,13 +24,15 @@ import com.zlw.main.recorderlib.recorder.listener.RecordStateListener
 import java.util.*
 
 class AudioRecordBottomSheetFragment :
-    BaseBottomSheetDialog<FragmentBottomSheetRecordAudioBinding>(), View.OnClickListener, AudioRecordUtils.Listener {
+    BaseBottomSheetDialog<FragmentBottomSheetRecordAudioBinding>(), View.OnClickListener,
+    AudioRecordUtils.Listener, ConfirmBottomSheetFragment.OnConfirmButtonClickListener {
 
     private lateinit var viewModel: AudioRecordBottomSheetViewModel
     private var audioRecordUtils: AudioRecordUtils? = null
     private var audioModel: AudioModel? = null
     private var recordManager = RecordManager.getInstance()
     private lateinit var mainActivity: MainActivity
+    private var confirmBottomSheetFragment: ConfirmBottomSheetFragment? = null
 
     override fun getLayout() = R.layout.fragment_bottom_sheet_record_audio
 
@@ -77,7 +80,15 @@ class AudioRecordBottomSheetFragment :
                 audioRecordUtils?.onStartRecording(audioModel!!)
             }
             binding!!.btnAbort -> {
-
+                confirmBottomSheetFragment = ConfirmBottomSheetFragment.create(
+                    ConfirmBottomSheetFragment.DataBuilder().addTitle(getString(R.string.confirm))
+                        .addMsg(getString(R.string.abort_msg)).addPositive(getString(R.string.ok))
+                        .addNegative(getString(R.string.cancel))
+                )
+                confirmBottomSheetFragment!!.show(
+                    requireActivity().supportFragmentManager,
+                    "bottomSheetAbortAudioRecord"
+                )
             }
             binding!!.btnSave -> {
                 audioRecordUtils?.onStopRecording()
@@ -150,6 +161,14 @@ class AudioRecordBottomSheetFragment :
 
     override fun updateTimer(time: Long) {
         binding!!.tvTime.text = Utils.formatTimeIntervalHourMinSec(time)
+    }
+
+    override fun onPositiveClick() {
+
+    }
+
+    override fun onNegativeClick() {
+
     }
 
 
