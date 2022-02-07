@@ -83,7 +83,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/videoTime"
+                android:id="@+id/intervalTime"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -126,8 +126,9 @@
                         android:text="@string/video_record_configuration_preview"/>
 
                     <androidx.appcompat.widget.SwitchCompat
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:id="@+id/previewSwitch"
+                        android:layout_width="@dimen/record_switch_height"
+                        android:layout_height="@dimen/record_switch_height"
                         android:checked="@{configuration.previewMode}"
                         app:track="@drawable/bg_switch"
                         android:thumb="@drawable/bg_switch_thumb"/>
@@ -156,8 +157,9 @@
                         android:text="@string/video_record_configuration_flash" />
 
                     <androidx.appcompat.widget.SwitchCompat
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:id="@+id/flashSwitch"
+                        android:layout_width="@dimen/record_switch_height"
+                        android:layout_height="@dimen/record_switch_height"
                         android:checked="@{configuration.flash}"
                         app:track="@drawable/bg_switch"
                         android:thumb="@drawable/bg_switch_thumb"/>
@@ -186,8 +188,9 @@
                         android:text="@string/video_record_configuration_sound"/>
 
                     <androidx.appcompat.widget.SwitchCompat
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:id="@+id/soundSwitch"
+                        android:layout_width="@dimen/record_switch_height"
+                        android:layout_height="@dimen/record_switch_height"
                         android:checked="@{configuration.sound}"
                         app:track="@drawable/bg_switch"
                         android:thumb="@drawable/bg_switch_thumb"/>

@@ -66,5 +66,7 @@
     <string name="grant_permission">Please grant the application permission to continue using the app</string>
     <string name="goto_settings">You must approve this permission in Permissions in the app settings on your device to continue using the app.</string>
     <string name="settings">Settings</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
 
 </resources>

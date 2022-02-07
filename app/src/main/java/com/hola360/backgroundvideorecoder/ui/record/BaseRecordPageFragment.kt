@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 
 abstract class BaseRecordPageFragment<V : ViewDataBinding?> : Fragment() {
@@ -17,6 +16,7 @@ abstract class BaseRecordPageFragment<V : ViewDataBinding?> : Fragment() {
     @JvmField
     protected var binding: V? = null
     protected abstract val layoutId: Int
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

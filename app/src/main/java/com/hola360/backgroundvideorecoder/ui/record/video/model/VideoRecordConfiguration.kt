@@ -6,6 +6,7 @@ import android.os.Parcelable
 class VideoRecordConfiguration() : Parcelable {
     var isBack:Boolean= true
     var cameraQuality:Int=0
+    var zoomScale:Float=0f
     var totalTime:Long=0
     var timePerVideo:Long=60000L
     var previewMode:Boolean= true

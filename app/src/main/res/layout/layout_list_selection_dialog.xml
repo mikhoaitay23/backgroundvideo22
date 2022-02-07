@@ -14,8 +14,7 @@
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            style="@style/TextDialogTitle"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_marginTop="@dimen/home_v_margin"

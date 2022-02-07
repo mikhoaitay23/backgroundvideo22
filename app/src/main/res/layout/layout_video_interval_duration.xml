@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_bottom_sheet"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/TextDialogTitle" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/txtProgress"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@id/seekbar"
+                android:gravity="center"
+                android:paddingHorizontal="2dp"
+                android:background="@drawable/video_duration_tooltip"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="10dp"
+                android:layout_marginHorizontal="@dimen/home_v_margin"
+                app:layout_constraintStart_toStartOf="@id/seekbar"
+                app:layout_constraintEnd_toEndOf="@id/seekbar"
+                app:layout_constraintTop_toTopOf="@id/seekbar"
+                app:layout_constraintBottom_toBottomOf="@id/seekbar"
+                android:background="@drawable/video_interval_seekbar_bg"/>
+
+            <SeekBar
+                android:id="@+id/seekbar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:progressBackgroundTint="@color/transparent"
+                android:progressTint="@color/transparent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingVertical="@dimen/home_h_margin">
+
+            <TextView
+                android:id="@+id/cancel"
+                style="@style/TextDialog1"
+                android:layout_width="120dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="50dp"
+                android:background="@drawable/bg_button_cancel"
+                android:elevation="@dimen/home_v_padding"
+                android:gravity="center"
+                android:text="@string/cancel" />
+
+            <TextView
+                android:id="@+id/oke"
+                style="@style/TextDialog1"
+                android:layout_width="120dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_button_start"
+                android:elevation="@dimen/home_v_padding"
+                android:gravity="center"
+                android:text="@string/ok"
+                android:textColor="@color/md_white_1000" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

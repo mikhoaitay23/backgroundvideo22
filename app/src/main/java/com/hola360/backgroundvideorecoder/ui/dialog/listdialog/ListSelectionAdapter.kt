@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.ItemListSelectionBinding
 import com.hola360.backgroundvideorecoder.ui.base.baseviewholder.BaseViewHolder
 
@@ -33,7 +34,12 @@ class ListSelectionAdapter(val listItems: MutableList<String>, val callback: OnI
     inner class ItemListSelectionHolder(val binding:ItemListSelectionBinding): BaseViewHolder(binding.root){
         @SuppressLint("NotifyDataSetChanged")
         override fun onBind(position: Int) {
-            binding.check.isChecked= position==selectionPos
+            val checkRes= if(position== selectionPos){
+                R.drawable.ic_radio_check
+            }else{
+                R.drawable.ic_radio_uncheck
+            }
+            binding.check.setImageResource(checkRes)
             binding.itemName.text= listItems[position]
             binding.item.setOnClickListener {
                 if(position==selectionPos){

@@ -91,6 +91,22 @@
         <item name="android:elevation">@dimen/home_v_padding</item>
     </style>
 
+    <style name="TextDialogTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/home_h_margin</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextDialog1">
+        <item name="android:textSize">18dp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
     <style name="HomeSmallIcon">
         <item name="android:layout_width">@dimen/home_mall_icon_height</item>
         <item name="android:layout_height">@dimen/home_mall_icon_height</item>

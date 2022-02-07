@@ -4,9 +4,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutListSelectionDialogBinding
 import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDialog
+import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 
 class ListSelectionBotDialog(val title:String, private val listItem:MutableList<String>,
-                             val callback: ListSelectionAdapter.OnItemListSelection): BaseBottomSheetDialog<LayoutListSelectionDialogBinding>() {
+                             val callback: ListSelectionAdapter.OnItemListSelection,
+                            val dismissCallback:OnDialogDismiss): BaseBottomSheetDialog<LayoutListSelectionDialogBinding>() {
 
     override fun getLayout(): Int {
         return R.layout.layout_list_selection_dialog
@@ -30,6 +32,11 @@ class ListSelectionBotDialog(val title:String, private val listItem:MutableList<
     override fun onResume() {
         super.onResume()
         adapter.setSelectionPos(selectionPos)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dismissCallback.onDismiss()
     }
 
 }
