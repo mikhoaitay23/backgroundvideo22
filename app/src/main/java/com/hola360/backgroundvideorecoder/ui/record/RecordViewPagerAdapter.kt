@@ -4,8 +4,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.hola360.backgroundvideorecoder.ui.record.audio.RecordAudio
-import com.hola360.backgroundvideorecoder.ui.record.audio.ScheduleAudio
+import com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord.RecordAudio
+import com.hola360.backgroundvideorecoder.ui.record.audio.audioschedule.ScheduleAudio
 import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
 

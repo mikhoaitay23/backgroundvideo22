@@ -8,18 +8,20 @@ import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.ItemListSelectionBinding
 import com.hola360.backgroundvideorecoder.ui.base.baseviewholder.BaseViewHolder
 
-class ListSelectionAdapter(val listItems: MutableList<String>, val callback: OnItemListSelection): RecyclerView.Adapter<BaseViewHolder>() {
+class ListSelectionAdapter(val listItems: MutableList<String>, val callback: OnItemListSelection) :
+    RecyclerView.Adapter<BaseViewHolder>() {
 
-    private var selectionPos=0
+    private var selectionPos = 0
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setSelectionPos(position: Int){
-        selectionPos= position
+    fun setSelectionPos(position: Int) {
+        selectionPos = position
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val binding= ItemListSelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemListSelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ItemListSelectionHolder(binding)
     }
 
@@ -31,28 +33,29 @@ class ListSelectionAdapter(val listItems: MutableList<String>, val callback: OnI
         return listItems.size
     }
 
-    inner class ItemListSelectionHolder(val binding:ItemListSelectionBinding): BaseViewHolder(binding.root){
+    inner class ItemListSelectionHolder(val binding: ItemListSelectionBinding) :
+        BaseViewHolder(binding.root) {
         @SuppressLint("NotifyDataSetChanged")
         override fun onBind(position: Int) {
-            val checkRes= if(position== selectionPos){
+            val checkRes = if (position == selectionPos) {
                 R.drawable.ic_radio_check
-            }else{
+            } else {
                 R.drawable.ic_radio_uncheck
             }
             binding.check.setImageResource(checkRes)
-            binding.itemName.text= listItems[position]
+            binding.itemName.text = listItems[position]
             binding.item.setOnClickListener {
-                if(position==selectionPos){
+                if (position == selectionPos) {
                     return@setOnClickListener
                 }
-                selectionPos=position
+                selectionPos = position
                 notifyDataSetChanged()
                 callback.onSelection(position)
             }
         }
     }
 
-    interface OnItemListSelection{
+    interface OnItemListSelection {
         fun onSelection(position: Int)
     }
 }

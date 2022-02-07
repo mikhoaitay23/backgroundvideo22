@@ -23,8 +23,12 @@ abstract class BaseBottomSheetDialog<V: ViewDataBinding?>: BottomSheetDialogFrag
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, getLayout(), container, false)
-        initView()
         return binding!!.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initView()
     }
 
     abstract fun initView()

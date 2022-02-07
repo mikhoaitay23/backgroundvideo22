@@ -16,11 +16,15 @@ import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfi
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import android.app.Activity
 import android.content.Context
+import android.os.Binder
+import android.util.Log
 
 
 class RecordService : Service() {
 
     private lateinit var listener: Listener
+    var mBinder: IBinder = LocalBinder()
+
     private val previewVideoWindow:PreviewVideoWindow by lazy {
         PreviewVideoWindow(this, object: PreviewVideoWindow.RecordAction{
             override fun onFinishRecord() {
@@ -29,8 +33,8 @@ class RecordService : Service() {
         })
     }
 
-    override fun onBind(intent: Intent): IBinder? {
-        return null
+    override fun onBind(intent: Intent): IBinder {
+        return mBinder
     }
 
     override fun onCreate() {
@@ -39,6 +43,7 @@ class RecordService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         recordVideo(intent)
+        recordAudio(intent)
         sendNotification()
         return START_NOT_STICKY
     }
@@ -65,6 +70,15 @@ class RecordService : Service() {
         }
     }
 
+    private fun recordAudio(intent: Intent?){
+        intent?.let {
+            val configuration= it.getParcelableExtra<VideoRecordConfiguration>("Audio_configuration")
+            when(it.getIntExtra("Audio_status", 0)){
+
+            }
+        }
+    }
+
     private fun sendNotification() {
         val pendingIntent = NavDeepLinkBuilder(this)
             .setComponentName(MainActivity::class.java)
@@ -80,6 +94,12 @@ class RecordService : Service() {
             .build()
 
         startForeground(1, notification)
+    }
+
+    class LocalBinder : Binder() {
+        fun getServiceInstance(): RecordService {
+            return RecordService()
+        }
     }
 
     fun registerListener(activity: Activity) {

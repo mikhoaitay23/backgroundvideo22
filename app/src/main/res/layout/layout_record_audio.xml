@@ -4,6 +4,10 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord.RecordAudioViewModel" />
+
     </data>
 
     <ScrollView
@@ -12,7 +16,7 @@
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="@dimen/dp_10">
 
@@ -29,6 +33,7 @@
                 android:orientation="vertical">
 
                 <RelativeLayout
+                    android:id="@+id/btnQuality"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingVertical="@dimen/dp_16">
@@ -46,7 +51,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginHorizontal="@dimen/dp_8"
                         android:layout_toStartOf="@id/icArrowRight"
-                        android:text="High"
+                        android:setRecordQuality="@{viewModel.recordAudioLiveData}"
                         android:textAppearance="?textAppearanceBody1"
                         android:textColor="@color/signature_color"
                         android:textStyle="bold" />
@@ -67,6 +72,7 @@
                     android:background="@color/md_blue_grey_200" />
 
                 <RelativeLayout
+                    android:id="@+id/btnMode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingVertical="@dimen/dp_16">
@@ -84,7 +90,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginHorizontal="@dimen/dp_8"
                         android:layout_toStartOf="@id/icArrowRight2"
-                        android:text="Mono"
+                        android:setRecordMode="@{viewModel.recordAudioLiveData}"
                         android:textAppearance="?textAppearanceBody1"
                         android:textColor="@color/signature_color"
                         android:textStyle="bold" />
@@ -105,6 +111,7 @@
                     android:background="@color/md_blue_grey_200" />
 
                 <RelativeLayout
+                    android:id="@+id/btnDuration"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingVertical="@dimen/dp_16">
