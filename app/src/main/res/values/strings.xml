@@ -43,6 +43,10 @@
         <item>Front</item>
         <item>Back</item>
     </array>
+    <string name="video_record_schedule_title">Schedule automatically video recording</string>
+    <string name="video_record_schedule_date">Date</string>
+    <string name="video_record_schedule_time">Time</string>
+    <string name="video_record_schedule_set">Set Schedule</string>
     
     //Audio Record
     <string name="record">Record</string>

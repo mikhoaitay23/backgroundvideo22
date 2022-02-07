@@ -3,11 +3,9 @@ package com.hola360.backgroundvideorecoder.ui.record.video
 import android.os.Build
 import android.view.View
 import androidx.annotation.RequiresApi
-import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
-import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 
 class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener {
 
@@ -16,24 +14,16 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     @RequiresApi(Build.VERSION_CODES.M)
     override fun initView() {
         generateVideoConfiguration()
+        applyNewVideoConfiguration()
         binding!!.camera.setOnClickListener(this)
         binding!!.recordDuration.setOnClickListener(this)
         binding!!.intervalTime.setOnClickListener(this)
         binding!!.previewMode.setOnClickListener(this)
         binding!!.flash.setOnClickListener(this)
         binding!!.sound.setOnClickListener(this)
-    }
-
-    private fun generateVideoConfiguration() {
-        videoConfiguration = if (dataPref!!.getVideoConfiguration() != "") {
-            Gson().fromJson(
-                dataPref!!.getVideoConfiguration()!!,
-                VideoRecordConfiguration::class.java
-            )
-        } else {
-            VideoRecordConfiguration()
-        }
-        binding!!.configuration = videoConfiguration!!
+        binding!!.previewSwitch.isEnabled=false
+        binding!!.flashSwitch.isEnabled=false
+        binding!!.soundSwitch.isEnabled= false
     }
 
     override fun initViewModel() {
@@ -46,51 +36,22 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.camera -> {
-                if (!showDialog) {
-                    showDialog = true
-                    val position = if (videoConfiguration!!.isBack) {
-                        0
-                    } else {
-                        1
-                    }
-                    cameraSelectionDialog.setSelectionPos(position)
-                    cameraSelectionDialog.show(requireActivity().supportFragmentManager, "Camera")
-                }
+                onCameraFacingSelect()
             }
             R.id.recordDuration -> {
-                if (!showDialog) {
-                    showDialog = true
-                    recordVideoDurationDialog.setupTotalTime(videoConfiguration!!.totalTime)
-                    recordVideoDurationDialog.show(
-                        requireActivity().supportFragmentManager,
-                        "VideoDuration"
-                    )
-                }
+                onVideoRecordDurationSelect()
             }
             R.id.intervalTime->{
-                if (!showDialog) {
-                    showDialog = true
-                    videoIntervalDurationDialog.setupIntervalTime(videoConfiguration!!.timePerVideo)
-                    videoIntervalDurationDialog.show(
-                        requireActivity().supportFragmentManager,
-                        "IntervalTime"
-                    )
-                }
+                onVideoIntervalSelect()
             }
             R.id.previewMode->{
-                videoConfiguration!!.previewMode= !videoConfiguration!!.previewMode
-                binding!!.configuration= videoConfiguration
-                saveNewVideoConfiguration()
+                onPreviewModeChange()
             }
             R.id.flash->{
-                videoConfiguration!!.flash= !videoConfiguration!!.flash
-                binding!!.configuration= videoConfiguration
-                saveNewVideoConfiguration()
+                onFlashModeChange()
             }
             R.id.sound->{
-                videoConfiguration!!.sound= !videoConfiguration!!.sound
-                binding!!.configuration= videoConfiguration
-                saveNewVideoConfiguration()
+                onSoundModeChange()
             }
         }
     }

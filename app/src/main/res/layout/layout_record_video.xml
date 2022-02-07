@@ -197,9 +197,6 @@
 
                 </LinearLayout>
 
-                <View
-                    style="@style/RecordDivineStyle"/>
-
             </LinearLayout>
 
             <TextView
