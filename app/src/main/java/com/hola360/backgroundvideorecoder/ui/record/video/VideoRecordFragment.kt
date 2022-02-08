@@ -19,7 +19,6 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
             updateFragment(true)
         }
     }
-    private var curPagerPage= 0
 
     override fun initViewModel() {
 
@@ -29,17 +28,19 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
         binding!!.viewPager.adapter= adapter
         binding!!.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
-                curPagerPage= position
+                binding!!.position= position
             }
         })
         binding!!.record.setOnClickListener {
-            if(curPagerPage != 0){
+            if(binding!!.position != 0){
                 binding!!.viewPager.setCurrentItem(0, true)
+                binding!!.position=0
             }
         }
         binding!!.schedule.setOnClickListener {
-            if(curPagerPage != 1){
+            if(binding!!.position != 1){
                 binding!!.viewPager.setCurrentItem(1, true)
+                binding!!.position=1
             }
         }
     }

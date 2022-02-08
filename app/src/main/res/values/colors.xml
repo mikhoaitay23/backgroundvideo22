@@ -19,6 +19,8 @@
     <color name="bg_switch">#AFAFAF</color>
     <color name="bg_switch_disable">#C4C4C4</color>
 
+    <color name="bg_page_un_select">#68878B</color>
+
     <!-- Common -->
     <color name="transparent">#00000000</color>
     <array name="reds">

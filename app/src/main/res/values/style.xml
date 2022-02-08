@@ -39,6 +39,13 @@
         <item name="android:textSize">18dp</item>
     </style>
 
+    <style name="TextPager">
+        <item name="android:textSize">14dp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
     <style name="TextRecordTitle">
         <item name="android:textSize">18dp</item>
         <item name="android:fontFamily">@font/roboto_medium</item>

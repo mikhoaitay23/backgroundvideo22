@@ -1,6 +1,9 @@
 package com.hola360.backgroundvideorecoder.utils
 
+import android.os.Build
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.databinding.BindingAdapter
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
@@ -86,6 +89,18 @@ object BindingUtils {
             }
             textView.text= txtTime
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    @JvmStatic
+    @BindingAdapter("android:pagerIconTint")
+    fun pagerIconTint(imageView: ImageView, isSelected: Boolean) {
+        val color= if(isSelected){
+            imageView.context.resources.getColor(R.color.md_white_1000, null)
+        }else{
+            imageView.context.resources.getColor(R.color.bg_page_un_select, null)
+        }
+        imageView.setColorFilter(color)
     }
 
     private const val DATE_FORMAT= "dd/MM/yyyy"

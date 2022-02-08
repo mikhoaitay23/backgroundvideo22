@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-
+        <variable
+            name="position"
+            type="Integer" />
     </data>
 
     <LinearLayout
@@ -20,23 +23,48 @@
             android:orientation="horizontal"
             android:background="@color/colorAccent"
             android:layout_width="match_parent"
-            android:layout_height="50dp">
+            android:layout_height="@dimen/record_bottom_pager_height">
 
-            <ImageView
+            <LinearLayout
                 android:id="@+id/record"
-                android:src="@drawable/ic_record_normal"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:paddingVertical="10dp"/>
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_height="match_parent">
 
-            <ImageView
+                <ImageView
+                    android:src="@drawable/ic_video_record"
+                    android:layout_width="@dimen/record_bottom_icon_height"
+                    android:layout_height="@dimen/record_bottom_icon_height"
+                    android:pagerIconTint="@{position==0}"/>
+
+                <TextView
+                    style="@style/TextPager"
+                    android:textColor="@{position==1? @color/bg_page_un_select: @color/md_white_1000}"
+                    android:text="@string/video_record_page_record"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/schedule"
-                android:src="@drawable/ic_schedule"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:paddingVertical="10dp"/>
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:src="@drawable/ic_video_schedule"
+                    android:layout_width="@dimen/record_bottom_icon_height"
+                    android:layout_height="@dimen/record_bottom_icon_height"
+                    android:pagerIconTint="@{position==1}"/>
+
+                <TextView
+                    style="@style/TextPager"
+                    android:textColor="@{position==0? @color/bg_page_un_select: @color/md_white_1000}"
+                    android:text="@string/video_record_page_schedule"/>
+                
+            </LinearLayout>
 
         </LinearLayout>
 

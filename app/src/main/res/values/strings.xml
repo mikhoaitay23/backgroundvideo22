@@ -22,6 +22,8 @@
 
 
     <string name="video_record_title">Video Record</string>
+    <string name="video_record_page_record">RECORD</string>
+    <string name="video_record_page_schedule">SCHEDULE</string>
     <string name="video_record_configuration_title">Camera Information</string>
     <string name="video_record_configuration_camera">Camera</string>
     <string name="video_record_configuration_front">Front</string>
