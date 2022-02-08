@@ -20,6 +20,7 @@
     <color name="bg_switch_disable">#C4C4C4</color>
 
     <color name="bg_page_un_select">#68878B</color>
+    <color name="un_clickable">#C4C4C4</color>
 
     <!-- Common -->
     <color name="transparent">#00000000</color>

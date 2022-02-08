@@ -1,5 +1,6 @@
 package com.hola360.backgroundvideorecoder.ui.record.video.base
 
+import android.os.Bundle
 import androidx.databinding.ViewDataBinding
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
@@ -9,11 +10,13 @@ import com.hola360.backgroundvideorecoder.ui.dialog.VideoIntervalDurationDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
+import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 
 abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragment<V>() {
 
     protected var videoConfiguration: VideoRecordConfiguration? = null
+    protected var recordSchedule: RecordSchedule?=null
     protected val cameraSelectionDialog: ListSelectionBotDialog by lazy {
         val title = resources.getString(R.string.video_record_configuration_camera)
         val itemList = resources.getStringArray(R.array.camera_facing).toMutableList()
@@ -50,8 +53,15 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
         }
     }
     protected var showDialog = false
+    protected var isRecording= false
 
-    protected fun generateVideoConfiguration() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        generateVideoConfiguration()
+        getSchedule()
+    }
+
+    private fun generateVideoConfiguration() {
         videoConfiguration = if (dataPref!!.getVideoConfiguration() != "") {
             Gson().fromJson(
                 dataPref!!.getVideoConfiguration(),
@@ -60,6 +70,16 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
         } else {
             VideoRecordConfiguration()
         }
+    }
+
+    private fun getSchedule(){
+        recordSchedule= if(dataPref!!.getSchedule() != ""){
+            Gson().fromJson(dataPref!!.getSchedule(), RecordSchedule::class.java)
+        }else{
+            RecordSchedule()
+        }
+        isRecording= recordSchedule!!.scheduleTime!= 0L && recordSchedule!!.scheduleTime< System.currentTimeMillis()
+                && (recordSchedule!!.scheduleTime+ videoConfiguration!!.totalTime)>System.currentTimeMillis()
     }
 
     protected fun saveNewVideoConfiguration(){

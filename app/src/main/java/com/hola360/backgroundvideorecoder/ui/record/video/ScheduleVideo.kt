@@ -17,7 +17,6 @@ import java.util.*
 class ScheduleVideo: BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View.OnClickListener {
 
     override val layoutId: Int = R.layout.layout_schedule_video
-    private var recordSchedule:RecordSchedule?=null
     private var calendar:Calendar= Calendar.getInstance()
     private val confirmCancelSchedule:ConfirmDialog by lazy {
         ConfirmDialog(object : ConfirmDialog.OnConfirmOke{
@@ -25,19 +24,6 @@ class ScheduleVideo: BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View
                 cancelSchedule()
             }
         }, dismissCallback)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        getSchedule()
-    }
-
-    private fun getSchedule(){
-        recordSchedule= if(dataPref!!.getSchedule() != ""){
-            Gson().fromJson(dataPref!!.getSchedule(), RecordSchedule::class.java)
-        }else{
-            RecordSchedule()
-        }
     }
 
     override fun initView() {
@@ -49,7 +35,6 @@ class ScheduleVideo: BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View
             binding!!.scheduleTime= recordSchedule!!.scheduleTime
             binding!!.scheduleCard.schedule= recordSchedule
         }
-        generateVideoConfiguration()
         applyNewVideoConfiguration()
         binding!!.date.setOnClickListener(this)
         binding!!.time.setOnClickListener(this)
@@ -62,6 +47,17 @@ class ScheduleVideo: BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View
         binding!!.scheduleCard.cancelSchedule.setOnClickListener(this)
         binding!!.flashSwitch.isEnabled=false
         binding!!.soundSwitch.isEnabled= false
+        setSwitchThumb()
+    }
+
+    private fun setSwitchThumb(){
+        val thumbRes= if(binding!!.schedule){
+            R.drawable.bg_switch_thumb_un_clickable
+        }else{
+            R.drawable.bg_switch_thumb
+        }
+        binding!!.flashSwitch.setThumbResource(thumbRes)
+        binding!!.soundSwitch.setThumbResource(thumbRes)
     }
 
     override fun initViewModel() {
@@ -115,6 +111,7 @@ class ScheduleVideo: BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View
                 scheduleTime= calendar.timeInMillis
             }
             binding!!.schedule= true
+            setSwitchThumb()
             binding!!.scheduleCard.schedule= recordSchedule
             val scheduleValue = Gson().toJson(recordSchedule)
             dataPref!!.putSchedule(scheduleValue)
@@ -123,6 +120,7 @@ class ScheduleVideo: BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View
 
     private fun cancelSchedule(){
         binding!!.schedule=false
+        setSwitchThumb()
         calendar.timeInMillis= System.currentTimeMillis()
         binding!!.scheduleTime= calendar.timeInMillis
         dataPref!!.putSchedule("")

@@ -30,6 +30,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
+                android:clickable="@{!isRecording}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -46,6 +47,7 @@
 
                     <TextView
                         style="@style/TextRecordProperties2"
+                        android:textColor="@{isRecording? @color/un_clickable: @color/colorAccent}"
                         android:text="@{configuration.back? @string/video_record_configuration_front: @string/video_record_configuration_back}"/>
 
                 </LinearLayout>
@@ -58,6 +60,7 @@
             <LinearLayout
                 android:id="@+id/recordDuration"
                 android:orientation="vertical"
+                android:clickable="@{!isRecording}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -73,6 +76,7 @@
 
                     <TextView
                         style="@style/TextRecordProperties2"
+                        android:textColor="@{isRecording? @color/un_clickable: @color/colorAccent}"
                         videoRecordDuration="@{configuration.totalTime}"/>
 
                 </LinearLayout>
@@ -85,6 +89,7 @@
             <LinearLayout
                 android:id="@+id/intervalTime"
                 android:orientation="vertical"
+                android:clickable="@{!isRecording}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -100,6 +105,7 @@
 
                     <TextView
                         style="@style/TextRecordProperties2"
+                        android:textColor="@{isRecording? @color/un_clickable: @color/colorAccent}"
                         timePerVideo="@{configuration.timePerVideo}"/>
 
                 </LinearLayout>
@@ -112,6 +118,7 @@
             <LinearLayout
                 android:id="@+id/previewMode"
                 android:orientation="vertical"
+                android:clickable="@{!isRecording}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -127,7 +134,7 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/previewSwitch"
-                        android:layout_width="@dimen/record_switch_height"
+                        android:layout_width="wrap_content"
                         android:layout_height="@dimen/record_switch_height"
                         android:checked="@{configuration.previewMode}"
                         app:track="@drawable/bg_switch"
@@ -143,6 +150,7 @@
             <LinearLayout
                 android:id="@+id/flash"
                 android:orientation="vertical"
+                android:clickable="@{!isRecording}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -158,7 +166,7 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/flashSwitch"
-                        android:layout_width="@dimen/record_switch_height"
+                        android:layout_width="wrap_content"
                         android:layout_height="@dimen/record_switch_height"
                         android:checked="@{configuration.flash}"
                         app:track="@drawable/bg_switch"
@@ -174,6 +182,7 @@
             <LinearLayout
                 android:id="@+id/sound"
                 android:orientation="vertical"
+                android:clickable="@{!isRecording}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -189,7 +198,7 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/soundSwitch"
-                        android:layout_width="@dimen/record_switch_height"
+                        android:layout_width="wrap_content"
                         android:layout_height="@dimen/record_switch_height"
                         android:checked="@{configuration.sound}"
                         app:track="@drawable/bg_switch"
@@ -206,7 +215,7 @@
 
             <TextView
                 android:id="@+id/start"
-                android:text="@string/video_record_configuration_start"
+                android:text="@{isRecording? @string/video_record_configuration_stop: @string/video_record_configuration_start}"
                 style="@style/TextRecordButton" />
 
         </LinearLayout>

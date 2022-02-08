@@ -13,7 +13,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun initView() {
-        generateVideoConfiguration()
+        binding!!.isRecording= isRecording
         applyNewVideoConfiguration()
         binding!!.camera.setOnClickListener(this)
         binding!!.recordDuration.setOnClickListener(this)
@@ -24,6 +24,18 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         binding!!.previewSwitch.isEnabled=false
         binding!!.flashSwitch.isEnabled=false
         binding!!.soundSwitch.isEnabled= false
+        setSwitchThumb()
+    }
+
+    private fun setSwitchThumb(){
+        val thumbRes= if(isRecording){
+            R.drawable.bg_switch_thumb_un_clickable
+        }else{
+            R.drawable.bg_switch_thumb
+        }
+        binding!!.previewSwitch.setThumbResource(thumbRes)
+        binding!!.flashSwitch.setThumbResource(thumbRes)
+        binding!!.soundSwitch.setThumbResource(thumbRes)
     }
 
     override fun initViewModel() {

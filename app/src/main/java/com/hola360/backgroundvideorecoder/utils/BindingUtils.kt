@@ -4,6 +4,7 @@ import android.os.Build
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.SwitchCompat
 import androidx.databinding.BindingAdapter
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
@@ -104,6 +105,6 @@ object BindingUtils {
     }
 
     private const val DATE_FORMAT= "dd/MM/yyyy"
-    const val TIME_FORMAT= "HH:mm"
+    private const val TIME_FORMAT= "HH:mm"
 
 }
