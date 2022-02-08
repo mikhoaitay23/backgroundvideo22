@@ -19,14 +19,14 @@
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="@dimen/record_bottom_pager_height"
             android:background="@color/colorAccent"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/mLayoutRecord"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
@@ -34,25 +34,23 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imgRecord"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/dp_30"
+                    android:layout_height="@dimen/dp_30"
                     android:src="@drawable/ic_micro"
                     app:tint="@color/md_white_1000" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvRecord"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/record"
+                    style="@style/TextPager"
                     android:textAllCaps="true"
-                    android:textColor="@color/md_white_1000" />
+                    android:text="@string/record" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/mLayoutSchedule"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
@@ -60,17 +58,15 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imgSchedule"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_schedule" />
+                    android:layout_width="@dimen/dp_30"
+                    android:layout_height="@dimen/dp_30"
+                    android:src="@drawable/ic_video_schedule" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvSchedule"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/schedule"
+                    style="@style/TextPager"
                     android:textAllCaps="true"
-                    android:textColor="@color/md_white_1000" />
+                    android:text="@string/schedule" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.appcompat.widget.LinearLayoutCompat>

@@ -6,6 +6,8 @@
         <variable
             name="viewModel"
             type="com.hola360.backgroundvideorecoder.ui.record.audio.audioschedule.ScheduleAudioViewModel" />
+
+        <import type="android.view.View" />
     </data>
 
     <ScrollView
@@ -81,7 +83,9 @@
                         style="@style/TextRecordProperties1"
                         android:text="@string/date" />
 
-                    <androidx.appcompat.widget.AppCompatTextView style="@style/TextRecordProperties2" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties2"
+                        android:setScheduleDate="@{viewModel.recordScheduleLiveData.scheduleTime}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <View
@@ -99,7 +103,9 @@
                         style="@style/TextRecordProperties1"
                         android:text="@string/time" />
 
-                    <androidx.appcompat.widget.AppCompatTextView style="@style/TextRecordProperties2" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties2"
+                        android:setScheduleTime="@{viewModel.recordScheduleLiveData.scheduleTime}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <View
@@ -143,16 +149,28 @@
                         android:onClick="@{()->viewModel.updateMuted()}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:layout_width="wrap_content"
+                <FrameLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/dp_40"
-                    android:background="@drawable/bg_button_start"
-                    android:paddingHorizontal="@dimen/dp_24"
-                    android:text="@string/set_schedule"
-                    android:textAllCaps="false"
-                    android:textColor="@color/md_white_1000" />
+                    android:layout_marginTop="@dimen/dp_30">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:background="@drawable/bg_button_start"
+                        android:onClick="@{()->viewModel.setSchedule()}"
+                        android:paddingHorizontal="@dimen/dp_24"
+                        android:text="@string/set_schedule"
+                        android:textAllCaps="false"
+                        android:textColor="@color/md_white_1000"
+                        android:visibility="@{viewModel.isRecordScheduleLiveData?View.GONE:View.VISIBLE}" />
+
+                    <include
+                        android:id="@+id/scheduleCard"
+                        layout="@layout/layout_schedule_record"
+                        android:visibility="@{viewModel.isRecordScheduleLiveData?View.VISIBLE:View.GONE}" />
+                </FrameLayout>
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>

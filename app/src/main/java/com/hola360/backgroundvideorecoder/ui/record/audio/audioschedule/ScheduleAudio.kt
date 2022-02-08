@@ -1,6 +1,10 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.audioschedule
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
@@ -8,11 +12,15 @@ import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.databinding.LayoutScheduleAudioBinding
+import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
+import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
+import com.hola360.backgroundvideorecoder.utils.Utils
+import java.util.*
 
 class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View.OnClickListener {
 
@@ -22,6 +30,21 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
     private var listSelectionBottomSheet: ListSelectionBotDialog? = null
     private var showBottomSheet = false
     private var audioModel: AudioModel? = null
+    private var recordSchedule: RecordSchedule? = null
+    private var calendar = Calendar.getInstance()
+
+    private val confirmCancelSchedule: ConfirmDialog by lazy {
+        ConfirmDialog(object : ConfirmDialog.OnConfirmOke {
+            override fun onConfirm() {
+                viewModel.cancelSchedule()
+            }
+        }, object : OnDialogDismiss {
+            override fun onDismiss() {
+
+            }
+
+        })
+    }
 
     override val layoutId: Int = R.layout.layout_schedule_audio
 
@@ -31,6 +54,9 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
         binding!!.btnQuality.setOnClickListener(this)
         binding!!.btnMode.setOnClickListener(this)
         binding!!.btnDuration.setOnClickListener(this)
+        binding!!.btnDate.setOnClickListener(this)
+        binding!!.btnTime.setOnClickListener(this)
+        binding!!.scheduleCard.cancelSchedule.setOnClickListener(this)
 
         binding!!.lifecycleOwner = this
         binding!!.viewModel = viewModel
@@ -43,6 +69,27 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
 
         viewModel.recordAudioLiveData.observe(this, {
             audioModel = it
+        })
+
+        viewModel.recordScheduleLiveData.observe(this, {
+            recordSchedule = it
+        })
+
+        viewModel.isRecordScheduleLiveData.observe(this, {
+            if (it) {
+                binding!!.scheduleCard.schedule = recordSchedule
+            }
+        })
+
+        viewModel.saveRecordScheduleLiveData.observe(this, {
+            when (it) {
+                ScheduleAudioViewModel.ValidateType.InvalidTime -> {
+                    Utils.showInvalidateTime(binding!!.root)
+                }
+                else -> {
+
+                }
+            }
         })
     }
 
@@ -65,6 +112,17 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
                     showBottomSheet = true
                     onDurationBottomSheet()
                 }
+            }
+            binding!!.btnDate -> {
+                onDatePicker()
+            }
+            binding!!.btnTime -> {
+                onTimePicker()
+            }
+            binding!!.scheduleCard.cancelSchedule -> {
+                val messages = resources.getString(R.string.video_record_schedule_cancel_message)
+                confirmCancelSchedule.setMessages(messages)
+                confirmCancelSchedule.show(requireActivity().supportFragmentManager, "Confirm")
             }
         }
     }
@@ -134,5 +192,44 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
             requireActivity().supportFragmentManager,
             "VideoDuration"
         )
+    }
+
+    private fun onDatePicker() {
+        val curDay = calendar.get(Calendar.DAY_OF_MONTH)
+        val curMonth = calendar.get(Calendar.MONTH)
+        val curYear = calendar.get(Calendar.YEAR)
+        val datePicker = DatePickerDialog(
+            requireContext(), R.style.TimeAndDatePickerStyle,
+            { _, year, month, dayOfMonth ->
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, month)
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                if (calendar.timeInMillis < Calendar.getInstance().timeInMillis) {
+                    Utils.showInvalidateTime(binding!!.root)
+                } else {
+                    viewModel.updateDate(calendar.timeInMillis)
+                }
+            }, curYear, curMonth, curDay
+        )
+        datePicker.datePicker.minDate = Calendar.getInstance().timeInMillis
+        datePicker.show()
+    }
+
+    private fun onTimePicker() {
+        val curHour = calendar.get(Calendar.HOUR_OF_DAY)
+        val curMinute = calendar.get(Calendar.MINUTE)
+        val timePicker = TimePickerDialog(
+            requireContext(), R.style.TimeAndDatePickerStyle,
+            { _, hourOfDay, minute ->
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                calendar.set(Calendar.MINUTE, minute)
+                if (calendar.timeInMillis < Calendar.getInstance().timeInMillis) {
+                    Utils.showInvalidateTime(binding!!.root)
+                } else {
+                    viewModel.updateTime(calendar.timeInMillis)
+                }
+            }, curHour, curMinute, true
+        )
+        timePicker.show()
     }
 }
