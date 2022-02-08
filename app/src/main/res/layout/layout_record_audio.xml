@@ -21,10 +21,10 @@
             android:padding="@dimen/dp_10">
 
             <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextRecordTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/audio_information"
-                android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Title" />
+                android:text="@string/audio_information" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
@@ -32,147 +32,89 @@
                 android:layout_marginTop="@dimen/dp_8"
                 android:orientation="vertical">
 
-                <RelativeLayout
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/btnQuality"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingVertical="@dimen/dp_16">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/record_quality"
-                        android:textAppearance="?textAppearanceBody1" />
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/record_quality" />
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginHorizontal="@dimen/dp_8"
-                        android:layout_toStartOf="@id/icArrowRight"
-                        android:setRecordQuality="@{viewModel.recordAudioLiveData}"
-                        android:textAppearance="?textAppearanceBody1"
-                        android:textColor="@color/signature_color"
-                        android:textStyle="bold" />
+                        style="@style/TextRecordProperties2"
+                        android:setRecordQuality="@{viewModel.recordAudioLiveData}" />
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/icArrowRight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:tint="@color/md_blue_grey_200"
-                        app:srcCompat="@drawable/ic_keyboard_arrow_right" />
-                </RelativeLayout>
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/md_blue_grey_200" />
 
-                <RelativeLayout
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/btnMode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingVertical="@dimen/dp_16">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/mode"
-                        android:textAppearance="?textAppearanceBody1" />
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/mode" />
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginHorizontal="@dimen/dp_8"
-                        android:layout_toStartOf="@id/icArrowRight2"
-                        android:setRecordMode="@{viewModel.recordAudioLiveData}"
-                        android:textAppearance="?textAppearanceBody1"
-                        android:textColor="@color/signature_color"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/icArrowRight2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:tint="@color/md_blue_grey_200"
-                        app:srcCompat="@drawable/ic_keyboard_arrow_right" />
-                </RelativeLayout>
+                        style="@style/TextRecordProperties2"
+                        android:setRecordMode="@{viewModel.recordAudioLiveData}" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/md_blue_grey_200" />
 
-                <RelativeLayout
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/btnDuration"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingVertical="@dimen/dp_16">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/record_duration"
-                        android:textAppearance="?textAppearanceBody1" />
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/record_duration" />
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginHorizontal="@dimen/dp_8"
-                        android:layout_toStartOf="@id/icArrowRight3"
-                        android:text="30 Minutes"
-                        android:textAppearance="?textAppearanceBody1"
-                        android:textColor="@color/signature_color"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/icArrowRight3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:tint="@color/md_blue_grey_200"
-                        app:srcCompat="@drawable/ic_keyboard_arrow_right" />
-                </RelativeLayout>
+                        style="@style/TextRecordProperties2"
+                        android:setRecordAudioDuration="@{viewModel.recordAudioLiveData}" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/md_blue_grey_200" />
 
-                <RelativeLayout
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingVertical="@dimen/dp_16">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/mute_ring_msg"
-                        android:textAppearance="?textAppearanceBody1" />
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/mute_ring_msg" />
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true" />
-                </RelativeLayout>
+                        android:checked="@{viewModel.recordAudioLiveData.muted}"
+                        android:onClick="@{()->viewModel.updateMuted()}" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imgRecord"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/dp_120"
+                    android:layout_marginTop="@dimen/dp_40"
                     app:srcCompat="@drawable/ic_record_normal" />
 
                 <TextView

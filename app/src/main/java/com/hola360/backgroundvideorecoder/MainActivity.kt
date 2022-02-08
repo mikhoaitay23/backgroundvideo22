@@ -18,6 +18,7 @@ import android.content.Intent
 import android.os.IBinder
 
 import android.content.ServiceConnection
+import android.util.Log
 
 
 class MainActivity : AppCompatActivity(), RecordService.Listener {
@@ -96,7 +97,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         const val PRIVACY = "privacy"
     }
 
-    override fun updateData() {
+    override fun isStarted() {
 
     }
 }
