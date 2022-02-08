@@ -33,23 +33,24 @@ class RecordAudioViewModel(val application: Application) : ViewModel() {
         }
     }
 
-    fun updateDuration(duration: Int) {
+    fun updateDuration(duration: Long) {
         viewModelScope.launch {
             audioModel?.duration = duration
             recordAudioLiveData.value = audioModel
         }
     }
 
-    fun updateMuted(isMuted: Boolean) {
+    fun updateMuted() {
         viewModelScope.launch {
-            audioModel?.isMuted = isMuted
+            audioModel?.isMuted = !audioModel?.isMuted!!
             recordAudioLiveData.value = audioModel
         }
     }
 
     fun getAudioConfig(){
         viewModelScope.launch {
-            recordAudioLiveData.value = AudioModel()
+            audioModel = AudioModel()
+            recordAudioLiveData.value = audioModel
         }
     }
 

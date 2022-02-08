@@ -46,24 +46,6 @@ object BindingUtils {
         }
     }
 
-    @BindingAdapter("android:setRecordQuality")
-    @JvmStatic
-    fun setRecordQuality(textView: TextView, audioModel: AudioModel?) {
-        if (audioModel != null) {
-            val recordQuality = textView.context.resources.getStringArray(R.array.record_quality)
-            textView.text = recordQuality[audioModel.quality.ordinal]
-        }
-    }
-
-    @BindingAdapter("android:setRecordMode")
-    @JvmStatic
-    fun setRecordMode(textView: TextView, audioModel: AudioModel?) {
-        if (audioModel != null) {
-            val recordMode = textView.context.resources.getStringArray(R.array.record_mode)
-            textView.text = recordMode[audioModel.mode.ordinal]
-        }
-    }
-
     @BindingAdapter("android:setScheduleDate")
     @JvmStatic
     fun setScheduleDate(textView: TextView, time:Long?) {
@@ -106,5 +88,40 @@ object BindingUtils {
 
     private const val DATE_FORMAT= "dd/MM/yyyy"
     private const val TIME_FORMAT= "HH:mm"
+
+    //Audio
+    @BindingAdapter("android:setRecordQuality")
+    @JvmStatic
+    fun setRecordQuality(textView: TextView, audioModel: AudioModel?) {
+        if (audioModel != null) {
+            val recordQuality = textView.context.resources.getStringArray(R.array.record_quality)
+            textView.text = recordQuality[audioModel.quality.ordinal]
+        }
+    }
+
+    @BindingAdapter("android:setRecordMode")
+    @JvmStatic
+    fun setRecordMode(textView: TextView, audioModel: AudioModel?) {
+        if (audioModel != null) {
+            val recordMode = textView.context.resources.getStringArray(R.array.record_mode)
+            textView.text = recordMode[audioModel.mode.ordinal]
+        }
+    }
+
+    @BindingAdapter("android:setRecordAudioDuration")
+    @JvmStatic
+    fun setRecordAudioDuration(textView: TextView, audioModel: AudioModel?) {
+        audioModel?.duration?.let {
+            textView.text = if (it > 0) {
+                val time = it / 1000 / 60
+                textView.resources.getQuantityString(
+                    R.plurals.video_record_configuration_minute,
+                    time.toInt(), time.toInt()
+                )
+            } else {
+                textView.resources.getString(R.string.video_record_configuration_un_limit)
+            }
+        }
+    }
 
 }

@@ -3,16 +3,175 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.hola360.backgroundvideorecoder.ui.record.audio.audioschedule.ScheduleAudioViewModel" />
+
+        <import type="android.view.View" />
     </data>
 
-    <LinearLayout
-        android:gravity="center"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:text="Schedule audio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/dp_10">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextRecordTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/schedule_audio_record" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/btnQuality"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/dp_16">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/record_quality" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties2"
+                        android:setRecordQuality="@{viewModel.recordAudioLiveData}" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/md_blue_grey_200" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/btnMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/dp_16">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/mode" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties2"
+                        android:setRecordMode="@{viewModel.recordAudioLiveData}" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/md_blue_grey_200" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/btnDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/dp_16">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/date" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties2"
+                        android:setScheduleDate="@{viewModel.recordScheduleLiveData.scheduleTime}" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/md_blue_grey_200" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/btnTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/dp_16">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/time" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties2"
+                        android:setScheduleTime="@{viewModel.recordScheduleLiveData.scheduleTime}" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/md_blue_grey_200" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/btnDuration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/dp_16">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/record_duration" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties2"
+                        android:setRecordAudioDuration="@{viewModel.recordAudioLiveData}" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/md_blue_grey_200" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/dp_16">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/mute_ring_msg" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="@{viewModel.recordAudioLiveData.muted}"
+                        android:onClick="@{()->viewModel.updateMuted()}" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_30">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:background="@drawable/bg_button_start"
+                        android:onClick="@{()->viewModel.setSchedule()}"
+                        android:paddingHorizontal="@dimen/dp_24"
+                        android:text="@string/set_schedule"
+                        android:textAllCaps="false"
+                        android:textColor="@color/md_white_1000"
+                        android:visibility="@{viewModel.isRecordScheduleLiveData?View.GONE:View.VISIBLE}" />
+
+                    <include
+                        android:id="@+id/scheduleCard"
+                        layout="@layout/layout_schedule_record"
+                        android:visibility="@{viewModel.isRecordScheduleLiveData?View.VISIBLE:View.GONE}" />
+                </FrameLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </ScrollView>
 </layout>
