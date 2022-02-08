@@ -57,7 +57,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">40dp</item>
         <item name="android:drawableEnd">@drawable/ic_keyboard_arrow_right</item>
-        <item name="android:drawablePadding">@dimen/home_h_margin</item>
+        <item name="android:drawablePadding">@dimen/home_v_padding</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">18dp</item>
         <item name="android:fontFamily">@font/roboto_medium</item>
@@ -91,6 +91,18 @@
         <item name="android:elevation">@dimen/home_v_padding</item>
     </style>
 
+    <style name="TextSchedule">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:paddingStart">@dimen/home_h_margin</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="TextDialogTitle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -101,10 +113,35 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="TextDialogConfirmTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">20dp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="TextDialog1">
+        <item name="android:layout_width">120dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:elevation">@dimen/home_v_padding</item>
+        <item name="android:gravity">center</item>
         <item name="android:textSize">18dp</item>
         <item name="android:fontFamily">@font/roboto_medium</item>
         <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:foreground">?selectableItemBackground</item>
+    </style>
+
+    <style name="TextDialogMsg">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:paddingStart">30dp</item>
+        <item name="android:paddingEnd">30dp</item>
+        <item name="android:layout_marginTop">20dp</item>
     </style>
 
     <style name="HomeSmallIcon">

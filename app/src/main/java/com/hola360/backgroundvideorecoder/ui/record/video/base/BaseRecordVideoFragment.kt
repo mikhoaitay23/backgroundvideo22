@@ -24,11 +24,7 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
                 applyNewVideoConfiguration()
                 cameraSelectionDialog.dialog?.dismiss()
             }
-        }, object : OnDialogDismiss {
-            override fun onDismiss() {
-                showDialog = false
-            }
-        })
+        }, dismissCallback)
     }
     private val recordVideoDurationDialog: RecordVideoDurationDialog by lazy {
         RecordVideoDurationDialog(object : RecordVideoDurationDialog.OnSelectDuration {
@@ -37,12 +33,7 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
                 saveNewVideoConfiguration()
                 applyNewVideoConfiguration()
             }
-        },
-            object : OnDialogDismiss {
-                override fun onDismiss() {
-                    showDialog = false
-                }
-            })
+        },dismissCallback)
     }
     private val videoIntervalDurationDialog: VideoIntervalDurationDialog by lazy {
         VideoIntervalDurationDialog(object : RecordVideoDurationDialog.OnSelectDuration{
@@ -51,18 +42,19 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
                 saveNewVideoConfiguration()
                 applyNewVideoConfiguration()
             }
-        }, object : OnDialogDismiss {
-            override fun onDismiss() {
-                showDialog=false
-            }
-        })
+        }, dismissCallback)
+    }
+    protected val dismissCallback= object : OnDialogDismiss{
+        override fun onDismiss() {
+            showDialog=false
+        }
     }
     protected var showDialog = false
 
     protected fun generateVideoConfiguration() {
         videoConfiguration = if (dataPref!!.getVideoConfiguration() != "") {
             Gson().fromJson(
-                dataPref!!.getVideoConfiguration()!!,
+                dataPref!!.getVideoConfiguration(),
                 VideoRecordConfiguration::class.java
             )
         } else {
@@ -73,7 +65,7 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
     protected fun saveNewVideoConfiguration(){
         val configurationString= Gson().toJson(videoConfiguration!!)
         configurationString?.let {
-            dataPref!!.setVideoRecordConfiguration(it)
+            dataPref!!.putVideoConfiguration(it)
         }
     }
 
@@ -131,4 +123,5 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
         applyNewVideoConfiguration()
         saveNewVideoConfiguration()
     }
+
 }

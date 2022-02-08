@@ -64,22 +64,14 @@
             <TextView
                 android:id="@+id/cancel"
                 style="@style/TextDialog1"
-                android:layout_width="120dp"
-                android:layout_height="40dp"
                 android:layout_marginEnd="50dp"
                 android:background="@drawable/bg_button_cancel"
-                android:elevation="@dimen/home_v_padding"
-                android:gravity="center"
                 android:text="@string/cancel" />
 
             <TextView
                 android:id="@+id/oke"
                 style="@style/TextDialog1"
-                android:layout_width="120dp"
-                android:layout_height="40dp"
                 android:background="@drawable/bg_button_start"
-                android:elevation="@dimen/home_v_padding"
-                android:gravity="center"
                 android:text="@string/ok"
                 android:textColor="@color/md_white_1000" />
 

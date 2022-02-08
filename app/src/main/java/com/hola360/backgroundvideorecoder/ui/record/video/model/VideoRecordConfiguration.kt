@@ -12,6 +12,7 @@ class VideoRecordConfiguration() : Parcelable {
     var previewMode:Boolean= true
     var flash:Boolean= false
     var sound:Boolean= true
+    var scheduleTime:Long=0L
 
     constructor(parcel: Parcel) : this() {
         isBack = parcel.readByte() != 0.toByte()

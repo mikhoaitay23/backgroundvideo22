@@ -48,6 +48,11 @@
     <string name="video_record_schedule_date">Date</string>
     <string name="video_record_schedule_time">Time</string>
     <string name="video_record_schedule_set">Set Schedule</string>
+    <string name="video_record_schedule_invalidate_time">Timer must bigger than current time</string>
+    <string name="video_record_schedule_video_title">Video record will start at:</string>
+    <string name="video_record_schedule_audio_title">Audio record will start at:</string>
+    <string name="video_record_schedule_cancel_message">Do you want to cancel this schedule</string>
+    <string name="video_record_schedule_cancel_progress_message">There is audio, video or schedule in progress. Would you like to stop it?</string>
 
     //Audio Record
     <string name="record">Record</string>
@@ -62,7 +67,7 @@
     <string name="mode">Mode</string>
     <string name="record_duration">Record duration</string>
     <string name="mute_ring_msg">Mute ring when recording</string>
-    <string name="confirm">Confirm</string>
+    <string name="confirm">Confirm?</string>
     <string name="abort_msg">Abort recording will not be saved.</string>
     <string name="high">High</string>
     <string name="medium">Medium</string>

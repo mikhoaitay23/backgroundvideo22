@@ -16,12 +16,20 @@ class DataSharePreferenceUtil private constructor(context: Context) {
         return sharedPreferences.getString(key, "")
     }
 
-    fun setVideoRecordConfiguration(value: String) {
+    fun putVideoConfiguration(value: String) {
         putStringValue("Video_configuration", value)
     }
 
     fun getVideoConfiguration(): String? {
         return getStringValue("Video_configuration")
+    }
+
+    fun putSchedule(value:String){
+        putStringValue("Record_schedule", value)
+    }
+
+    fun getSchedule():String?{
+        return getStringValue("Record_schedule")
     }
 
     fun putBooleanValue(key: String, value: Boolean) {

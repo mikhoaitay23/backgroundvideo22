@@ -5,6 +5,8 @@ import androidx.databinding.BindingAdapter
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
+import java.text.SimpleDateFormat
+import java.util.*
 
 object BindingUtils {
 
@@ -57,5 +59,36 @@ object BindingUtils {
             textView.text = recordMode[audioModel.mode.ordinal]
         }
     }
+
+    @BindingAdapter("android:setScheduleDate")
+    @JvmStatic
+    fun setScheduleDate(textView: TextView, time:Long?) {
+        time?.let {
+            val dateFormat= SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
+            val txtTime= if(it==0L){
+                dateFormat.format(Calendar.getInstance().timeInMillis)
+            }else{
+                dateFormat.format(it)
+            }
+            textView.text= txtTime
+        }
+    }
+
+    @BindingAdapter("android:setScheduleTime")
+    @JvmStatic
+    fun setScheduleTime(textView: TextView, time:Long?) {
+        time?.let {
+            val timeFormat= SimpleDateFormat(TIME_FORMAT, Locale.getDefault())
+            val txtTime= if(it==0L){
+                timeFormat.format(Calendar.getInstance().timeInMillis)
+            }else{
+                timeFormat.format(it)
+            }
+            textView.text= txtTime
+        }
+    }
+
+    private const val DATE_FORMAT= "dd/MM/yyyy"
+    const val TIME_FORMAT= "HH:mm"
 
 }

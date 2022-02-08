@@ -2,6 +2,9 @@ package com.hola360.backgroundvideorecoder.utils
 
 import android.os.Build
 import android.os.Environment
+import android.view.View
+import com.google.android.material.snackbar.Snackbar
+import com.hola360.backgroundvideorecoder.R
 import java.io.File
 import java.util.*
 
@@ -38,5 +41,9 @@ object Utils {
         } else {
             String.format(Locale.getDefault(), "%02dh:%02dm:%02ds", hour, min, sec)
         }
+    }
+
+    fun showInvalidateTime(view:View){
+        Snackbar.make(view, view.resources.getString(R.string.video_record_schedule_invalidate_time), Snackbar.LENGTH_SHORT).show()
     }
 }
