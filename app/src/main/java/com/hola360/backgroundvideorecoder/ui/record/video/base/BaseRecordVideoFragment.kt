@@ -12,6 +12,14 @@ import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotD
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat.startActivityForResult
+
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+
 
 abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragment<V>() {
 
@@ -124,12 +132,6 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
                 "IntervalTime"
             )
         }
-    }
-
-    protected fun onPreviewModeChange(){
-        videoConfiguration!!.previewMode= !videoConfiguration!!.previewMode
-        applyNewVideoConfiguration()
-        saveNewVideoConfiguration()
     }
 
     protected fun onFlashModeChange(){
