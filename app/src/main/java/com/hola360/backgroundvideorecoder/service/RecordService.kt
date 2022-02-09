@@ -37,7 +37,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     private val previewVideoWindow: PreviewVideoWindow by lazy {
         PreviewVideoWindow(this, object : PreviewVideoWindow.RecordAction {
             override fun onFinishRecord() {
-                stopSelf()
+                stopForeground(true)
             }
         })
     }

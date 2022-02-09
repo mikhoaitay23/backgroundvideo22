@@ -90,7 +90,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         customLifeCycleOwner= CustomLifeCycleOwner().apply {
             doOnResume()
         }
-        totalTimeRecord=0L
+        totalTimeRecord -= videoRecordConfiguration.timePerVideo
     }
 
     private fun bindCaptureUserCase() {
@@ -144,6 +144,11 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
 
     private val captureListener = Consumer<VideoRecordEvent> { event ->
         when(event){
+            is VideoRecordEvent.Start->{
+                totalTimeRecord+= videoRecordConfiguration!!.timePerVideo
+                Log.d("abcVideo", "Start status: $totalTimeRecord")
+                newInterval=true
+            }
             is VideoRecordEvent.Status->{
                 Log.d("abcVideo", "New status: ${event.recordingStats.recordedDurationNanos/1000000}")
                 if(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000> videoRecordConfiguration!!.totalTime){
@@ -153,21 +158,14 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
                     Log.d("abcVideo", "Finish: $totalTimeRecord")
                 }
                 if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration!!.timePerVideo){
-                    Log.d("abcVideo", "New interval: ${event.recordingStats.recordedDurationNanos/1000000}")
                     if(newInterval){
                         stopRecording()
                         newInterval=false
-                    }else{
                         startRecording()
+                        Log.d("abcVideo", "Stop interval: ${event.recordingStats.recordedDurationNanos/1000000}")
                     }
                 }
             }
-            is VideoRecordEvent.Finalize->{
-                if(event.recordingStats.recordedDurationNanos==0L){
-                    Log.d("abcVideo", "Final status: ${event.recordingStats.recordedDurationNanos/1000000}")
-                }
-            }
-            else->{}
         }
     }
 
