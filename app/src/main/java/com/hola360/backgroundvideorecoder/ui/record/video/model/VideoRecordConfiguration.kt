@@ -8,7 +8,7 @@ class VideoRecordConfiguration() : Parcelable {
     var cameraQuality:Int=0
     var zoomScale:Float=0f
     var totalTime:Long=0
-    var timePerVideo:Long=60000L
+    var timePerVideo:Long=0
     var previewMode:Boolean= true
     var flash:Boolean= false
     var sound:Boolean= true

@@ -9,6 +9,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.navigation.fragment.findNavController
+import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
@@ -108,18 +109,22 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
                 onSoundModeChange()
             }
             R.id.start->{
-                if(!binding!!.isRecording){
-                    if(SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)){
-                        startRecordVideo()
-                    }else{
-                        getCameraPermission.launch(Constants.CAMERA_RECORD_PERMISSION)
-                    }
+                if(SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)){
+                    startRecordVideo()
+                }else{
+                    getCameraPermission.launch(Constants.CAMERA_RECORD_PERMISSION)
                 }
             }
         }
     }
 
     private fun startRecordVideo(){
+        if(!binding!!.isRecording){
+            (requireActivity() as MainActivity).startRecordVideo(START)
+        }else{
+            (requireActivity() as MainActivity).startRecordVideo(CLEAR)
+        }
+        binding!!.isRecording= !binding!!.isRecording
     }
 
     private val getCameraPermission = registerForActivityResult(

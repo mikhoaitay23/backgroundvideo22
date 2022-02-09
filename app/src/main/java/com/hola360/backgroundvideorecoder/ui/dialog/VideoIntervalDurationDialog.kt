@@ -30,7 +30,7 @@ class VideoIntervalDurationDialog(val callback: RecordVideoDurationDialog.OnSele
             dismiss()
         }
         binding!!.oke.setOnClickListener {
-            callback.onSelectDuration((binding!!.seekbar.progress+1)*60000L)
+            callback.onSelectDuration((binding!!.seekbar.progress+1)*RecordVideoDurationDialog.TIME_SQUARE)
             dismiss()
         }
     }
@@ -40,7 +40,7 @@ class VideoIntervalDurationDialog(val callback: RecordVideoDurationDialog.OnSele
     }
 
     private fun setupProgress(intervalTime: Long){
-        val progress= intervalTime.toInt()/60000-1
+        val progress= (intervalTime/RecordVideoDurationDialog.TIME_SQUARE).toInt()-1
         binding!!.seekbar.progress= progress
         Handler(Looper.getMainLooper()).postDelayed({
             setupToolTipText(progress)
