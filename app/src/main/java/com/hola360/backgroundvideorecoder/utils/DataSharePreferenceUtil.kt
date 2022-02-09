@@ -24,11 +24,11 @@ class DataSharePreferenceUtil private constructor(context: Context) {
         return getStringValue("Video_configuration")
     }
 
-    fun putSchedule(value:String){
+    fun putSchedule(value: String) {
         putStringValue("Record_schedule", value)
     }
 
-    fun getSchedule():String?{
+    fun getSchedule(): String? {
         return getStringValue("Record_schedule")
     }
 
@@ -54,13 +54,30 @@ class DataSharePreferenceUtil private constructor(context: Context) {
         return sharedPreferences.getInt(key, 1)
     }
 
-    fun putLongValue(key: String?, value: Long){
+    fun putLongValue(key: String?, value: Long) {
         val editor = sharedPreferences.edit()
         editor.putLong(key, value).apply()
     }
 
     fun getLongValue(key: String?): Long {
         return sharedPreferences.getLong(key, 0L)
+    }
+
+    //Audio
+    fun setAudioConfig(value: String) {
+        putStringValue("Audio_config", value)
+    }
+
+    fun getAudioConfig(): String? {
+        return getStringValue("Audio_config")
+    }
+
+    fun setAudioSchedule(value: String?) {
+        putStringValue("Audio_schedule", value)
+    }
+
+    fun getAudioSchedule(): String? {
+        return getStringValue("Audio_schedule")
     }
 
     companion object {

@@ -1,25 +1,25 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.audioschedule
 
 import android.app.Application
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import android.util.Log
+import androidx.lifecycle.*
+import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
+import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import kotlinx.coroutines.launch
 import java.util.*
 
 class ScheduleAudioViewModel(val application: Application) : ViewModel() {
 
-    var audioModel: AudioModel? = null
-    var recordSchedule: RecordSchedule? = null
+    private var audioModel: AudioModel? = null
+    private var recordSchedule: RecordSchedule? = null
     val recordAudioLiveData = MutableLiveData<AudioModel>()
     val recordScheduleLiveData = MutableLiveData<RecordSchedule>()
     val isRecordScheduleLiveData = MutableLiveData<Boolean>()
-    val saveRecordScheduleLiveData = MutableLiveData<ValidateType>()
+    private val dataSharedPreferenceUtil = DataSharePreferenceUtil.getInstance(application)
 
     init {
         isRecordScheduleLiveData.value = false
@@ -28,89 +28,93 @@ class ScheduleAudioViewModel(val application: Application) : ViewModel() {
     fun updateQuality(audioQuality: AudioQuality) {
         viewModelScope.launch {
             audioModel?.quality = audioQuality
-            recordAudioLiveData.value = audioModel
+            dataSharedPreferenceUtil!!.setAudioConfig(Gson().toJson(audioModel))
+            recordAudioLiveData.value = audioModel!!
         }
     }
 
     fun updateMode(audioMode: AudioMode) {
         viewModelScope.launch {
             audioModel?.mode = audioMode
-            recordAudioLiveData.value = audioModel
+            dataSharedPreferenceUtil!!.setAudioConfig(Gson().toJson(audioModel))
+            recordAudioLiveData.value = audioModel!!
         }
     }
 
     fun updateDuration(duration: Long) {
         viewModelScope.launch {
             audioModel?.duration = duration
-            recordAudioLiveData.value = audioModel
+            dataSharedPreferenceUtil!!.setAudioConfig(Gson().toJson(audioModel))
+            recordAudioLiveData.value = audioModel!!
         }
     }
 
     fun updateMuted() {
         viewModelScope.launch {
             audioModel?.isMuted = !audioModel?.isMuted!!
-            recordAudioLiveData.value = audioModel
+            dataSharedPreferenceUtil!!.setAudioConfig(Gson().toJson(audioModel))
+            recordAudioLiveData.value = audioModel!!
         }
     }
 
     fun updateDate(date: Long) {
         viewModelScope.launch {
-            if (recordSchedule == null) {
-                recordSchedule = RecordSchedule()
-            }
             recordSchedule?.scheduleTime = date
-            recordScheduleLiveData.value = recordSchedule
+            recordScheduleLiveData.value = recordSchedule!!
         }
     }
 
     fun updateTime(time: Long) {
         viewModelScope.launch {
-            if (recordSchedule == null) {
-                recordSchedule = RecordSchedule()
-            }
             recordSchedule?.scheduleTime = time
-            recordScheduleLiveData.value = recordSchedule
+            recordScheduleLiveData.value = recordSchedule!!
         }
     }
 
     fun getAudioConfig() {
         viewModelScope.launch {
-            audioModel = AudioModel()
-            recordAudioLiveData.value = audioModel
+            audioModel = if (!dataSharedPreferenceUtil!!.getAudioConfig().isNullOrEmpty()) {
+                Gson().fromJson(dataSharedPreferenceUtil.getAudioConfig(), AudioModel::class.java)
+            } else {
+                AudioModel()
+            }
+            recordAudioLiveData.value = audioModel!!
+        }
+    }
+
+    fun getAudioScheduleConfig() {
+        viewModelScope.launch {
+            recordSchedule = if (!dataSharedPreferenceUtil!!.getAudioSchedule().isNullOrEmpty()) {
+                Gson().fromJson(
+                    dataSharedPreferenceUtil.getAudioSchedule(),
+                    RecordSchedule::class.java
+                )
+            } else {
+                RecordSchedule()
+            }
+            recordScheduleLiveData.value = recordSchedule!!
+        }
+    }
+
+    fun getSavedSchedule() {
+        viewModelScope.launch {
+            isRecordScheduleLiveData.value =
+                !dataSharedPreferenceUtil!!.getAudioSchedule().isNullOrEmpty()
         }
     }
 
     fun setSchedule() {
         viewModelScope.launch {
-            if (recordSchedule == null) {
-                recordSchedule = RecordSchedule()
-                recordSchedule!!.scheduleTime = Calendar.getInstance().timeInMillis
-                recordSchedule!!.isVideo = false
-            }
-            val validateType = validateSchedule()
-            if (validateType == ValidateType.ValidateDone) {
-                isRecordScheduleLiveData.value = true
-            }
-            saveRecordScheduleLiveData.value = validateType
+            dataSharedPreferenceUtil!!.setAudioSchedule(Gson().toJson(recordSchedule))
+            isRecordScheduleLiveData.value = true
         }
     }
 
     fun cancelSchedule() {
         viewModelScope.launch {
+            dataSharedPreferenceUtil!!.setAudioSchedule(null)
             isRecordScheduleLiveData.value = false
         }
-    }
-
-    private fun validateSchedule(): ValidateType {
-        return if (Calendar.getInstance().timeInMillis == recordSchedule!!.scheduleTime) {
-            ValidateType.InvalidTime
-        } else {
-            ValidateType.ValidateDone
-        }
-    }
-
-    enum class ValidateType {
-        ValidateDone, InvalidTime
     }
 
     class Factory(private val application: Application) :

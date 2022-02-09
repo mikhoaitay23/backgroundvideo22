@@ -14,7 +14,7 @@ class AudioRecordFragment : BaseFragment<FragmentAudioRecordBinding>() {
     override val toolbarTitle: String? by lazy {
         resources.getString(R.string.audio_record_title)
     }
-    override val menuCode: Int = 0
+    override val menuCode: Int = R.drawable.ic_home_setting
     private val adapter: RecordViewPagerAdapter by lazy {
         RecordViewPagerAdapter(childFragmentManager, lifecycle).apply {
             updateFragment(false)
@@ -36,22 +36,6 @@ class AudioRecordFragment : BaseFragment<FragmentAudioRecordBinding>() {
                     binding!!.imgRecord.setColorFilter(
                         ContextCompat.getColor(
                             requireContext(),
-                            R.color.signature_color
-                        ), android.graphics.PorterDuff.Mode.SRC_IN
-                    )
-                    binding!!.tvRecord.setTextColor(resources.getColor(R.color.signature_color))
-
-                    binding!!.imgSchedule.setColorFilter(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.md_white_1000
-                        ), android.graphics.PorterDuff.Mode.SRC_IN
-                    )
-                    binding!!.tvSchedule.setTextColor(resources.getColor(R.color.md_white_1000))
-                } else {
-                    binding!!.imgRecord.setColorFilter(
-                        ContextCompat.getColor(
-                            requireContext(),
                             R.color.md_white_1000
                         ), android.graphics.PorterDuff.Mode.SRC_IN
                     )
@@ -60,10 +44,26 @@ class AudioRecordFragment : BaseFragment<FragmentAudioRecordBinding>() {
                     binding!!.imgSchedule.setColorFilter(
                         ContextCompat.getColor(
                             requireContext(),
-                            R.color.signature_color
+                            R.color.bg_page_un_select
                         ), android.graphics.PorterDuff.Mode.SRC_IN
                     )
-                    binding!!.tvSchedule.setTextColor(resources.getColor(R.color.signature_color))
+                    binding!!.tvSchedule.setTextColor(resources.getColor(R.color.bg_page_un_select))
+                } else {
+                    binding!!.imgRecord.setColorFilter(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.bg_page_un_select
+                        ), android.graphics.PorterDuff.Mode.SRC_IN
+                    )
+                    binding!!.tvRecord.setTextColor(resources.getColor(R.color.bg_page_un_select))
+
+                    binding!!.imgSchedule.setColorFilter(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.md_white_1000
+                        ), android.graphics.PorterDuff.Mode.SRC_IN
+                    )
+                    binding!!.tvSchedule.setTextColor(resources.getColor(R.color.md_white_1000))
                 }
             }
         })

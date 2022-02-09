@@ -1,8 +1,5 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord
 
-import android.content.Context
-import android.content.Intent
-import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
@@ -12,17 +9,14 @@ import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordAudioBinding
-import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
-import com.hola360.backgroundvideorecoder.ui.record.audio.bottomsheet.AudioRecordBottomSheetFragment
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
-import kotlinx.android.synthetic.main.layout_record_audio.*
 
 class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnClickListener {
 
@@ -40,9 +34,9 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
         val factory = RecordAudioViewModel.Factory(requireActivity().application)
         viewModel = ViewModelProvider(this, factory)[RecordAudioViewModel::class.java]
 
-        viewModel.recordAudioLiveData.observe(this, {
+        viewModel.recordAudioLiveData.observe(this) {
             audioModel = it
-        })
+        }
     }
 
     override fun initView() {
@@ -56,6 +50,10 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
 
         binding!!.lifecycleOwner = this
         binding!!.viewModel = viewModel
+    }
+
+    override fun onResume() {
+        super.onResume()
         viewModel.getAudioConfig()
     }
 
@@ -103,15 +101,9 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
     }
 
     private fun onServiceStart() {
-        mainActivity.intentService = Intent(requireActivity(), RecordService::class.java)
-        mainActivity.intentService!!.putExtra("Audio_status", AudioRecordUtils.START)
-        mainActivity.intentService!!.putExtra("Audio_configuration", audioModel)
-        requireActivity().startService(mainActivity.intentService)
-        requireActivity().bindService(
-            mainActivity.intentService!!,
-            mainActivity.mConnection,
-            Context.BIND_AUTO_CREATE
-        )
+//        mainActivity.intentService = Intent(requireActivity(), RecordService::class.java)
+//        requireActivity().startService(mainActivity.intentService)
+        mainActivity.recordService!!.recordAudio(audioModel!!)
     }
 
     private fun onQualityBottomSheet() {
