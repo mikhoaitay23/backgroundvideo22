@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         setupNavigation()
         setupToolbar()
         setupPrivacy()
+        bindActivityToService()
     }
 
     private fun setupNavigation() {
@@ -59,6 +60,11 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         }
     }
 
+    fun bindActivityToService(){
+        val intent= Intent(this, RecordService::class.java)
+        bindService(intent, mConnection, BIND_AUTO_CREATE)
+    }
+
     fun hideToolbar() {
         binding?.showToolbar = false
     }
@@ -73,6 +79,12 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
 
     fun showToolbarMenu(menuCode: Int) {
         binding?.toolbar?.showToolbarMenu(menuCode)
+    }
+
+    fun startRecordVideo(status:Int){
+        val intent= Intent(this, RecordService::class.java)
+        intent.putExtra("Video_status", status)
+        startService(intent)
     }
 
     val mConnection: ServiceConnection = object : ServiceConnection {

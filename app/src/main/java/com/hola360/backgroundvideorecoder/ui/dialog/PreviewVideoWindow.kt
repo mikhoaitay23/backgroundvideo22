@@ -47,23 +47,18 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
     private var currentRecording: Recording? = null
     private val mainThreadExecutor by lazy { ContextCompat.getMainExecutor(context) }
     var recordingState:VideoRecordEvent?=null
-    private val customLifeCycleOwner= CustomLifeCycleOwner()
+    private var customLifeCycleOwner: CustomLifeCycleOwner?=null
     private val cameraCapabilities: MutableList<CameraCapability> by lazy {
-        VideoRecordUtils.getCameraCapabilities(context, customLifeCycleOwner)
+        VideoRecordUtils.getCameraCapabilities(context, customLifeCycleOwner!!)
     }
     private var videoRecordConfiguration: VideoRecordConfiguration?= null
     private var totalTimeRecord:Long= 0
+    private var newInterval=false
 
     init {
         windowManager= context.getSystemService(WINDOW_SERVICE) as WindowManager
         val layoutInflater= context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         view= layoutInflater.inflate(R.layout.layout_preview_video, null)
-//        val start =  view?.findViewById<TextView>(R.id.start)
-//       start?.setOnClickListener {
-//           startRecording()
-//           start.isEnabled= false
-//        }
-
     }
 
     fun setupVideoConfiguration(videoRecordConfiguration: VideoRecordConfiguration){
@@ -74,8 +69,8 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             WindowManager.LayoutParams.TYPE_PHONE;
         }
         params= if(videoRecordConfiguration.previewMode){
-            WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
+               WindowManager.LayoutParams.WRAP_CONTENT,
                 layoutFlag,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT)
@@ -85,14 +80,17 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT)
         }
-        params!!.gravity= Gravity.BOTTOM
+        params!!.gravity= Gravity.NO_GRAVITY
         cameraIndex= if(videoRecordConfiguration.isBack){
             0
         }else{
             1
         }
         qualityIndex= videoRecordConfiguration.cameraQuality
-        customLifeCycleOwner.doOnResume()
+        customLifeCycleOwner= CustomLifeCycleOwner().apply {
+            doOnResume()
+        }
+        totalTimeRecord=0L
     }
 
     private fun bindCaptureUserCase() {
@@ -116,7 +114,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         try {
             cameraProvider.unbindAll()
             cameraProvider.bindToLifecycle(
-                customLifeCycleOwner,
+                customLifeCycleOwner!!,
                 cameraSelector,
                 videoCapture,
                 preview
@@ -136,56 +134,44 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         }
 //        val mediaStoreOutput = VideoRecordUtils.generateMediaStoreOutput(context)
         val file= File(context.cacheDir, "Record_video_${System.currentTimeMillis()}.mp4")
-        val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
+        val fileOutputOptions= VideoRecordUtils.generateMediaStoreOutput(context)
         currentRecording = videoCapture.output
             .prepareRecording(context, fileOutputOptions)
             .apply { if (videoRecordConfiguration!!.sound) withAudioEnabled() }
             .start(mainThreadExecutor, captureListener)
-    }
-
-    fun pauseAndResume() {
-        when (recordingState) {
-            is VideoRecordEvent.Start -> {
-                currentRecording?.pause()
-            }
-            is VideoRecordEvent.Pause -> {
-                currentRecording?.resume()
-            }
-            is VideoRecordEvent.Resume -> {
-                currentRecording?.pause()
-            }
-        }
+        Log.d("abcVideo", "Start new interval: ")
     }
 
     private val captureListener = Consumer<VideoRecordEvent> { event ->
-        // cache the recording state
         when(event){
             is VideoRecordEvent.Status->{
                 Log.d("abcVideo", "New status: ${event.recordingStats.recordedDurationNanos/1000000}")
                 if(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000> videoRecordConfiguration!!.totalTime){
                     stopRecording()
-                    Toast.makeText(context, "Finish", Toast.LENGTH_SHORT).show()
                     close()
                     callback.onFinishRecord()
+                    Log.d("abcVideo", "Finish: $totalTimeRecord")
                 }
                 if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration!!.timePerVideo){
-                    startRecording()
+                    Log.d("abcVideo", "New interval: ${event.recordingStats.recordedDurationNanos/1000000}")
+                    if(newInterval){
+                        stopRecording()
+                        newInterval=false
+                    }else{
+                        startRecording()
+                    }
                 }
             }
             is VideoRecordEvent.Finalize->{
                 if(event.recordingStats.recordedDurationNanos==0L){
                     Log.d("abcVideo", "Final status: ${event.recordingStats.recordedDurationNanos/1000000}")
-                    totalTimeRecord+= videoRecordConfiguration!!.timePerVideo
-                    Toast.makeText(context, "Finish", Toast.LENGTH_SHORT).show()
                 }
             }
-            else->{
-                recordingState = event
-            }
+            else->{}
         }
     }
 
-    private fun stopRecording(){
+    fun stopRecording(){
         if (currentRecording == null || recordingState is VideoRecordEvent.Finalize) {
             return
         }
@@ -195,6 +181,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             currentRecording = null
             recordingState= null
         }
+        Log.d("abcVideo", "Stop old interval: ")
     }
 
     fun open(){
@@ -215,7 +202,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
     fun close(){
         try {
             // remove the view from the window
-            customLifeCycleOwner.doOnDestroy()
+            customLifeCycleOwner!!.doOnDestroy()
             (context.getSystemService(WINDOW_SERVICE) as WindowManager).removeView(view!!)
             // invalidate the view
             view?.invalidate()

@@ -1,5 +1,9 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
+import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -12,9 +16,11 @@ import androidx.navigation.fragment.findNavController
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
+import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
+import java.util.*
 
 class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener {
 
@@ -118,9 +124,17 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         }
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     private fun startRecordVideo(){
         if(!binding!!.isRecording){
             (requireActivity() as MainActivity).startRecordVideo(START)
+//            val alarmManager= requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+//            val intent= Intent(requireContext(), RecordService::class.java)
+//            intent.putExtra("Video_status", START)
+//            val pendingIntent= PendingIntent.getService(requireContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+//            val calendar= Calendar.getInstance()
+//            calendar.add(Calendar.SECOND, 5)
+//            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
         }else{
             (requireActivity() as MainActivity).startRecordVideo(CLEAR)
         }
@@ -139,8 +153,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 
     companion object {
         const val START = 0
-        const val PAUSE = 1
-        const val RESUME = 2
+        const val INTERVAL = 1
         const val CLEAR = 3
     }
 }

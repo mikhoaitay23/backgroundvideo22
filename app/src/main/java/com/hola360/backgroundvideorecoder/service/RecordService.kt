@@ -1,12 +1,16 @@
 package com.hola360.backgroundvideorecoder.service
 
 import android.app.Activity
+import android.app.Notification
+import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
+import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.app.App
@@ -15,12 +19,21 @@ import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
 import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
+import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 
 
 class RecordService : Service(), AudioRecordUtils.Listener {
 
     private lateinit var listener: Listener
     var mBinder: IBinder = LocalBinder()
+    private val videoRecordConfiguration:VideoRecordConfiguration by lazy {
+        val dataPref= DataSharePreferenceUtil.getInstance(this)
+        Gson().fromJson(dataPref!!.getVideoConfiguration(), VideoRecordConfiguration::class.java)
+    }
+    private val notificationManager: NotificationManager by lazy {
+        this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+    private var recordTimeCount:Long=0L
 
     private val previewVideoWindow: PreviewVideoWindow by lazy {
         PreviewVideoWindow(this, object : PreviewVideoWindow.RecordAction {
@@ -43,28 +56,26 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         recordVideo(intent)
         recordAudio(intent)
-        sendNotification(intent)
         return START_NOT_STICKY
     }
 
     private fun recordVideo(intent: Intent?) {
         intent?.let {
-            val configuration =
-                it.getParcelableExtra<VideoRecordConfiguration>("Video_configuration")
             when (it.getIntExtra("Video_status", 0)) {
                 RecordVideo.START -> {
-                    if (configuration != null) {
-                        previewVideoWindow.setupVideoConfiguration(configuration)
-                        previewVideoWindow.open()
-                        previewVideoWindow.startRecording()
-                    }
+                    previewVideoWindow.setupVideoConfiguration(videoRecordConfiguration)
+                    previewVideoWindow.open()
+                    previewVideoWindow.startRecording()
+                    startForeground(1, getNotification(0))
+                }
+                RecordVideo.INTERVAL -> {
+                    previewVideoWindow.stopRecording()
+                    previewVideoWindow.startRecording()
+                    notificationManager.notify(1, getNotification(1))
                 }
                 RecordVideo.CLEAR -> {
                     previewVideoWindow.close()
-                    stopSelf()
-                }
-                RecordVideo.PAUSE -> {
-                    previewVideoWindow.pauseAndResume()
+                    stopForeground(true)
                 }
             }
         }
@@ -97,27 +108,19 @@ class RecordService : Service(), AudioRecordUtils.Listener {
         }
     }
 
-    private fun sendNotification(intent: Intent?) {
+    private fun getNotification(index:Int):Notification {
         val pendingIntent = NavDeepLinkBuilder(this)
             .setComponentName(MainActivity::class.java)
             .setGraph(R.navigation.nav_main_graph)
             .setDestination(R.id.nav_video_record)
             .createPendingIntent()
 
-        val notification = NotificationCompat.Builder(this, App.CHANNEL_SERVICE_ID)
-            .setContentTitle(
-                if (intent!!.getIntExtra("Audio_status", 0) == 0) {
-                    getString(R.string.audio_record_is_running)
-                } else {
-                    getString(R.string.video_record_is_running)
-                }
-            )
+        return NotificationCompat.Builder(this, App.CHANNEL_SERVICE_ID)
+            .setContentTitle("Test $index")
             .setContentText(getString(R.string.tap_to_open_now))
             .setContentIntent(pendingIntent)
             .setSmallIcon(R.drawable.ic_schedule)
             .build()
-
-        startForeground(1, notification)
     }
 
     class LocalBinder : Binder() {
