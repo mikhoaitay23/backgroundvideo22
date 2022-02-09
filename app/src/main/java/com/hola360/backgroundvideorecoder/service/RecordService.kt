@@ -19,8 +19,8 @@ import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfi
 
 class RecordService : Service(), AudioRecordUtils.Listener {
 
-    private lateinit var listener: Listener
-    var mBinder: IBinder = LocalBinder()
+    private var listener: Listener? = null
+    var mBinder = LocalBinder()
 
     private val previewVideoWindow: PreviewVideoWindow by lazy {
         PreviewVideoWindow(this, object : PreviewVideoWindow.RecordAction {
@@ -42,8 +42,6 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         recordVideo(intent)
-        recordAudio(intent)
-        sendNotification(intent)
         return START_NOT_STICKY
     }
 
@@ -70,34 +68,18 @@ class RecordService : Service(), AudioRecordUtils.Listener {
         }
     }
 
-    private fun recordAudio(intent: Intent?) {
-        intent?.let {
-            audioRecordUtils.registerListener(this)
-            val configuration =
-                it.getParcelableExtra<AudioModel>("Audio_configuration")
-            when (it.getIntExtra("Audio_status", 0)) {
-                AudioRecordUtils.START -> {
-                    if (configuration != null) {
-                        if (audioRecordUtils.isRecording()) {
-                            audioRecordUtils.onStopRecording()
-                        } else
-                            audioRecordUtils.onStartRecording(configuration)
-                    }
-                }
-                AudioRecordUtils.PAUSE -> {
-
-                }
-                AudioRecordUtils.RESUME -> {
-
-                }
-                AudioRecordUtils.STOP -> {
-
-                }
-            }
+    fun recordAudio(audioModel: AudioModel) {
+        audioRecordUtils.registerListener(this)
+        if (audioRecordUtils.isRecording()) {
+            audioRecordUtils.onStopRecording()
+            stopSelf()
+        } else {
+            audioRecordUtils.onStartRecording(audioModel)
+            sendNotification()
         }
     }
 
-    private fun sendNotification(intent: Intent?) {
+    private fun sendNotification() {
         val pendingIntent = NavDeepLinkBuilder(this)
             .setComponentName(MainActivity::class.java)
             .setGraph(R.navigation.nav_main_graph)
@@ -105,13 +87,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
             .createPendingIntent()
 
         val notification = NotificationCompat.Builder(this, App.CHANNEL_SERVICE_ID)
-            .setContentTitle(
-                if (intent!!.getIntExtra("Audio_status", 0) == 0) {
-                    getString(R.string.audio_record_is_running)
-                } else {
-                    getString(R.string.video_record_is_running)
-                }
-            )
+            .setContentTitle(getString(R.string.audio_record_is_running))
             .setContentText(getString(R.string.tap_to_open_now))
             .setContentIntent(pendingIntent)
             .setSmallIcon(R.drawable.ic_schedule)
@@ -120,14 +96,12 @@ class RecordService : Service(), AudioRecordUtils.Listener {
         startForeground(1, notification)
     }
 
-    class LocalBinder : Binder() {
-        fun getServiceInstance(): RecordService {
-            return RecordService()
-        }
+    inner class LocalBinder : Binder() {
+        fun getServiceInstance(): RecordService = this@RecordService
     }
 
-    fun registerListener(activity: Activity) {
-        listener = activity as Listener
+    fun registerListener(activity: Activity?) {
+        this.listener = activity as Listener
     }
 
     interface Listener {

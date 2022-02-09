@@ -103,11 +103,4 @@ class AudioRecordUtils {
         fun updateTimer(time: Long)
     }
 
-    companion object {
-        const val START = 0
-        const val PAUSE = 1
-        const val RESUME = 2
-        const val STOP = 3
-    }
-
 }

@@ -13,17 +13,18 @@ import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 
 abstract class BaseFragment<V : ViewDataBinding?> : Fragment() {
-    protected var dataPref: DataSharePreferenceUtil?= null
+    protected var dataPref: DataSharePreferenceUtil? = null
+
     @JvmField
     protected var binding: V? = null
     protected abstract val layoutId: Int
-    protected abstract val showToolbar:Boolean
+    protected abstract val showToolbar: Boolean
     protected abstract val toolbarTitle: String?
     protected abstract val menuCode: Int
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dataPref= DataSharePreferenceUtil.getInstance(requireActivity())
+        dataPref = DataSharePreferenceUtil.getInstance(requireActivity())
         initViewModel()
     }
 
@@ -42,9 +43,9 @@ abstract class BaseFragment<V : ViewDataBinding?> : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if(showToolbar){
+        if (showToolbar) {
             (requireActivity() as MainActivity).showToolbar()
-        }else{
+        } else {
             (requireActivity() as MainActivity).hideToolbar()
         }
         (requireActivity() as MainActivity).showToolbarMenu(menuCode)

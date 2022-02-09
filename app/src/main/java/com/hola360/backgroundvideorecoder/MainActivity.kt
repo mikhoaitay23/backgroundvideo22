@@ -1,8 +1,14 @@
 package com.hola360.backgroundvideorecoder
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
+import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -12,13 +18,6 @@ import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.widget.Toolbar
-import android.content.ComponentName
-import android.content.Intent
-
-import android.os.IBinder
-
-import android.content.ServiceConnection
-import android.util.Log
 
 
 class MainActivity : AppCompatActivity(), RecordService.Listener {
@@ -26,8 +25,8 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     private var binding: ActivityMainBinding? = null
     private var navController: NavController? = null
     private var navHostFragment: Fragment? = null
-    private var recordService: RecordService? = null
-    var intentService: Intent? = null
+    var recordService: RecordService? = null
+    private var bound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +35,12 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         setupNavigation()
         setupToolbar()
         setupPrivacy()
+        bindService()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService()
     }
 
     private fun setupNavigation() {
@@ -80,16 +85,28 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
             className: ComponentName,
             service: IBinder
         ) {
-            Toast.makeText(this@MainActivity, "onServiceConnected", Toast.LENGTH_SHORT)
-                .show()
             val binder: RecordService.LocalBinder = service as RecordService.LocalBinder
             recordService = binder.getServiceInstance()
             recordService!!.registerListener(this@MainActivity)
+            bound = true
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
-            Toast.makeText(this@MainActivity, "onServiceDisconnected", Toast.LENGTH_SHORT)
-                .show()
+            bound = false
+        }
+    }
+
+    private fun bindService() {
+        Intent(this@MainActivity, RecordService::class.java).also {
+            bindService(it, mConnection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    private fun unbindService() {
+        if (bound) {
+//            recordService!!.registerListener(null)
+            unbindService(mConnection)
+            bound = false
         }
     }
 
@@ -98,6 +115,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     override fun isStarted() {
-
+        Log.d("TAG", "isStarted: ")
     }
 }

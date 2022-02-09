@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
@@ -57,40 +58,36 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
         binding!!.btnDate.setOnClickListener(this)
         binding!!.btnTime.setOnClickListener(this)
         binding!!.scheduleCard.cancelSchedule.setOnClickListener(this)
+        binding!!.btnSetSchedule.setOnClickListener(this)
 
         binding!!.lifecycleOwner = this
         binding!!.viewModel = viewModel
-        viewModel.getAudioConfig()
+        viewModel.getAudioScheduleConfig()
     }
 
     override fun initViewModel() {
         val factory = ScheduleAudioViewModel.Factory(requireActivity().application)
         viewModel = ViewModelProvider(this, factory)[ScheduleAudioViewModel::class.java]
 
-        viewModel.recordAudioLiveData.observe(this, {
+        viewModel.recordAudioLiveData.observe(this) {
             audioModel = it
-        })
+        }
 
-        viewModel.recordScheduleLiveData.observe(this, {
+        viewModel.recordScheduleLiveData.observe(this) {
             recordSchedule = it
-        })
+        }
 
-        viewModel.isRecordScheduleLiveData.observe(this, {
+        viewModel.isRecordScheduleLiveData.observe(this) {
             if (it) {
                 binding!!.scheduleCard.schedule = recordSchedule
             }
-        })
+        }
+    }
 
-        viewModel.saveRecordScheduleLiveData.observe(this, {
-            when (it) {
-                ScheduleAudioViewModel.ValidateType.InvalidTime -> {
-                    Utils.showInvalidateTime(binding!!.root)
-                }
-                else -> {
-
-                }
-            }
-        })
+    override fun onResume() {
+        super.onResume()
+        viewModel.getAudioConfig()
+        viewModel.getSavedSchedule()
     }
 
     override fun onClick(p0: View?) {
@@ -124,6 +121,22 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
                 confirmCancelSchedule.setMessages(messages)
                 confirmCancelSchedule.show(requireActivity().supportFragmentManager, "Confirm")
             }
+            binding!!.btnSetSchedule -> {
+                setSchedule()
+            }
+        }
+    }
+
+    private fun setSchedule() {
+        if (calendar.timeInMillis < System.currentTimeMillis()) {
+            Utils.showInvalidateTime(binding!!.root)
+        } else {
+            recordSchedule = RecordSchedule().apply {
+                isVideo = false
+                scheduleTime = calendar.timeInMillis
+            }
+            binding!!.scheduleCard.schedule = recordSchedule
+            viewModel.setSchedule()
         }
     }
 
