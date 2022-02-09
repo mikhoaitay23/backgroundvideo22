@@ -98,7 +98,7 @@ class ScheduleVideo: BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View
                 }else{
                     binding!!.scheduleTime= calendar.timeInMillis
                 }
-            }, curHour, curMinute, true)
+            }, curHour, curMinute, false)
         timePicker.show()
     }
 

@@ -31,11 +31,7 @@ class HomeFragment: BaseFragment<FragmentHomeBinding>() {
 
         }
         binding!!.camera.setOnClickListener {
-            if(SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)){
-                findNavController().navigate(R.id.nav_video_record)
-            }else{
-                getCameraPermission.launch(Constants.CAMERA_RECORD_PERMISSION)
-            }
+            findNavController().navigate(R.id.nav_video_record)
         }
         binding!!.audio.setOnClickListener {
             findNavController().navigate(R.id.nav_audio_record)
@@ -44,15 +40,5 @@ class HomeFragment: BaseFragment<FragmentHomeBinding>() {
 
     override fun initViewModel() {
 
-    }
-
-    private val getCameraPermission = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { result: Map<String?, Boolean?>? ->
-        if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
-            findNavController().navigate(R.id.nav_video_record)
-        } else {
-            SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
-        }
     }
 }
