@@ -210,7 +210,7 @@
 
             <TextView
                 android:id="@+id/recordTime"
-                android:text="00:00:00"
+                android:text="@string/video_record_time_zero"
                 style="@style/TextRecordDuration"/>
 
             <TextView

@@ -20,7 +20,7 @@ import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.widget.Toolbar
 
 
-class MainActivity : AppCompatActivity(), RecordService.Listener {
+class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null
     private var navController: NavController? = null
@@ -93,7 +93,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         ) {
             val binder: RecordService.LocalBinder = service as RecordService.LocalBinder
             recordService = binder.getServiceInstance()
-            recordService!!.registerListener(this@MainActivity)
             bound = true
         }
 
@@ -116,11 +115,11 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         }
     }
 
-    companion object {
-        const val PRIVACY = "privacy"
+    fun registerServiceListener(listener:RecordService.Listener){
+        recordService!!.registerListener(listener)
     }
 
-    override fun isStarted() {
-        Log.d("TAG", "isStarted: ")
+    companion object {
+        const val PRIVACY = "privacy"
     }
 }

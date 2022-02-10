@@ -133,17 +133,12 @@ object VideoRecordUtils {
         return FileOutputOptions.Builder(file).build()
     }
 
-    fun generateRecordTime(context: Context, time:Long, isComplete:Boolean):String{
+    fun generateRecordTime(time:Long):String{
         val timeInSecond= time/1000
         val hour= timeInSecond/3600
         val minute= (timeInSecond%3600)/60
         val second= (timeInSecond%3600)%60
-        val prefix= if(isComplete){
-            context.resources.getString(R.string.video_record_complete_prefix)
-        }else{
-            context.resources.getString(R.string.video_record_notification_prefix)
-        }
-        return  String.format("%s %02d:%02d:%02d", prefix, hour, minute, second)
+        return  String.format("%02d:%02d:%02d", hour, minute, second)
     }
 
 

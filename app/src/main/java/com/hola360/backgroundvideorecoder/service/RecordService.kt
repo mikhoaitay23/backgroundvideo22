@@ -33,11 +33,18 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     private val previewVideoWindow: PreviewVideoWindow by lazy {
         PreviewVideoWindow(this, object : PreviewVideoWindow.RecordAction {
             override fun onRecording(time: Long, isComplete:Boolean) {
-                notificationContent = VideoRecordUtils.generateRecordTime(this@RecordService, time, isComplete)
+                notificationTitle= if(isComplete){
+                    this@RecordService.resources.getString(R.string.video_record_complete_prefix)
+                }else{
+                    this@RecordService.resources.getString(R.string.video_record_is_running)
+                }
+                listener?.updateTime(time)
+                notificationContent = VideoRecordUtils.generateRecordTime(time)
                 notificationManager.notify(NOTIFICATION_ID, getNotification())
             }
 
             override fun onFinishRecord() {
+                listener?.onRecordCompleted()
                 stopForeground(true)
             }
         })
@@ -111,12 +118,16 @@ class RecordService : Service(), AudioRecordUtils.Listener {
         fun getServiceInstance(): RecordService = this@RecordService
     }
 
-    fun registerListener(activity: Activity?) {
-        this.listener = activity as Listener
+    fun registerListener(listener: Listener) {
+        this.listener = listener
     }
 
     interface Listener {
-        fun isStarted()
+        fun onRecordStarted()
+
+        fun updateTime(time:Long)
+
+        fun onRecordCompleted()
     }
 
     override fun updateTimer(time: Long) {
