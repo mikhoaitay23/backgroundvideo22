@@ -27,15 +27,18 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
 import androidx.lifecycle.LifecycleOwner
+import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
+import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils.getAspectRatio
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
+@SuppressLint("InflateParams")
 class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
 
     private var view: View?= null
@@ -51,7 +54,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
     private val cameraCapabilities: MutableList<CameraCapability> by lazy {
         VideoRecordUtils.getCameraCapabilities(context, customLifeCycleOwner!!)
     }
-    private var videoRecordConfiguration: VideoRecordConfiguration?= null
+    private lateinit var videoRecordConfiguration: VideoRecordConfiguration
     private var totalTimeRecord:Long= 0
     private var newInterval=false
 
@@ -61,8 +64,8 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         view= layoutInflater.inflate(R.layout.layout_preview_video, null)
     }
 
-    fun setupVideoConfiguration(videoRecordConfiguration: VideoRecordConfiguration){
-        this.videoRecordConfiguration= videoRecordConfiguration
+    fun setupVideoConfiguration(){
+        videoRecordConfiguration= VideoRecordUtils.getVideoConfiguration(context)
         val layoutFlag =if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         } else {
@@ -80,7 +83,8 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT)
         }
-        params!!.gravity= Gravity.NO_GRAVITY
+        params!!.verticalMargin= 0.3f
+        params!!.horizontalMargin= -0.3f
         cameraIndex= if(videoRecordConfiguration.isBack){
             0
         }else{
@@ -90,7 +94,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         customLifeCycleOwner= CustomLifeCycleOwner().apply {
             doOnResume()
         }
-        totalTimeRecord -= videoRecordConfiguration.timePerVideo
+        totalTimeRecord = -videoRecordConfiguration.timePerVideo
     }
 
     private fun bindCaptureUserCase() {
@@ -137,7 +141,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         val fileOutputOptions= VideoRecordUtils.generateMediaStoreOutput(context)
         currentRecording = videoCapture.output
             .prepareRecording(context, fileOutputOptions)
-            .apply { if (videoRecordConfiguration!!.sound) withAudioEnabled() }
+            .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
             .start(mainThreadExecutor, captureListener)
         Log.d("abcVideo", "Start new interval: ")
     }
@@ -145,19 +149,21 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
     private val captureListener = Consumer<VideoRecordEvent> { event ->
         when(event){
             is VideoRecordEvent.Start->{
-                totalTimeRecord+= videoRecordConfiguration!!.timePerVideo
+                totalTimeRecord+= videoRecordConfiguration.timePerVideo
                 Log.d("abcVideo", "Start status: $totalTimeRecord")
                 newInterval=true
             }
             is VideoRecordEvent.Status->{
+                callback.onRecording(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000,
+                    totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.totalTime)
                 Log.d("abcVideo", "New status: ${event.recordingStats.recordedDurationNanos/1000000}")
-                if(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000> videoRecordConfiguration!!.totalTime){
+                if(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000> videoRecordConfiguration.totalTime){
                     stopRecording()
                     close()
                     callback.onFinishRecord()
                     Log.d("abcVideo", "Finish: $totalTimeRecord")
                 }
-                if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration!!.timePerVideo){
+                if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.timePerVideo){
                     if(newInterval){
                         stopRecording()
                         newInterval=false
@@ -219,6 +225,8 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
     }
 
     interface RecordAction{
+        fun onRecording(time:Long, isComplete:Boolean)
+
         fun onFinishRecord()
     }
 

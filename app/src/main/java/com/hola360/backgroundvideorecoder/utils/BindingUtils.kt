@@ -9,6 +9,7 @@ import androidx.databinding.BindingAdapter
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
+import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -19,7 +20,7 @@ object BindingUtils {
     fun videoRecordDuration(textView: TextView, duration: Long?) {
         duration?.let {
             textView.text = if (it > 0) {
-                val time = it / 1000 / 60
+                val time = it / RecordVideoDurationDialog.TIME_SQUARE
                 textView.resources.getQuantityString(
                     R.plurals.video_record_configuration_minute,
                     time.toInt(), time
@@ -35,7 +36,7 @@ object BindingUtils {
     fun timePerVideo(textView: TextView, duration: Long?) {
         duration?.let {
             textView.text = if (it > 0) {
-                val time = it / 1000 / 60
+                val time = it / RecordVideoDurationDialog.TIME_SQUARE
                 textView.resources.getQuantityString(
                     R.plurals.video_record_configuration_minute,
                     time.toInt(), time.toInt()

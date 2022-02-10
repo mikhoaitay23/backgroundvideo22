@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
+import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
@@ -130,5 +131,24 @@ object VideoRecordUtils {
 
     fun generateFileOutput(file:File):FileOutputOptions{
         return FileOutputOptions.Builder(file).build()
+    }
+
+    fun generateRecordTime(context: Context, time:Long, isComplete:Boolean):String{
+        val timeInSecond= time/1000
+        val hour= timeInSecond/3600
+        val minute= (timeInSecond%3600)/60
+        val second= (timeInSecond%3600)%60
+        val prefix= if(isComplete){
+            context.resources.getString(R.string.video_record_complete_prefix)
+        }else{
+            context.resources.getString(R.string.video_record_notification_prefix)
+        }
+        return  String.format("%s %02d:%02d:%02d", prefix, hour, minute, second)
+    }
+
+
+    fun getVideoConfiguration(context: Context):VideoRecordConfiguration{
+        val dataPref = DataSharePreferenceUtil.getInstance(context)
+        return Gson().fromJson(dataPref!!.getVideoConfiguration(), VideoRecordConfiguration::class.java)
     }
 }

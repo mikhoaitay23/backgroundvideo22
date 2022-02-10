@@ -45,6 +45,8 @@
         <item>Front</item>
         <item>Back</item>
     </array>
+    <string name="video_record_notification_prefix">Record time:</string>
+    <string name="video_record_complete_prefix">Record video complete:</string>
 
     <string name="video_record_schedule_title">Schedule automatically video recording</string>
     <string name="video_record_schedule_date">Date</string>
