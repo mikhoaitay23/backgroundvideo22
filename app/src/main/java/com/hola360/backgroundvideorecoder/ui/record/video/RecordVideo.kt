@@ -23,7 +23,7 @@ import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import java.util.*
 
-class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener, RecordService.Listener {
+class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener{
 
     override val layoutId: Int = R.layout.layout_record_video
 
@@ -81,7 +81,10 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     override fun onResume() {
         super.onResume()
         checkPreviewMode()
-        (requireActivity() as MainActivity).registerServiceListener(this)
+        binding!!.isRecording= (requireActivity() as MainActivity).recordStatus== MainActivity.VIDEO_RECORD
+        if((requireActivity() as MainActivity).recordStatus != MainActivity.VIDEO_RECORD){
+            binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -95,18 +98,14 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         }
     }
 
-    override fun onRecordStarted() {
-
+    fun updateRecordingTime(time:Long){
+        binding?.isRecording=true
+        binding?.recordTime?.text= VideoRecordUtils.generateRecordTime(time)
     }
 
-    override fun updateTime(time: Long) {
-        binding!!.isRecording=true
-        binding!!.recordTime.text= VideoRecordUtils.generateRecordTime(time)
-    }
-
-    override fun onRecordCompleted() {
-        binding!!.isRecording=false
-        binding!!.recordTime.text= resources.getString(R.string.video_record_time_zero)
+    fun onRecordCompleted(){
+        binding?.isRecording=false
+        binding?.recordTime?.text= resources.getString(R.string.video_record_time_zero)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -143,16 +142,17 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun startRecordVideo(){
         if(!binding!!.isRecording){
-//            (requireActivity() as MainActivity).startRecordVideo(START)
-            val alarmManager= requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val intent= Intent(requireContext(), RecordService::class.java)
-            intent.putExtra("Video_status", START)
-            val pendingIntent= PendingIntent.getService(requireContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-            val calendar= Calendar.getInstance()
-            calendar.add(Calendar.SECOND, 5)
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+            (requireActivity() as MainActivity).startRecordVideo(START)
+//            val alarmManager= requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+//            val intent= Intent(requireContext(), RecordService::class.java)
+//            intent.putExtra("Video_status", START)
+//            val pendingIntent= PendingIntent.getService(requireContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+//            val calendar= Calendar.getInstance()
+//            calendar.add(Calendar.SECOND, 5)
+//            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
         }else{
             (requireActivity() as MainActivity).startRecordVideo(CLEAR)
+            binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
         }
         binding!!.isRecording= !binding!!.isRecording
     }

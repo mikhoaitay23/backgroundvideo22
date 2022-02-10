@@ -16,17 +16,19 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
+import com.hola360.backgroundvideorecoder.ui.record.video.VideoRecordFragment
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.widget.Toolbar
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RecordService.Listener {
 
     private var binding: ActivityMainBinding? = null
     private var navController: NavController? = null
     private var navHostFragment: Fragment? = null
     var recordService: RecordService? = null
     private var bound = false
+    var recordStatus:Int= NO_RECORDING
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,15 +86,18 @@ class MainActivity : AppCompatActivity() {
         val intent= Intent(this, RecordService::class.java)
         intent.putExtra("Video_status", status)
         startService(intent)
+        bindService()
     }
 
-    val mConnection: ServiceConnection = object : ServiceConnection {
+    private val mConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
             className: ComponentName,
             service: IBinder
         ) {
             val binder: RecordService.LocalBinder = service as RecordService.LocalBinder
             recordService = binder.getServiceInstance()
+            recordService!!.registerListener(this@MainActivity)
+            recordStatus= recordService!!.recordStatus
             bound = true
         }
 
@@ -115,11 +120,38 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun registerServiceListener(listener:RecordService.Listener){
-        recordService!!.registerListener(listener)
+    override fun onRecordStarted(status: Int) {
+        this.recordStatus= status
+    }
+
+    override fun updateRecordTime(time: Long) {
+        if(navHostFragment?.isAdded==true){
+            val curFragment= navHostFragment?.childFragmentManager?.fragments?.get(0)
+            curFragment?.let {
+                if(it is VideoRecordFragment){
+                    it.updateRecodingTime(time)
+                    Log.d("abcVideo", "update time main activity")
+                }
+            }
+        }
+    }
+
+    override fun onRecordCompleted() {
+        this.recordStatus= NO_RECORDING
+        if(navHostFragment?.isAdded==true){
+            val curFragment= navHostFragment?.childFragmentManager?.fragments?.get(0)
+            curFragment?.let {
+                if(it is VideoRecordFragment){
+                    it.onRecordCompleted()
+                }
+            }
+        }
     }
 
     companion object {
         const val PRIVACY = "privacy"
+        const val NO_RECORDING=0
+        const val VIDEO_RECORD=1
+        const val AUDIO_RECORD=2
     }
 }

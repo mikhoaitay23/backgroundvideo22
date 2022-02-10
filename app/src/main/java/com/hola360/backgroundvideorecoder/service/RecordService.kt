@@ -1,6 +1,5 @@
 package com.hola360.backgroundvideorecoder.service
 
-import android.app.Activity
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.Service
@@ -8,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import android.provider.MediaStore
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.hola360.backgroundvideorecoder.MainActivity
@@ -28,6 +27,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     }
     private var notificationTitle: String = ""
     private var notificationContent: String = ""
+    var recordStatus:Int= MainActivity.NO_RECORDING
     private var listener: Listener? = null
     var mBinder = LocalBinder()
     private val previewVideoWindow: PreviewVideoWindow by lazy {
@@ -38,7 +38,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
                 }else{
                     this@RecordService.resources.getString(R.string.video_record_is_running)
                 }
-                listener?.updateTime(time)
+                listener?.updateRecordTime(time)
                 notificationContent = VideoRecordUtils.generateRecordTime(time)
                 notificationManager.notify(NOTIFICATION_ID, getNotification())
             }
@@ -56,11 +56,13 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     }
 
     override fun onCreate() {
+        Log.d("abcVideo", "Service  oncreate")
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         recordVideo(intent)
+        Log.d("abcVideo", "Service  start")
         return START_NOT_STICKY
     }
 
@@ -71,6 +73,8 @@ class RecordService : Service(), AudioRecordUtils.Listener {
                     previewVideoWindow.setupVideoConfiguration()
                     previewVideoWindow.open()
                     previewVideoWindow.startRecording()
+                    listener?.onRecordStarted(MainActivity.VIDEO_RECORD)
+                    recordStatus= MainActivity.VIDEO_RECORD
                     notificationTitle = this.resources.getString(R.string.video_record_is_running)
                     startForeground(NOTIFICATION_ID, getNotification())
                 }
@@ -123,9 +127,9 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     }
 
     interface Listener {
-        fun onRecordStarted()
+        fun onRecordStarted(status:Int)
 
-        fun updateTime(time:Long)
+        fun updateRecordTime(time:Long)
 
         fun onRecordCompleted()
     }
@@ -136,5 +140,10 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
     companion object {
         const val NOTIFICATION_ID = 1
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("abcVideo", "Service  killed")
     }
 }

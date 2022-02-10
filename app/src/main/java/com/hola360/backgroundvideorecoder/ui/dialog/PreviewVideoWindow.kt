@@ -156,7 +156,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             is VideoRecordEvent.Status->{
                 callback.onRecording(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000,
                     totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.totalTime)
-                Log.d("abcVideo", "New status: ${event.recordingStats.recordedDurationNanos/1000000}")
+                Log.d("abcVideo", "New record status: ${event.recordingStats.recordedDurationNanos/1000000}")
                 if(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000> videoRecordConfiguration.totalTime){
                     stopRecording()
                     close()
@@ -166,8 +166,8 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
                 if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.timePerVideo){
                     if(newInterval){
                         stopRecording()
-                        newInterval=false
                         startRecording()
+                        newInterval=false
                         Log.d("abcVideo", "Stop interval: ${event.recordingStats.recordedDurationNanos/1000000}")
                     }
                 }
