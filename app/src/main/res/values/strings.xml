@@ -58,6 +58,7 @@
     <string name="video_record_schedule_audio_title">Audio record will start at:</string>
     <string name="video_record_schedule_cancel_message">Do you want to cancel this schedule</string>
     <string name="video_record_schedule_cancel_progress_message">There is audio, video or schedule in progress. Would you like to stop it?</string>
+    <string name="video_record_schedule_notification_title">Video record will start at:</string>
 
     //Audio Record
     <string name="record">Record</string>

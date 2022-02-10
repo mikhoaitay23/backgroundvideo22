@@ -5,17 +5,19 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Binder
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.app.App
+import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
+import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
 
@@ -23,6 +25,9 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
     private val notificationManager: NotificationManager by lazy {
         this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+    private val recordScheduleBroadcast: ListenRecordScheduleBroadcast by lazy {
+        ListenRecordScheduleBroadcast()
     }
     private var notificationTitle: String = ""
     private var notificationContent: String = ""
@@ -38,8 +43,10 @@ class RecordService : Service(), AudioRecordUtils.Listener {
                     this@RecordService.resources.getString(R.string.video_record_is_running)
                 }
                 listener?.updateRecordTime(time)
-                notificationContent = VideoRecordUtils.generateRecordTime(time)
-                notificationManager.notify(NOTIFICATION_ID, getNotification())
+                if(recordStatus!= MainActivity.NO_RECORDING){
+                    notificationContent = VideoRecordUtils.generateRecordTime(time)
+                    notificationManager.notify(NOTIFICATION_ID, getNotification())
+                }
             }
 
             override fun onFinishRecord() {
@@ -56,6 +63,10 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
     override fun onCreate() {
         super.onCreate()
+        val intentFilter= IntentFilter().apply {
+            addAction(ScheduleVideo.SCHEDULE_VIDEO)
+        }
+        registerReceiver(recordScheduleBroadcast, intentFilter)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -78,6 +89,14 @@ class RecordService : Service(), AudioRecordUtils.Listener {
                 recordStatus=MainActivity.NO_RECORDING
                 stopForeground(true)
                 notificationManager.cancel(NOTIFICATION_ID)
+            }
+            MainActivity.SCHEDULE_RECORD_VIDEO->{
+                notificationTitle= this.getString(R.string.video_record_schedule_notification_title)
+                notificationContent= VideoRecordUtils.generateScheduleTime(this)
+                startForeground(NOTIFICATION_ID, getNotification())
+            }
+            MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO->{
+                stopForeground(true)
             }
         }
     }
@@ -134,6 +153,6 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("abcVideo", "Service  killed")
+        unregisterReceiver(recordScheduleBroadcast)
     }
 }

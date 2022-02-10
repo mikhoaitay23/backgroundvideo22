@@ -136,13 +136,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     private fun startRecordVideo(){
         if(!binding!!.isRecording){
             (requireActivity() as MainActivity).startRecordVideo(MainActivity.RECORD_VIDEO)
-//            val alarmManager= requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-//            val intent= Intent(requireContext(), RecordService::class.java)
-//            intent.putExtra("Video_status", START)
-//            val pendingIntent= PendingIntent.getBroadcast(requireContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-//            val calendar= Calendar.getInstance()
-//            calendar.add(Calendar.SECOND, 60)
-//            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
         }else{
             (requireActivity() as MainActivity).startRecordVideo(MainActivity.STOP_VIDEO_RECORD)
             binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)

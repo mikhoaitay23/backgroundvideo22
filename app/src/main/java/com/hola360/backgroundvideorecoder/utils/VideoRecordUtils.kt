@@ -19,6 +19,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
+import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
@@ -145,5 +146,15 @@ object VideoRecordUtils {
     fun getVideoConfiguration(context: Context):VideoRecordConfiguration{
         val dataPref = DataSharePreferenceUtil.getInstance(context)
         return Gson().fromJson(dataPref!!.getVideoConfiguration(), VideoRecordConfiguration::class.java)
+    }
+
+    fun generateScheduleTime(context: Context):String{
+        val dataPref = DataSharePreferenceUtil.getInstance(context)
+        val videoSchedule= Gson().fromJson(dataPref!!.getSchedule(), RecordSchedule::class.java)
+        val dateFormat= SimpleDateFormat(BindingUtils.DATE_FORMAT, Locale.getDefault())
+        val timeFormat= SimpleDateFormat(BindingUtils.TIME_FORMAT, Locale.getDefault())
+        val time= timeFormat.format(videoSchedule.scheduleTime)
+        val date= dateFormat.format(videoSchedule.scheduleTime)
+        return time.plus("  $date")
     }
 }

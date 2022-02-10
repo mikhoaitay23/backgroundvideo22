@@ -87,8 +87,8 @@ object BindingUtils {
         imageView.setColorFilter(color)
     }
 
-    private const val DATE_FORMAT= "dd/MM/yyyy"
-    private const val TIME_FORMAT= "HH:mm"
+    const val DATE_FORMAT= "dd/MM/yyyy"
+    const val TIME_FORMAT= "HH:mm"
 
     //Audio
     @BindingAdapter("android:setRecordQuality")

@@ -109,7 +109,8 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
 
     private fun handleRecordStatus(status: Int){
         when(status){
-            RECORD_VIDEO, STOP_VIDEO_RECORD->{
+            RECORD_VIDEO, STOP_VIDEO_RECORD,
+            SCHEDULE_RECORD_VIDEO, CANCEL_SCHEDULE_RECORD_VIDEO->{
                 recordService!!.recordVideo(status)
             }
         }
@@ -162,7 +163,9 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         const val NO_RECORDING=0
         const val RECORD_VIDEO=1
         const val STOP_VIDEO_RECORD=2
-        const val AUDIO_RECORD=3
-        const val STOP_AUDIO_RECORD=4
+        const val SCHEDULE_RECORD_VIDEO=3
+        const val CANCEL_SCHEDULE_RECORD_VIDEO=4
+        const val AUDIO_RECORD=10
+        const val STOP_AUDIO_RECORD=11
     }
 }
