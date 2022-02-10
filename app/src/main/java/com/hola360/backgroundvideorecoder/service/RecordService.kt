@@ -70,6 +70,10 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        intent?.let {
+            val status= it.getIntExtra("Video_status", 0)
+            recordVideo(status)
+        }
         return START_NOT_STICKY
     }
 

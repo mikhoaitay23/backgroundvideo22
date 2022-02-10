@@ -25,6 +25,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Background_Video_Record">
 
+        <receiver android:name=".broadcastreciever.ListenRecordScheduleBroadcast"/>
+
         <service
             android:name=".service.RecordService"
             android:enabled="true"

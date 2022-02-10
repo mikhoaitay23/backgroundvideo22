@@ -10,6 +10,7 @@ import android.view.View
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
+import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
 import com.hola360.backgroundvideorecoder.databinding.LayoutScheduleVideoBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
@@ -129,7 +130,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         (requireActivity() as MainActivity).startRecordVideo(MainActivity.SCHEDULE_RECORD_VIDEO)
         val alarmManager =
             requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(requireContext(), RecordService.ListenRecordScheduleBroadcast::class.java)
+        val intent = Intent(requireContext(), ListenRecordScheduleBroadcast::class.java)
         intent.action = SCHEDULE_VIDEO
         intent.putExtra(SCHEDULE_VIDEO, true)
         val pendingIntent = PendingIntent.getBroadcast(
