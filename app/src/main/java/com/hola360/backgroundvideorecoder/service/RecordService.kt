@@ -16,7 +16,6 @@ import com.hola360.backgroundvideorecoder.app.App
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
-import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
 
@@ -56,35 +55,29 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     }
 
     override fun onCreate() {
-        Log.d("abcVideo", "Service  oncreate")
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        recordVideo(intent)
-        Log.d("abcVideo", "Service  start")
         return START_NOT_STICKY
     }
 
-    private fun recordVideo(intent: Intent?) {
-        intent?.let {
-            when (it.getIntExtra("Video_status", 0)) {
-                RecordVideo.START -> {
-                    previewVideoWindow.setupVideoConfiguration()
-                    previewVideoWindow.open()
-                    previewVideoWindow.startRecording()
-                    listener?.onRecordStarted(MainActivity.VIDEO_RECORD)
-                    recordStatus= MainActivity.VIDEO_RECORD
-                    notificationTitle = this.resources.getString(R.string.video_record_is_running)
-                    Log.d("abcVideo", "Service  start record")
-                    startForeground(NOTIFICATION_ID, getNotification())
-                }
-                RecordVideo.CLEAR -> {
-                    previewVideoWindow.close()
-                    recordStatus=MainActivity.NO_RECORDING
-                    stopForeground(true)
-                    notificationManager.cancel(NOTIFICATION_ID)
-                }
+    fun recordVideo(status: Int) {
+        when (status) {
+           MainActivity.RECORD_VIDEO -> {
+                previewVideoWindow.setupVideoConfiguration()
+                previewVideoWindow.open()
+                previewVideoWindow.startRecording()
+                listener?.onRecordStarted(MainActivity.RECORD_VIDEO)
+                recordStatus= MainActivity.RECORD_VIDEO
+                notificationTitle = this.resources.getString(R.string.video_record_is_running)
+                startForeground(NOTIFICATION_ID, getNotification())
+            }
+            MainActivity.STOP_VIDEO_RECORD -> {
+                previewVideoWindow.close()
+                recordStatus=MainActivity.NO_RECORDING
+                stopForeground(true)
+                notificationManager.cancel(NOTIFICATION_ID)
             }
         }
     }

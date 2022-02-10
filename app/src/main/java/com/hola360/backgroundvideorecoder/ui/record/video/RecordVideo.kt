@@ -1,27 +1,20 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
 import android.annotation.SuppressLint
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.navigation.fragment.findNavController
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
-import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
-import java.util.*
 
 class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener{
 
@@ -81,8 +74,8 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     override fun onResume() {
         super.onResume()
         checkPreviewMode()
-        binding!!.isRecording= (requireActivity() as MainActivity).recordStatus== MainActivity.VIDEO_RECORD
-        if((requireActivity() as MainActivity).recordStatus != MainActivity.VIDEO_RECORD){
+        binding!!.isRecording= (requireActivity() as MainActivity).recordStatus== MainActivity.RECORD_VIDEO
+        if((requireActivity() as MainActivity).recordStatus != MainActivity.RECORD_VIDEO){
             binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
         }
     }
@@ -142,7 +135,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun startRecordVideo(){
         if(!binding!!.isRecording){
-            (requireActivity() as MainActivity).startRecordVideo(START)
+            (requireActivity() as MainActivity).startRecordVideo(MainActivity.RECORD_VIDEO)
 //            val alarmManager= requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
 //            val intent= Intent(requireContext(), RecordService::class.java)
 //            intent.putExtra("Video_status", START)
@@ -151,7 +144,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 //            calendar.add(Calendar.SECOND, 60)
 //            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
         }else{
-            (requireActivity() as MainActivity).startRecordVideo(CLEAR)
+            (requireActivity() as MainActivity).startRecordVideo(MainActivity.STOP_VIDEO_RECORD)
             binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
         }
         binding!!.isRecording= !binding!!.isRecording

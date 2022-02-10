@@ -7,7 +7,6 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
@@ -83,10 +82,12 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     fun startRecordVideo(status:Int){
-        val intent= Intent(this, RecordService::class.java)
-        intent.putExtra("Video_status", status)
-        startService(intent)
-        bindService()
+        recordStatus= status
+        if(recordService!=null){
+            handleRecordStatus(status)
+        }else{
+            bindService()
+        }
     }
 
     private val mConnection: ServiceConnection = object : ServiceConnection {
@@ -97,12 +98,20 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
             val binder: RecordService.LocalBinder = service as RecordService.LocalBinder
             recordService = binder.getServiceInstance()
             recordService!!.registerListener(this@MainActivity)
-            recordStatus= recordService!!.recordStatus
+            handleRecordStatus(recordStatus)
             bound = true
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
             bound = false
+        }
+    }
+
+    private fun handleRecordStatus(status: Int){
+        when(status){
+            RECORD_VIDEO, STOP_VIDEO_RECORD->{
+                recordService!!.recordVideo(status)
+            }
         }
     }
 
@@ -128,7 +137,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         if(navHostFragment?.isAdded==true){
             val curFragment= navHostFragment?.childFragmentManager?.fragments?.get(0)
             curFragment?.let {
-                if(it is VideoRecordFragment){
+                if(it is VideoRecordFragment && recordStatus== RECORD_VIDEO){
                     it.updateRecodingTime(time)
                     Log.d("abcVideo", "update time main activity")
                 }
@@ -151,7 +160,9 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     companion object {
         const val PRIVACY = "privacy"
         const val NO_RECORDING=0
-        const val VIDEO_RECORD=1
-        const val AUDIO_RECORD=2
+        const val RECORD_VIDEO=1
+        const val STOP_VIDEO_RECORD=2
+        const val AUDIO_RECORD=3
+        const val STOP_AUDIO_RECORD=4
     }
 }
