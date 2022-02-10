@@ -76,15 +76,12 @@ class RecordService : Service(), AudioRecordUtils.Listener {
                     listener?.onRecordStarted(MainActivity.VIDEO_RECORD)
                     recordStatus= MainActivity.VIDEO_RECORD
                     notificationTitle = this.resources.getString(R.string.video_record_is_running)
+                    Log.d("abcVideo", "Service  start record")
                     startForeground(NOTIFICATION_ID, getNotification())
-                }
-                RecordVideo.INTERVAL -> {
-                    previewVideoWindow.stopRecording()
-                    previewVideoWindow.startRecording()
-                    notificationManager.notify(NOTIFICATION_ID, getNotification())
                 }
                 RecordVideo.CLEAR -> {
                     previewVideoWindow.close()
+                    recordStatus=MainActivity.NO_RECORDING
                     stopForeground(true)
                     notificationManager.cancel(NOTIFICATION_ID)
                 }

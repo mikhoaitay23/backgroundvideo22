@@ -146,9 +146,9 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 //            val alarmManager= requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
 //            val intent= Intent(requireContext(), RecordService::class.java)
 //            intent.putExtra("Video_status", START)
-//            val pendingIntent= PendingIntent.getService(requireContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+//            val pendingIntent= PendingIntent.getBroadcast(requireContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 //            val calendar= Calendar.getInstance()
-//            calendar.add(Calendar.SECOND, 5)
+//            calendar.add(Calendar.SECOND, 60)
 //            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
         }else{
             (requireActivity() as MainActivity).startRecordVideo(CLEAR)
