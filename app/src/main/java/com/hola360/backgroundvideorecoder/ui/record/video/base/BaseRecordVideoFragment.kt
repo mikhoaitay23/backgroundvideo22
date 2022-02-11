@@ -33,7 +33,7 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
         val itemList = resources.getStringArray(R.array.camera_facing).toMutableList()
         ListSelectionBotDialog(title, itemList, object : ListSelectionAdapter.OnItemListSelection {
             override fun onSelection(position: Int) {
-                videoConfiguration!!.isBack = position == 0
+                videoConfiguration!!.isBack = position==CAMERA_FACING_BACK
                 saveNewVideoConfiguration()
                 applyNewVideoConfiguration()
                 cameraSelectionDialog.dialog?.dismiss()
@@ -91,9 +91,9 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
         if (!showDialog) {
             showDialog = true
             val position = if (videoConfiguration!!.isBack) {
-                0
+                CAMERA_FACING_BACK
             } else {
-                1
+                CAMERA_FACING_FRONT
             }
             cameraSelectionDialog.setSelectionPos(position)
             cameraSelectionDialog.show(requireActivity().supportFragmentManager, "Camera")
@@ -146,7 +146,7 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun requestOverlayPermission(){
+    protected fun requestOverlayPermission(){
         if (!Settings.canDrawOverlays(requireContext())) {
             val intent = Intent(
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -170,5 +170,10 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
     }
 
     abstract fun startAction()
+
+    companion object{
+        const val CAMERA_FACING_FRONT=0
+        const val CAMERA_FACING_BACK=1
+    }
 
 }

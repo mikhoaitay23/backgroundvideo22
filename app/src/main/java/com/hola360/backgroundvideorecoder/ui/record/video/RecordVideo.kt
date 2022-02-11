@@ -1,6 +1,5 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -11,8 +10,6 @@ import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
-import com.hola360.backgroundvideorecoder.utils.Constants
-import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
 class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener{
@@ -51,13 +48,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         applyNewVideoConfiguration()
         saveNewVideoConfiguration()
         if (videoConfiguration!!.previewMode) {
-            if (!Settings.canDrawOverlays(requireContext())) {
-                val intent = Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + requireContext().packageName)
-                )
-                startActivityForResult(intent, 0)
-            }
+            requestOverlayPermission()
         }
     }
 
@@ -141,6 +132,5 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         }
         binding!!.isRecording= !binding!!.isRecording
     }
-
 
 }

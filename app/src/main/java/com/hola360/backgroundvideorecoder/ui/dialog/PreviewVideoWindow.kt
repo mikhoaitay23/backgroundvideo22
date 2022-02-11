@@ -20,6 +20,7 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.widget.TextView
 import android.widget.Toast
+import androidx.camera.core.CameraControl
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
@@ -44,6 +45,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
     private var view: View?= null
     private var windowManager: WindowManager?= null
     private var params: WindowManager.LayoutParams?=null
+    private var cameraControl:CameraControl?=null
     private var cameraIndex = 0
     private var qualityIndex = 0
     private lateinit var videoCapture: VideoCapture<Recorder>
@@ -118,12 +120,13 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
 
         try {
             cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(
+            val camera= cameraProvider.bindToLifecycle(
                 customLifeCycleOwner!!,
                 cameraSelector,
                 videoCapture,
                 preview
             )
+            cameraControl= camera.cameraControl
         } catch (exc: Exception) {
             // we are on main thread, let's reset the controls on the UI.
             Log.e("CameraTest", "Use case binding failed", exc)
@@ -140,6 +143,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
 //        val mediaStoreOutput = VideoRecordUtils.generateMediaStoreOutput(context)
         val file= File(context.cacheDir, "Record_video_${System.currentTimeMillis()}.mp4")
         val fileOutputOptions= VideoRecordUtils.generateMediaStoreOutput(context)
+        cameraControl?.enableTorch(videoRecordConfiguration.flash)
         currentRecording = videoCapture.output
             .prepareRecording(context, fileOutputOptions)
             .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
