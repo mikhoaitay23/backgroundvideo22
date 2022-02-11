@@ -25,9 +25,9 @@ object Constants {
 
 
 
-    val TIME_ZONE_OFFSET= TimeZone.getDefault().getOffset(Date().time)
-    const val  DELETE_DIALOG= "DeleteDialog"
-    const val ASSETS_PATH: String= "file:///android_asset/"
+    val TIME_ZONE_OFFSET = TimeZone.getDefault().getOffset(Date().time)
+    const val DELETE_DIALOG = "DeleteDialog"
+    const val ASSETS_PATH: String = "file:///android_asset/"
     const val PHOTO_PATH: String = "ScanQrCode"
 
 }

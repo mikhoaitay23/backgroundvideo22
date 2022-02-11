@@ -56,6 +56,9 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
     override fun onResume() {
         super.onResume()
         viewModel.getAudioConfig()
+        if (mainActivity.recordService == null) {
+            mainActivity.bindService()
+        }
     }
 
     private var resultLauncher =
@@ -102,11 +105,7 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
     }
 
     private fun onServiceStart() {
-        if (audioRecordUtils?.isRecording() == false) {
-            mainActivity.startRecordAudio(MainActivity.AUDIO_RECORD, audioModel!!)
-        } else {
-            mainActivity.startRecordAudio(MainActivity.STOP_AUDIO_RECORD, audioModel!!)
-        }
+        mainActivity.startRecordAudio(MainActivity.AUDIO_RECORD)
     }
 
     private fun onQualityBottomSheet() {

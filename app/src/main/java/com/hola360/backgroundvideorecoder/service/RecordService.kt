@@ -6,24 +6,26 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.media.AudioFormat
 import android.os.Binder
 import android.os.Environment
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.app.App
 import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
-import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
-import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
+import com.hola360.backgroundvideorecoder.ui.record.audio.utils.RecordHelper
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
-import com.zlw.main.recorderlib.BuildConfig
-import com.zlw.main.recorderlib.RecordManager
+import com.zlw.main.recorderlib.recorder.RecordConfig
+import com.zlw.main.recorderlib.recorder.RecordConfig.RecordFormat
+import com.zlw.main.recorderlib.recorder.listener.*
+import com.zlw.main.recorderlib.utils.FileUtils
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -40,7 +42,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     var recordStatus: Int = MainActivity.NO_RECORDING
     private var listener: Listener? = null
     var mBinder = LocalBinder()
-    private var recordManager = RecordManager.getInstance()
+    private var currentConfig = RecordConfig()
     private val previewVideoWindow: PreviewVideoWindow by lazy {
         PreviewVideoWindow(this, object : PreviewVideoWindow.RecordAction {
             override fun onRecording(time: Long, isComplete: Boolean) {
@@ -53,14 +55,14 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
             override fun onFinishRecord() {
                 listener?.onRecordCompleted()
-                notificationTitle =  this@RecordService.resources.getString(R.string.video_record_complete_prefix)
+                notificationTitle =
+                    this@RecordService.resources.getString(R.string.video_record_complete_prefix)
                 VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
                 notificationManager.notify(NOTIFICATION_ID, getNotification())
                 stopForeground(true)
             }
         })
     }
-    private var audioRecordUtils = AudioRecordUtils()
 
     override fun onBind(intent: Intent): IBinder {
         return mBinder
@@ -76,13 +78,19 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let {
-            val status= it.getIntExtra(Constants.VIDEO_STATUS, 0)
+            val status = it.getIntExtra(Constants.VIDEO_STATUS, 0)
             recordVideo(status)
+
+            val statusAudio = it.getIntExtra("Audio", 0)
+            if (statusAudio == 0)
+                startRecording(
+                    getFilePath()!!
+                )
         }
         return START_NOT_STICKY
     }
 
-    private fun recordVideo(status: Int) {
+    fun recordVideo(status: Int) {
         when (status) {
             MainActivity.RECORD_VIDEO -> {
                 previewVideoWindow.setupVideoConfiguration()
@@ -111,34 +119,76 @@ class RecordService : Service(), AudioRecordUtils.Listener {
         }
     }
 
-    fun recordAudio(status: Int, audioModel: AudioModel) {
-        audioRecordUtils.registerListener(this)
-        when (status) {
-            MainActivity.AUDIO_RECORD -> {
-                initRecord()
-                audioRecordUtils.onStartRecording(audioModel)
-                recordStatus = MainActivity.AUDIO_RECORD
-                notificationTitle = this.resources.getString(R.string.audio_record_is_running)
-                notificationContent = "haha"
-                startForeground(NOTIFICATION_ID, getNotification())
-                listener?.onRecordStarted(MainActivity.AUDIO_RECORD)
-            }
-            MainActivity.STOP_AUDIO_RECORD -> {
-                audioRecordUtils.onStopRecording()
-                recordStatus = MainActivity.NO_RECORDING
-                stopForeground(true)
-                notificationManager.cancel(NOTIFICATION_ID)
-            }
-        }
-    }
-
-    private fun initRecord() {
-        recordManager!!.init(application, BuildConfig.DEBUG)
+    fun startRecording(path: String) {
         val recordDir = String.format(
             Locale.getDefault(), "%s/Record/backgroundrecord/",
             Environment.getExternalStorageDirectory().absolutePath
         )
-        recordManager.changeRecordDir(recordDir)
+        changeRecordDir(recordDir)
+        changeRecordConfig(
+            RecordConfig(
+                RecordFormat.MP3,
+                1,
+                AudioFormat.ENCODING_PCM_16BIT,
+                16000
+            )
+        )
+        RecordHelper().start(path, currentConfig)
+        startForeground(NOTIFICATION_ID, getNotification())
+    }
+
+    fun stopRecording() {
+        RecordHelper().stop()
+    }
+
+    fun resumeRecording() {
+        RecordHelper().resume()
+    }
+
+    fun pauseRecording() {
+        RecordHelper().pause()
+    }
+
+    /**
+     * Change format audio file
+     */
+    fun changeFormat(recordFormat: RecordFormat?): Boolean {
+        if (getState() == RecordHelper.RecordState.IDLE) {
+            currentConfig.format = recordFormat
+            return true
+        }
+        return false
+    }
+
+    /**
+     * Change audio record config
+     */
+    fun changeRecordConfig(recordConfig: RecordConfig?): Boolean {
+        if (getState() == RecordHelper.RecordState.IDLE) {
+            if (recordConfig != null) {
+                currentConfig = recordConfig
+            }
+            return true
+        }
+        return false
+    }
+
+    fun getRecordConfig(): RecordConfig {
+        return currentConfig
+    }
+
+    fun changeRecordDir(recordDir: String?) {
+        currentConfig.recordDir = recordDir
+    }
+
+    fun setCurrentConfig(currentConfig: RecordConfig?) {
+        if (currentConfig != null) {
+            this.currentConfig = currentConfig
+        }
+    }
+
+    fun getState(): RecordHelper.RecordState? {
+        return RecordHelper().getState()
     }
 
     private fun getNotification(): Notification {
@@ -182,5 +232,44 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(recordScheduleBroadcast)
+    }
+
+    fun setRecordStateListener(recordStateListener: RecordStateListener?) {
+        RecordHelper().setRecordStateListener(recordStateListener)
+    }
+
+    fun setRecordDataListener(recordDataListener: RecordDataListener?) {
+        RecordHelper().setRecordDataListener(recordDataListener)
+    }
+
+    fun setRecordSoundSizeListener(recordSoundSizeListener: RecordSoundSizeListener?) {
+        RecordHelper().setRecordSoundSizeListener(recordSoundSizeListener)
+    }
+
+    fun setRecordResultListener(recordResultListener: RecordResultListener?) {
+        RecordHelper().setRecordResultListener(recordResultListener)
+    }
+
+    fun setRecordFftDataListener(recordFftDataListener: RecordFftDataListener?) {
+        RecordHelper().setRecordFftDataListener(recordFftDataListener)
+    }
+
+    private fun getFilePath(): String? {
+        val fileDir = currentConfig.recordDir
+        if (!FileUtils.createOrExistsDir(fileDir)) {
+            return null
+        }
+        val fileName = java.lang.String.format(
+            Locale.getDefault(),
+            "bg_audio_%s",
+            FileUtils.getNowString(SimpleDateFormat("yyyyMMdd_HH_mm_ss", Locale.US))
+        )
+        return java.lang.String.format(
+            Locale.US,
+            "%s%s%s",
+            fileDir,
+            fileName,
+            ".mp3"
+        )
     }
 }

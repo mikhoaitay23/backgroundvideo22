@@ -128,10 +128,11 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 
     override fun startAction() {
         if(!binding!!.isRecording){
-            (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.RECORD_VIDEO)
+            (requireActivity() as MainActivity).handleRecordStatus(MainActivity.RECORD_VIDEO)
         }else{
-            (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.STOP_VIDEO_RECORD)
-            (requireActivity() as MainActivity).onRecordCompleted()
+            (requireActivity() as MainActivity).handleRecordStatus(MainActivity.STOP_VIDEO_RECORD)
+            (requireActivity() as MainActivity).recordStatus= MainActivity.NO_RECORDING
+            binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
         }
         binding!!.isRecording= !binding!!.isRecording
     }

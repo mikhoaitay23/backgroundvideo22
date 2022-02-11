@@ -174,7 +174,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun setScheduleBroadcast(time:Long){
-        (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.SCHEDULE_RECORD_VIDEO)
+        (requireActivity() as MainActivity).handleRecordStatus(MainActivity.SCHEDULE_RECORD_VIDEO)
         VideoRecordUtils.setAlarmSchedule(requireContext(), time)
     }
 
@@ -184,7 +184,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
             binding!!.scheduleTime=it
         }
         dataPref!!.putSchedule("")
-        (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO)
+        (requireActivity() as MainActivity).handleRecordStatus(MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO)
         VideoRecordUtils.cancelAlarmSchedule(requireContext())
     }
 
