@@ -144,7 +144,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             .prepareRecording(context, fileOutputOptions)
             .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
             .start(mainThreadExecutor, captureListener)
-        Log.d("abcVideo", "Start new interval: ")
     }
 
     private val captureListener = Consumer<VideoRecordEvent> { event ->
@@ -157,19 +156,15 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             is VideoRecordEvent.Status->{
                 callback.onRecording(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000,
                     totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.totalTime)
-                Log.d("abcVideo", "New record status: ${event.recordingStats.recordedDurationNanos/1000000}")
                 if(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000> videoRecordConfiguration.totalTime){
-                    stopRecording()
                     close()
                     callback.onFinishRecord()
-                    Log.d("abcVideo", "Finish: $totalTimeRecord")
                 }
                 if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.timePerVideo){
                     if(newInterval){
                         stopRecording()
                         startRecording()
                         newInterval=false
-                        Log.d("abcVideo", "Stop interval: ${event.recordingStats.recordedDurationNanos/1000000}")
                     }
                 }
             }

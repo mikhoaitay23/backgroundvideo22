@@ -9,6 +9,7 @@ import android.content.IntentFilter
 import android.os.Binder
 import android.os.Environment
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.hola360.backgroundvideorecoder.MainActivity
@@ -43,8 +44,8 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     private val previewVideoWindow: PreviewVideoWindow by lazy {
         PreviewVideoWindow(this, object : PreviewVideoWindow.RecordAction {
             override fun onRecording(time: Long, isComplete: Boolean) {
-                listener?.updateRecordTime(time, MainActivity.RECORD_VIDEO)
                 if (recordStatus != MainActivity.NO_RECORDING) {
+                    listener?.updateRecordTime(time, MainActivity.RECORD_VIDEO)
                     notificationContent = VideoRecordUtils.generateRecordTime(time)
                     notificationManager.notify(NOTIFICATION_ID, getNotification())
                 }
@@ -53,6 +54,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
             override fun onFinishRecord() {
                 listener?.onRecordCompleted()
                 notificationTitle =  this@RecordService.resources.getString(R.string.video_record_complete_prefix)
+                VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
                 notificationManager.notify(NOTIFICATION_ID, getNotification())
                 stopForeground(true)
             }
@@ -74,7 +76,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let {
-            val status= it.getIntExtra("Video_status", 0)
+            val status= it.getIntExtra(Constants.VIDEO_STATUS, 0)
             recordVideo(status)
         }
         return START_NOT_STICKY
@@ -93,6 +95,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
             MainActivity.STOP_VIDEO_RECORD -> {
                 previewVideoWindow.close()
                 recordStatus = MainActivity.NO_RECORDING
+                VideoRecordUtils.checkScheduleWhenRecordStop(this)
                 stopForeground(true)
                 notificationManager.cancel(NOTIFICATION_ID)
             }
@@ -170,7 +173,6 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     }
 
     override fun updateTimer(time: Long) {
-
     }
 
     companion object {

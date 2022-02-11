@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat.startActivityForResult
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
 
 abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragment<V>() {
@@ -65,29 +66,8 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        generateVideoConfiguration()
-        getSchedule()
-    }
-
-    private fun generateVideoConfiguration() {
-        videoConfiguration = if (dataPref!!.getVideoConfiguration() != "") {
-            Gson().fromJson(
-                dataPref!!.getVideoConfiguration(),
-                VideoRecordConfiguration::class.java
-            )
-        } else {
-            VideoRecordConfiguration()
-        }
-    }
-
-    private fun getSchedule(){
-        recordSchedule= if(dataPref!!.getSchedule() != ""){
-            Gson().fromJson(dataPref!!.getSchedule(), RecordSchedule::class.java)
-        }else{
-            RecordSchedule()
-        }
-        isRecording= recordSchedule!!.scheduleTime!= 0L && recordSchedule!!.scheduleTime< System.currentTimeMillis()
-                && (recordSchedule!!.scheduleTime+ videoConfiguration!!.totalTime)>System.currentTimeMillis()
+        videoConfiguration = VideoRecordUtils.getVideoConfiguration(requireContext())
+        recordSchedule= VideoRecordUtils.getVideoSchedule(requireContext())
     }
 
     protected fun saveNewVideoConfiguration(){

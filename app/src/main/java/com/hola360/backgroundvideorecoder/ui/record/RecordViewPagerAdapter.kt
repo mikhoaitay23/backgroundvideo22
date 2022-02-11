@@ -39,6 +39,9 @@ class RecordViewPagerAdapter(private val fragmentManager: FragmentManager, priva
         if(fragments.size>0 && fragments[0] is RecordVideo){
             (fragments[0] as RecordVideo).onRecordCompleted()
         }
+        if(fragments.size>1 && fragments[1] is ScheduleVideo){
+            (fragments[1] as ScheduleVideo).checkScheduleWhenRecordStop()
+        }
     }
 
     override fun createFragment(position: Int): Fragment {

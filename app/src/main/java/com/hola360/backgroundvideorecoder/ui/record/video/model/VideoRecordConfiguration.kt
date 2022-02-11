@@ -2,13 +2,15 @@ package com.hola360.backgroundvideorecoder.ui.record.video.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
+import com.hola360.backgroundvideorecoder.ui.dialog.VideoIntervalDurationDialog
 
 class VideoRecordConfiguration() : Parcelable {
     var isBack:Boolean= true
     var cameraQuality:Int=0
     var zoomScale:Float=0f
     var totalTime:Long=0
-    var timePerVideo:Long=0
+    var timePerVideo:Long= RecordVideoDurationDialog.TIME_SQUARE
     var previewMode:Boolean= true
     var flash:Boolean= false
     var sound:Boolean= true

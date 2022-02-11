@@ -51,13 +51,12 @@ class RecordVideoDurationDialog(val callback:OnSelectDuration,
         val progress= if(totalTime==0L){
             SEEKBAR_PROGRESS-6
         }else{
-            (totalTime.toFloat()/60000/120* TIME_SEGMENT).toInt()
+            (totalTime.toFloat()/ TIME_SQUARE/120* TIME_SEGMENT).toInt()
         }
         binding!!.seekbar.progress= progress
         Handler(Looper.getMainLooper()).postDelayed({
             setupToolTipText(progress)
         }, 100)
-
     }
 
     private fun setupToolTipText(progress:Int){

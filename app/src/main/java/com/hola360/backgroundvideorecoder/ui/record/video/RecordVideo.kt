@@ -23,7 +23,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     override val layoutId: Int = R.layout.layout_record_video
 
     override fun initView() {
-        binding!!.isRecording = isRecording
         applyNewVideoConfiguration()
         binding!!.camera.setOnClickListener(this)
         binding!!.recordDuration.setOnClickListener(this)
@@ -35,7 +34,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         binding!!.flashSwitch.isEnabled = false
         binding!!.soundSwitch.isEnabled = false
         binding!!.start.setOnClickListener(this)
-        setSwitchThumb()
+//        setSwitchThumb()
     }
 
     private fun setSwitchThumb() {
@@ -97,7 +96,9 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     }
 
     fun updateRecordingTime(time:Long){
-        binding?.isRecording=true
+        if(binding?.isRecording==false){
+            binding?.isRecording=true
+        }
         binding?.recordTime?.text= VideoRecordUtils.generateRecordTime(time)
     }
 
@@ -143,6 +144,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
             (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.RECORD_VIDEO)
         }else{
             (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.STOP_VIDEO_RECORD)
+            (requireActivity() as MainActivity).recordStatus= MainActivity.NO_RECORDING
             binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
         }
         binding!!.isRecording= !binding!!.isRecording

@@ -144,7 +144,28 @@ object VideoRecordUtils {
 
     fun getVideoConfiguration(context: Context):VideoRecordConfiguration{
         val dataPref = DataSharePreferenceUtil.getInstance(context)
-        return Gson().fromJson(dataPref!!.getVideoConfiguration(), VideoRecordConfiguration::class.java)
+        return if (dataPref?.getVideoConfiguration() != "") {
+            Gson().fromJson(
+                dataPref!!.getVideoConfiguration(),
+                VideoRecordConfiguration::class.java
+            )
+        } else {
+            VideoRecordConfiguration()
+        }
+    }
+
+    fun getVideoSchedule(context: Context):RecordSchedule{
+        val dataPref = DataSharePreferenceUtil.getInstance(context)
+        return if(dataPref?.getSchedule() != ""){
+            val schedule= Gson().fromJson(dataPref?.getSchedule(), RecordSchedule::class.java)
+            if(schedule.scheduleTime+ getVideoConfiguration(context).totalTime< System.currentTimeMillis()){
+                RecordSchedule()
+            }else{
+                schedule
+            }
+        }else{
+            RecordSchedule()
+        }
     }
 
     fun generateScheduleTime(context: Context):String{
@@ -188,5 +209,13 @@ object VideoRecordUtils {
         val alarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(getBroadcastPendingIntent(context))
+    }
+
+    fun checkScheduleWhenRecordStop(context: Context){
+        val schedule= getVideoSchedule(context)
+        if(schedule.scheduleTime != 0L && schedule.scheduleTime<  System.currentTimeMillis()){
+            val dataPref = DataSharePreferenceUtil.getInstance(context)
+            dataPref!!.putSchedule("")
+        }
     }
 }

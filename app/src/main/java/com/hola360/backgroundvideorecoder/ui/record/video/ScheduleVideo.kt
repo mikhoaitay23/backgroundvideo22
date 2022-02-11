@@ -1,24 +1,17 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
-import android.app.AlarmManager
 import android.app.DatePickerDialog
-import android.app.PendingIntent
 import android.app.TimePickerDialog
-import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.view.View
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
-import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
 import com.hola360.backgroundvideorecoder.databinding.LayoutScheduleVideoBinding
-import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
-import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import java.util.*
@@ -140,11 +133,17 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
     private fun cancelSchedule() {
         binding!!.schedule = false
         setSwitchThumb()
-        calendar.timeInMillis = System.currentTimeMillis()
-        binding!!.scheduleTime = calendar.timeInMillis
+        calendar.timeInMillis = System.currentTimeMillis().also {
+            binding!!.scheduleTime=it
+        }
         dataPref!!.putSchedule("")
         (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO)
         VideoRecordUtils.cancelAlarmSchedule(requireContext())
+    }
+
+    fun checkScheduleWhenRecordStop(){
+        val videoSchedule= VideoRecordUtils.getVideoSchedule(requireContext())
+        binding?.schedule= videoSchedule.scheduleTime>System.currentTimeMillis()
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
