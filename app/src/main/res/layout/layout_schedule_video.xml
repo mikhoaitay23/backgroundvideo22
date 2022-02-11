@@ -13,6 +13,10 @@
             type="Long" />
 
         <variable
+            name="isRecording"
+            type="boolean" />
+
+        <variable
             name="configuration"
             type="com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration" />
 
@@ -96,7 +100,7 @@
                 android:id="@+id/camera"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="@{!schedule}"
+                android:clickable="@{!isRecording}"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -111,8 +115,8 @@
 
                     <TextView
                         style="@style/TextRecordProperties2"
-                        android:text="@{configuration.back? @string/video_record_configuration_front: @string/video_record_configuration_back}"
-                        android:textColor="@{schedule? @color/un_clickable: @color/colorAccent}" />
+                        android:text="@{configuration.back? @string/video_record_configuration_back: @string/video_record_configuration_front}"
+                        android:textColor="@{isRecording? @color/un_clickable: @color/colorAccent}" />
 
                 </LinearLayout>
 
@@ -124,7 +128,7 @@
                 android:id="@+id/recordDuration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="@{!schedule}"
+                android:clickable="@{!isRecording}"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -140,7 +144,7 @@
                     <TextView
                         style="@style/TextRecordProperties2"
                         videoRecordDuration="@{configuration.totalTime}"
-                        android:textColor="@{schedule? @color/un_clickable: @color/colorAccent}" />
+                        android:textColor="@{isRecording? @color/un_clickable: @color/colorAccent}" />
 
                 </LinearLayout>
 
@@ -152,7 +156,7 @@
                 android:id="@+id/intervalTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="@{!schedule}"
+                android:clickable="@{!isRecording}"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -168,7 +172,7 @@
                     <TextView
                         style="@style/TextRecordProperties2"
                         timePerVideo="@{configuration.timePerVideo}"
-                        android:textColor="@{schedule? @color/un_clickable: @color/colorAccent}" />
+                        android:textColor="@{isRecording? @color/un_clickable: @color/colorAccent}" />
 
                 </LinearLayout>
 
@@ -180,7 +184,7 @@
                 android:id="@+id/flash"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="@{!schedule}"
+                android:clickable="@{!isRecording}"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -211,7 +215,7 @@
                 android:id="@+id/sound"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="@{!schedule}"
+                android:clickable="@{!isRecording}"
                 android:orientation="vertical">
 
                 <LinearLayout

@@ -11,11 +11,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
+import com.hola360.backgroundvideorecoder.ui.record.BackgroundRecordEvent
 import com.hola360.backgroundvideorecoder.ui.record.video.VideoRecordFragment
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
@@ -29,7 +31,12 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     private var navHostFragment: Fragment? = null
     var recordService: RecordService? = null
     private var bound = false
-    var recordStatus: Int = NO_RECORDING
+    private val curRecordEvent= BackgroundRecordEvent()
+    val recordStatusLiveData= MutableLiveData<BackgroundRecordEvent>()
+
+    init {
+        recordStatusLiveData.value = BackgroundRecordEvent()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,33 +140,22 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     override fun onRecordStarted(status: Int) {
-        this.recordStatus = status
+        curRecordEvent.status= status
+        recordStatusLiveData.value= curRecordEvent
     }
 
     override fun updateRecordTime(time: Long, status: Int) {
-        if(recordStatus!= status){
-            recordStatus= status
+        if(curRecordEvent.status != status){
+            curRecordEvent.status= status
         }
-        if (navHostFragment?.isAdded == true) {
-            val curFragment = navHostFragment?.childFragmentManager?.fragments?.get(0)
-            curFragment?.let {
-                if (it is VideoRecordFragment && recordStatus == RECORD_VIDEO) {
-                    it.updateRecodingTime(time)
-                }
-            }
-        }
+        curRecordEvent.time= time
+        recordStatusLiveData.value= curRecordEvent
     }
 
     override fun onRecordCompleted() {
-        this.recordStatus = NO_RECORDING
-        if (navHostFragment?.isAdded == true) {
-            val curFragment = navHostFragment?.childFragmentManager?.fragments?.get(0)
-            curFragment?.let {
-                if (it is VideoRecordFragment) {
-                    it.onRecordCompleted()
-                }
-            }
-        }
+        curRecordEvent.status= NO_RECORDING
+        curRecordEvent.time= 0L
+        recordStatusLiveData.value = curRecordEvent
     }
 
     companion object {

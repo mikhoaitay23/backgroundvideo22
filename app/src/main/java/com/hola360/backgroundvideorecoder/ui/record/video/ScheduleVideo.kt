@@ -3,6 +3,7 @@ package com.hola360.backgroundvideorecoder.ui.record.video
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Build
+import android.os.Bundle
 import android.view.View
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
@@ -28,6 +29,15 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         }, dismissCallback)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
+    fun checkScheduleWhenRecordStop(){
+        val videoSchedule= VideoRecordUtils.getVideoSchedule(requireContext())
+        binding?.schedule= videoSchedule.scheduleTime>System.currentTimeMillis()
+    }
+
     override fun initView() {
         if (recordSchedule!!.scheduleTime == 0L) {
             binding!!.schedule = false
@@ -49,17 +59,11 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         binding!!.scheduleCard.cancelSchedule.setOnClickListener(this)
         binding!!.flashSwitch.isEnabled = false
         binding!!.soundSwitch.isEnabled = false
-        setSwitchThumb()
     }
 
-    private fun setSwitchThumb() {
-        val thumbRes = if (binding!!.schedule) {
-            R.drawable.bg_switch_thumb_un_clickable
-        } else {
-            R.drawable.bg_switch_thumb
-        }
-        binding!!.flashSwitch.setThumbResource(thumbRes)
-        binding!!.soundSwitch.setThumbResource(thumbRes)
+    override fun updateSwitchThumb() {
+        binding!!.flashSwitch.setThumbResource(switchThumb)
+        binding!!.soundSwitch.setThumbResource(switchThumb)
     }
 
     override fun initViewModel() {
@@ -104,33 +108,6 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
             }, curHour, curMinute, false
         )
         timePicker.show()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun saveSchedule() {
-
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun setScheduleBroadcast(time:Long){
-        (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.SCHEDULE_RECORD_VIDEO)
-        VideoRecordUtils.setAlarmSchedule(requireContext(), time)
-    }
-
-    private fun cancelSchedule() {
-        binding!!.schedule = false
-        setSwitchThumb()
-        calendar.timeInMillis = System.currentTimeMillis().also {
-            binding!!.scheduleTime=it
-        }
-        dataPref!!.putSchedule("")
-        (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO)
-        VideoRecordUtils.cancelAlarmSchedule(requireContext())
-    }
-
-    fun checkScheduleWhenRecordStop(){
-        val videoSchedule= VideoRecordUtils.getVideoSchedule(requireContext())
-        binding?.schedule= videoSchedule.scheduleTime>System.currentTimeMillis()
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -184,7 +161,6 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
             Utils.showInvalidateTime(binding!!.root)
         } else {
             binding!!.schedule = true
-            setSwitchThumb()
             recordSchedule = RecordSchedule().apply {
                 isVideo = true
                 scheduleTime = calendar.timeInMillis
@@ -194,6 +170,22 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
             dataPref!!.putSchedule(scheduleValue)
             setScheduleBroadcast(calendar.timeInMillis)
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun setScheduleBroadcast(time:Long){
+        (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.SCHEDULE_RECORD_VIDEO)
+        VideoRecordUtils.setAlarmSchedule(requireContext(), time)
+    }
+
+    private fun cancelSchedule() {
+        binding!!.schedule = false
+        calendar.timeInMillis = System.currentTimeMillis().also {
+            binding!!.scheduleTime=it
+        }
+        dataPref!!.putSchedule("")
+        (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO)
+        VideoRecordUtils.cancelAlarmSchedule(requireContext())
     }
 
     companion object{

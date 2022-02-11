@@ -18,7 +18,10 @@ import androidx.annotation.RequiresApi
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.Observer
+import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
@@ -63,6 +66,7 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
             showDialog=false
         }
     }
+    protected var switchThumb:Int= 0
     protected var showDialog = false
     protected var isRecording= false
 
@@ -71,6 +75,8 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
         videoConfiguration = VideoRecordUtils.getVideoConfiguration(requireContext())
         recordSchedule= VideoRecordUtils.getVideoSchedule(requireContext())
     }
+
+    abstract fun updateSwitchThumb()
 
     override fun onResume() {
         super.onResume()

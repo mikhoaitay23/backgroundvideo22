@@ -44,12 +44,4 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
             }
         }
     }
-
-    fun updateRecodingTime(time:Long){
-        adapter.updateRecordingTime(time)
-    }
-
-    fun onRecordCompleted(){
-        adapter.onRecordingComplete()
-    }
 }

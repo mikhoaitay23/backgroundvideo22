@@ -186,7 +186,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             currentRecording = null
             recordingState= null
         }
-        Log.d("abcVideo", "Stop old interval: ")
     }
 
     fun open(){

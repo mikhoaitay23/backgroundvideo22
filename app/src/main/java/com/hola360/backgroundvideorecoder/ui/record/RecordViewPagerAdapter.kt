@@ -1,6 +1,5 @@
 package com.hola360.backgroundvideorecoder.ui.record
 
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
@@ -27,21 +26,6 @@ class RecordViewPagerAdapter(private val fragmentManager: FragmentManager, priva
 
     override fun getItemCount(): Int {
         return 2
-    }
-
-    fun updateRecordingTime(time:Long){
-        if(fragments.size>0 && fragments[0] is RecordVideo){
-            (fragments[0] as RecordVideo).updateRecordingTime(time)
-        }
-    }
-
-    fun onRecordingComplete(){
-        if(fragments.size>0 && fragments[0] is RecordVideo){
-            (fragments[0] as RecordVideo).onRecordCompleted()
-        }
-        if(fragments.size>1 && fragments[1] is ScheduleVideo){
-            (fragments[1] as ScheduleVideo).checkScheduleWhenRecordStop()
-        }
     }
 
     override fun createFragment(position: Int): Fragment {

@@ -29,13 +29,13 @@
                 style="@style/TextRecordTitle"/>
 
             <LinearLayout
+                android:id="@+id/camera"
                 android:orientation="vertical"
                 android:clickable="@{!isRecording}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:id="@+id/camera"
                     android:layout_marginTop="@dimen/home_v_margin"
                     android:gravity="center_vertical"
                     android:layout_width="match_parent"

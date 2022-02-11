@@ -1,11 +1,12 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.Observer
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
@@ -16,7 +17,28 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 
     override val layoutId: Int = R.layout.layout_record_video
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        (requireActivity() as MainActivity).recordStatusLiveData.observe(this, {
+            when(it.status){
+                MainActivity.RECORD_VIDEO->{
+                    Log.d("abcVideo", "update time ")
+                    if(!binding!!.isRecording && it.time>0){
+                        binding!!.isRecording = true
+                    }
+                    binding!!.recordTime.text= VideoRecordUtils.generateRecordTime(it.time)
+                }
+                MainActivity.NO_RECORDING->{
+                    Log.d("abcVideo", "Stop recording: record ")
+                    binding!!.isRecording=false
+                    binding!!.recordTime.text= getString(R.string.video_record_time_zero)
+                }
+            }
+        })
+    }
+
     override fun initView() {
+        binding!!.isRecording= isRecording
         applyNewVideoConfiguration()
         binding!!.camera.setOnClickListener(this)
         binding!!.recordDuration.setOnClickListener(this)
@@ -28,18 +50,12 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         binding!!.flashSwitch.isEnabled = false
         binding!!.soundSwitch.isEnabled = false
         binding!!.start.setOnClickListener(this)
-//        setSwitchThumb()
     }
 
-    private fun setSwitchThumb() {
-        val thumbRes = if (isRecording) {
-            R.drawable.bg_switch_thumb_un_clickable
-        } else {
-            R.drawable.bg_switch_thumb
-        }
-        binding!!.previewSwitch.setThumbResource(thumbRes)
-        binding!!.flashSwitch.setThumbResource(thumbRes)
-        binding!!.soundSwitch.setThumbResource(thumbRes)
+    override fun updateSwitchThumb() {
+        binding!!.previewSwitch.setThumbResource(switchThumb)
+        binding!!.flashSwitch.setThumbResource(switchThumb)
+        binding!!.soundSwitch.setThumbResource(switchThumb)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -63,13 +79,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     override fun onResume() {
         super.onResume()
         checkPreviewMode()
-        binding!!.isRecording= (requireActivity() as MainActivity).recordStatus== MainActivity.RECORD_VIDEO
-        if((requireActivity() as MainActivity).recordStatus != MainActivity.RECORD_VIDEO){
-            binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
-        }
-        if((requireActivity() as MainActivity).recordService == null){
-            (requireActivity() as MainActivity).bindService()
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -83,12 +92,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         }
     }
 
-    fun updateRecordingTime(time:Long){
-        if(binding?.isRecording==false){
-            binding?.isRecording=true
-        }
-        binding?.recordTime?.text= VideoRecordUtils.generateRecordTime(time)
-    }
+
 
     fun onRecordCompleted(){
         binding?.isRecording=false
@@ -127,8 +131,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
             (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.RECORD_VIDEO)
         }else{
             (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.STOP_VIDEO_RECORD)
-            (requireActivity() as MainActivity).recordStatus= MainActivity.NO_RECORDING
-            binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
+            (requireActivity() as MainActivity).onRecordCompleted()
         }
         binding!!.isRecording= !binding!!.isRecording
     }
