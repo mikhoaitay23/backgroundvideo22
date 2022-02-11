@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Binder
+import android.os.Environment
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
@@ -19,6 +20,9 @@ import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
 import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
+import com.zlw.main.recorderlib.BuildConfig
+import com.zlw.main.recorderlib.RecordManager
+import java.util.*
 
 
 class RecordService : Service(), AudioRecordUtils.Listener {
@@ -31,19 +35,20 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     }
     private var notificationTitle: String = ""
     private var notificationContent: String = ""
-    var recordStatus:Int= MainActivity.NO_RECORDING
+    var recordStatus: Int = MainActivity.NO_RECORDING
     private var listener: Listener? = null
     var mBinder = LocalBinder()
+    private var recordManager = RecordManager.getInstance()
     private val previewVideoWindow: PreviewVideoWindow by lazy {
         PreviewVideoWindow(this, object : PreviewVideoWindow.RecordAction {
-            override fun onRecording(time: Long, isComplete:Boolean) {
-                notificationTitle= if(isComplete){
+            override fun onRecording(time: Long, isComplete: Boolean) {
+                notificationTitle = if (isComplete) {
                     this@RecordService.resources.getString(R.string.video_record_complete_prefix)
-                }else{
+                } else {
                     this@RecordService.resources.getString(R.string.video_record_is_running)
                 }
                 listener?.updateRecordTime(time)
-                if(recordStatus!= MainActivity.NO_RECORDING){
+                if (recordStatus != MainActivity.NO_RECORDING) {
                     notificationContent = VideoRecordUtils.generateRecordTime(time)
                     notificationManager.notify(NOTIFICATION_ID, getNotification())
                 }
@@ -63,7 +68,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
     override fun onCreate() {
         super.onCreate()
-        val intentFilter= IntentFilter().apply {
+        val intentFilter = IntentFilter().apply {
             addAction(ScheduleVideo.SCHEDULE_VIDEO)
         }
         registerReceiver(recordScheduleBroadcast, intentFilter)
@@ -75,41 +80,61 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
     fun recordVideo(status: Int) {
         when (status) {
-           MainActivity.RECORD_VIDEO -> {
+            MainActivity.RECORD_VIDEO -> {
                 previewVideoWindow.setupVideoConfiguration()
                 previewVideoWindow.open()
                 previewVideoWindow.startRecording()
                 listener?.onRecordStarted(MainActivity.RECORD_VIDEO)
-                recordStatus= MainActivity.RECORD_VIDEO
+                recordStatus = MainActivity.RECORD_VIDEO
                 notificationTitle = this.resources.getString(R.string.video_record_is_running)
                 startForeground(NOTIFICATION_ID, getNotification())
             }
             MainActivity.STOP_VIDEO_RECORD -> {
                 previewVideoWindow.close()
-                recordStatus=MainActivity.NO_RECORDING
+                recordStatus = MainActivity.NO_RECORDING
                 stopForeground(true)
                 notificationManager.cancel(NOTIFICATION_ID)
             }
-            MainActivity.SCHEDULE_RECORD_VIDEO->{
-                notificationTitle= this.getString(R.string.video_record_schedule_notification_title)
-                notificationContent= VideoRecordUtils.generateScheduleTime(this)
+            MainActivity.SCHEDULE_RECORD_VIDEO -> {
+                notificationTitle =
+                    this.getString(R.string.video_record_schedule_notification_title)
+                notificationContent = VideoRecordUtils.generateScheduleTime(this)
                 startForeground(NOTIFICATION_ID, getNotification())
             }
-            MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO->{
+            MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO -> {
                 stopForeground(true)
             }
         }
     }
 
-    fun recordAudio(audioModel: AudioModel) {
+    fun recordAudio(status: Int, audioModel: AudioModel) {
         audioRecordUtils.registerListener(this)
-        if (audioRecordUtils.isRecording()) {
-            audioRecordUtils.onStopRecording()
-            stopSelf()
-        } else {
-            audioRecordUtils.onStartRecording(audioModel)
-//            sendNotification()
+        when (status) {
+            MainActivity.AUDIO_RECORD -> {
+                initRecord()
+                audioRecordUtils.onStartRecording(audioModel)
+                recordStatus = MainActivity.AUDIO_RECORD
+                notificationTitle = this.resources.getString(R.string.audio_record_is_running)
+                notificationContent = "haha"
+                startForeground(NOTIFICATION_ID, getNotification())
+                listener?.onRecordStarted(MainActivity.AUDIO_RECORD)
+            }
+            MainActivity.STOP_AUDIO_RECORD -> {
+                audioRecordUtils.onStopRecording()
+                recordStatus = MainActivity.NO_RECORDING
+                stopForeground(true)
+                notificationManager.cancel(NOTIFICATION_ID)
+            }
         }
+    }
+
+    private fun initRecord() {
+        recordManager!!.init(application, BuildConfig.DEBUG)
+        val recordDir = String.format(
+            Locale.getDefault(), "%s/Record/backgroundrecord/",
+            Environment.getExternalStorageDirectory().absolutePath
+        )
+        recordManager.changeRecordDir(recordDir)
     }
 
     private fun getNotification(): Notification {
@@ -136,9 +161,9 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     }
 
     interface Listener {
-        fun onRecordStarted(status:Int)
+        fun onRecordStarted(status: Int)
 
-        fun updateRecordTime(time:Long)
+        fun updateRecordTime(time: Long)
 
         fun onRecordCompleted()
     }

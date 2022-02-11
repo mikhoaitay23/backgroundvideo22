@@ -1,5 +1,6 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord
 
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
@@ -101,9 +102,11 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
     }
 
     private fun onServiceStart() {
-//        mainActivity.intentService = Intent(requireActivity(), RecordService::class.java)
-//        requireActivity().startService(mainActivity.intentService)
-        mainActivity.recordService!!.recordAudio(audioModel!!)
+        if (audioRecordUtils?.isRecording() == false) {
+            mainActivity.startRecordAudio(MainActivity.AUDIO_RECORD, audioModel!!)
+        } else {
+            mainActivity.startRecordAudio(MainActivity.STOP_AUDIO_RECORD, audioModel!!)
+        }
     }
 
     private fun onQualityBottomSheet() {
@@ -128,6 +131,7 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
             requireActivity().supportFragmentManager,
             "bottomSheetAudioRecordQuality"
         )
+        Log.d("TAG", "onQualityBottomSheet: ${audioRecordUtils?.isRecording()}")
     }
 
     private fun onModeBottomSheet() {

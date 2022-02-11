@@ -13,6 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.video.VideoRecordFragment
@@ -27,7 +28,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     private var navHostFragment: Fragment? = null
     var recordService: RecordService? = null
     private var bound = false
-    var recordStatus:Int= NO_RECORDING
+    var recordStatus: Int = NO_RECORDING
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,11 +82,19 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         binding?.toolbar?.showToolbarMenu(menuCode)
     }
 
-    fun startRecordVideo(status:Int){
-        recordStatus= status
-        if(recordService!=null){
+    fun startRecordVideo(status: Int) {
+        recordStatus = status
+        if (recordService != null) {
             handleRecordStatus(status)
-        }else{
+        } else {
+            bindService()
+        }
+    }
+
+    fun startRecordAudio(status: Int, audioModel: AudioModel) {
+        if (recordService != null) {
+            handleRecordAudio(status, audioModel)
+        } else {
             bindService()
         }
     }
@@ -107,13 +116,17 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         }
     }
 
-    private fun handleRecordStatus(status: Int){
-        when(status){
+    private fun handleRecordStatus(status: Int) {
+        when (status) {
             RECORD_VIDEO, STOP_VIDEO_RECORD,
-            SCHEDULE_RECORD_VIDEO, CANCEL_SCHEDULE_RECORD_VIDEO->{
+            SCHEDULE_RECORD_VIDEO, CANCEL_SCHEDULE_RECORD_VIDEO -> {
                 recordService!!.recordVideo(status)
             }
         }
+    }
+
+    private fun handleRecordAudio(status: Int, audioModel: AudioModel) {
+        recordService!!.recordAudio(status, audioModel)
     }
 
     private fun bindService() {
@@ -131,14 +144,14 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     override fun onRecordStarted(status: Int) {
-        this.recordStatus= status
+        this.recordStatus = status
     }
 
     override fun updateRecordTime(time: Long) {
-        if(navHostFragment?.isAdded==true){
-            val curFragment= navHostFragment?.childFragmentManager?.fragments?.get(0)
+        if (navHostFragment?.isAdded == true) {
+            val curFragment = navHostFragment?.childFragmentManager?.fragments?.get(0)
             curFragment?.let {
-                if(it is VideoRecordFragment && recordStatus== RECORD_VIDEO){
+                if (it is VideoRecordFragment && recordStatus == RECORD_VIDEO) {
                     it.updateRecodingTime(time)
                     Log.d("abcVideo", "update time main activity")
                 }
@@ -147,11 +160,11 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     override fun onRecordCompleted() {
-        this.recordStatus= NO_RECORDING
-        if(navHostFragment?.isAdded==true){
-            val curFragment= navHostFragment?.childFragmentManager?.fragments?.get(0)
+        this.recordStatus = NO_RECORDING
+        if (navHostFragment?.isAdded == true) {
+            val curFragment = navHostFragment?.childFragmentManager?.fragments?.get(0)
             curFragment?.let {
-                if(it is VideoRecordFragment){
+                if (it is VideoRecordFragment) {
                     it.onRecordCompleted()
                 }
             }
@@ -160,12 +173,12 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
 
     companion object {
         const val PRIVACY = "privacy"
-        const val NO_RECORDING=0
-        const val RECORD_VIDEO=1
-        const val STOP_VIDEO_RECORD=2
-        const val SCHEDULE_RECORD_VIDEO=3
-        const val CANCEL_SCHEDULE_RECORD_VIDEO=4
-        const val AUDIO_RECORD=10
-        const val STOP_AUDIO_RECORD=11
+        const val NO_RECORDING = 0
+        const val RECORD_VIDEO = 1
+        const val STOP_VIDEO_RECORD = 2
+        const val SCHEDULE_RECORD_VIDEO = 3
+        const val CANCEL_SCHEDULE_RECORD_VIDEO = 4
+        const val AUDIO_RECORD = 10
+        const val STOP_AUDIO_RECORD = 11
     }
 }
