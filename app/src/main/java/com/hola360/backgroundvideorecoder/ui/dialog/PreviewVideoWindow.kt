@@ -95,6 +95,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             doOnResume()
         }
         totalTimeRecord = -videoRecordConfiguration.timePerVideo
+        bindCaptureUserCase()
     }
 
     private fun bindCaptureUserCase() {
@@ -195,7 +196,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             if (view?.windowToken == null) {
                 if (view?.parent == null) {
                     windowManager?.addView(view, params!!)
-                    bindCaptureUserCase()
                 }
             }
         } catch (e: Exception) {
