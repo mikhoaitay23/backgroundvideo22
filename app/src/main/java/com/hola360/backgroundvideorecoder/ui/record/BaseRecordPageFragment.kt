@@ -17,7 +17,6 @@ abstract class BaseRecordPageFragment<V : ViewDataBinding?> : Fragment() {
     protected var binding: V? = null
     protected abstract val layoutId: Int
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataPref= DataSharePreferenceUtil.getInstance(requireActivity())

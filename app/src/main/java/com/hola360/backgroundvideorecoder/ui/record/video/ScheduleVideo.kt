@@ -6,7 +6,9 @@ import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.view.View
+import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
@@ -16,7 +18,9 @@ import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
+import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.Utils
+import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import java.util.*
 
 class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View.OnClickListener {
@@ -109,6 +113,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         timePicker.show()
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun saveSchedule() {
         if (calendar.timeInMillis < System.currentTimeMillis()) {
             Utils.showInvalidateTime(binding!!.root)
@@ -122,24 +127,14 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
             binding!!.scheduleCard.schedule = recordSchedule
             val scheduleValue = Gson().toJson(recordSchedule)
             dataPref!!.putSchedule(scheduleValue)
-            sendScheduleBroadcast()
+            setScheduleBroadcast(calendar.timeInMillis)
         }
     }
 
-    private fun sendScheduleBroadcast(){
-        (requireActivity() as MainActivity).startRecordVideo(MainActivity.SCHEDULE_RECORD_VIDEO)
-        val alarmManager =
-            requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(requireContext(), ListenRecordScheduleBroadcast::class.java)
-        intent.action = SCHEDULE_VIDEO
-        intent.putExtra(SCHEDULE_VIDEO, true)
-        val pendingIntent = PendingIntent.getBroadcast(
-            requireContext(),
-            1,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun setScheduleBroadcast(time:Long){
+        (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.SCHEDULE_RECORD_VIDEO)
+        VideoRecordUtils.setAlarmSchedule(requireContext(), time)
     }
 
     private fun cancelSchedule() {
@@ -148,9 +143,11 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         calendar.timeInMillis = System.currentTimeMillis()
         binding!!.scheduleTime = calendar.timeInMillis
         dataPref!!.putSchedule("")
-        (requireActivity() as MainActivity).startRecordVideo(MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO)
+        (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO)
+        VideoRecordUtils.cancelAlarmSchedule(requireContext())
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.date -> {
@@ -195,8 +192,8 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         }
     }
 
-    companion object {
-        const val SCHEDULE_VIDEO = "Schedule_video"
+    companion object{
+        const val BROADCAST_INTENT_REQUEST_CODE=1
     }
 
 }

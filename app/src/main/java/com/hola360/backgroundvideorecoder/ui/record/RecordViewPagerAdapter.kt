@@ -32,7 +32,6 @@ class RecordViewPagerAdapter(private val fragmentManager: FragmentManager, priva
     fun updateRecordingTime(time:Long){
         if(fragments.size>0 && fragments[0] is RecordVideo){
             (fragments[0] as RecordVideo).updateRecordingTime(time)
-            Log.d("abcVideo", "update time adapter")
         }
     }
 

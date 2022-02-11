@@ -5,12 +5,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
+import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
@@ -78,6 +80,9 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         if((requireActivity() as MainActivity).recordStatus != MainActivity.RECORD_VIDEO){
             binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
         }
+        if((requireActivity() as MainActivity).recordService == null){
+            (requireActivity() as MainActivity).bindService()
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -135,9 +140,9 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun startRecordVideo(){
         if(!binding!!.isRecording){
-            (requireActivity() as MainActivity).startRecordVideo(MainActivity.RECORD_VIDEO)
+            (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.RECORD_VIDEO)
         }else{
-            (requireActivity() as MainActivity).startRecordVideo(MainActivity.STOP_VIDEO_RECORD)
+            (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.STOP_VIDEO_RECORD)
             binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
         }
         binding!!.isRecording= !binding!!.isRecording
@@ -151,11 +156,5 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         } else {
             SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
         }
-    }
-
-    companion object {
-        const val START = 0
-        const val INTERVAL = 1
-        const val CLEAR = 3
     }
 }

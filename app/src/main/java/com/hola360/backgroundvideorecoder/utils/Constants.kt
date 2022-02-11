@@ -19,6 +19,11 @@ object Constants {
 
     const val FOLDER_NAME = "BackgroundRecorder"
 
+    const val RECORD_TYPE= "Record_type"
+    const val VIDEO_STATUS= "Video_status"
+    const val SCHEDULE_TYPE= "Schedule_type"
+
+
 
     val TIME_ZONE_OFFSET= TimeZone.getDefault().getOffset(Date().time)
     const val  DELETE_DIALOG= "DeleteDialog"

@@ -1,27 +1,26 @@
 package com.hola360.backgroundvideorecoder.utils
 
-import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
-import androidx.camera.view.PreviewView
-import androidx.core.content.ContextCompat
-import androidx.core.util.Consumer
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
-import com.hola360.backgroundvideorecoder.R
+import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
+import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
+import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
-import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import java.io.File
 import java.lang.Exception
@@ -156,5 +155,38 @@ object VideoRecordUtils {
         val time= timeFormat.format(videoSchedule.scheduleTime)
         val date= dateFormat.format(videoSchedule.scheduleTime)
         return time.plus("  $date")
+    }
+
+    fun startRecordIntent(context: Context, status:Int) {
+        val intent=  Intent(context, RecordService::class.java).apply {
+            putExtra(Constants.RECORD_TYPE, true)
+            putExtra(Constants.VIDEO_STATUS, status)
+        }
+        context.startService(intent)
+    }
+
+    private fun getBroadcastPendingIntent(context: Context):PendingIntent{
+        val intent=  Intent(context, ListenRecordScheduleBroadcast::class.java).apply {
+            action = Constants.SCHEDULE_TYPE
+            putExtra(Constants.SCHEDULE_TYPE, true)
+        }
+        return PendingIntent.getBroadcast(
+            context, ScheduleVideo.BROADCAST_INTENT_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun setAlarmSchedule(context: Context, time: Long){
+        val alarmManager =
+            context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, getBroadcastPendingIntent(context))
+    }
+
+    fun cancelAlarmSchedule(context: Context){
+        val alarmManager =
+            context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.cancel(getBroadcastPendingIntent(context))
     }
 }

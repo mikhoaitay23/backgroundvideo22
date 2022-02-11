@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
@@ -18,6 +17,7 @@ import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.video.VideoRecordFragment
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.hola360.backgroundvideorecoder.widget.Toolbar
 
 
@@ -82,19 +82,17 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         binding?.toolbar?.showToolbarMenu(menuCode)
     }
 
-    fun startRecordVideo(status: Int) {
-        recordStatus = status
+    fun startRecordAudio(status: Int, audioModel: AudioModel) {
         if (recordService != null) {
-            handleRecordStatus(status)
+            handleRecordAudio(status, audioModel)
         } else {
             bindService()
         }
     }
 
-    fun startRecordAudio(status: Int, audioModel: AudioModel) {
-        if (recordService != null) {
-            handleRecordAudio(status, audioModel)
-        } else {
+    fun handleRecordVideoIntent(status: Int){
+        VideoRecordUtils.startRecordIntent(this, status)
+        if(recordService== null){
             bindService()
         }
     }
@@ -107,7 +105,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
             val binder: RecordService.LocalBinder = service as RecordService.LocalBinder
             recordService = binder.getServiceInstance()
             recordService!!.registerListener(this@MainActivity)
-            handleRecordStatus(recordStatus)
             bound = true
         }
 
@@ -116,20 +113,11 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         }
     }
 
-    private fun handleRecordStatus(status: Int) {
-        when (status) {
-            RECORD_VIDEO, STOP_VIDEO_RECORD,
-            SCHEDULE_RECORD_VIDEO, CANCEL_SCHEDULE_RECORD_VIDEO -> {
-                recordService!!.recordVideo(status)
-            }
-        }
-    }
-
     private fun handleRecordAudio(status: Int, audioModel: AudioModel) {
         recordService!!.recordAudio(status, audioModel)
     }
 
-    private fun bindService() {
+    fun bindService() {
         Intent(this@MainActivity, RecordService::class.java).also {
             bindService(it, mConnection, Context.BIND_AUTO_CREATE)
         }
@@ -147,13 +135,15 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         this.recordStatus = status
     }
 
-    override fun updateRecordTime(time: Long) {
+    override fun updateRecordTime(time: Long, status: Int) {
+        if(recordStatus!= status){
+            recordStatus= status
+        }
         if (navHostFragment?.isAdded == true) {
             val curFragment = navHostFragment?.childFragmentManager?.fragments?.get(0)
             curFragment?.let {
                 if (it is VideoRecordFragment && recordStatus == RECORD_VIDEO) {
                     it.updateRecodingTime(time)
-                    Log.d("abcVideo", "update time main activity")
                 }
             }
         }

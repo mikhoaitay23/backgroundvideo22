@@ -19,6 +19,7 @@ import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
 import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
+import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.zlw.main.recorderlib.BuildConfig
 import com.zlw.main.recorderlib.RecordManager
@@ -42,12 +43,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     private val previewVideoWindow: PreviewVideoWindow by lazy {
         PreviewVideoWindow(this, object : PreviewVideoWindow.RecordAction {
             override fun onRecording(time: Long, isComplete: Boolean) {
-                notificationTitle = if (isComplete) {
-                    this@RecordService.resources.getString(R.string.video_record_complete_prefix)
-                } else {
-                    this@RecordService.resources.getString(R.string.video_record_is_running)
-                }
-                listener?.updateRecordTime(time)
+                listener?.updateRecordTime(time, MainActivity.RECORD_VIDEO)
                 if (recordStatus != MainActivity.NO_RECORDING) {
                     notificationContent = VideoRecordUtils.generateRecordTime(time)
                     notificationManager.notify(NOTIFICATION_ID, getNotification())
@@ -56,6 +52,8 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
             override fun onFinishRecord() {
                 listener?.onRecordCompleted()
+                notificationTitle =  this@RecordService.resources.getString(R.string.video_record_complete_prefix)
+                notificationManager.notify(NOTIFICATION_ID, getNotification())
                 stopForeground(true)
             }
         })
@@ -69,7 +67,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     override fun onCreate() {
         super.onCreate()
         val intentFilter = IntentFilter().apply {
-            addAction(ScheduleVideo.SCHEDULE_VIDEO)
+            addAction(Constants.SCHEDULE_TYPE)
         }
         registerReceiver(recordScheduleBroadcast, intentFilter)
     }
@@ -82,13 +80,12 @@ class RecordService : Service(), AudioRecordUtils.Listener {
         return START_NOT_STICKY
     }
 
-    fun recordVideo(status: Int) {
+    private fun recordVideo(status: Int) {
         when (status) {
             MainActivity.RECORD_VIDEO -> {
                 previewVideoWindow.setupVideoConfiguration()
                 previewVideoWindow.open()
                 previewVideoWindow.startRecording()
-                listener?.onRecordStarted(MainActivity.RECORD_VIDEO)
                 recordStatus = MainActivity.RECORD_VIDEO
                 notificationTitle = this.resources.getString(R.string.video_record_is_running)
                 startForeground(NOTIFICATION_ID, getNotification())
@@ -167,7 +164,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     interface Listener {
         fun onRecordStarted(status: Int)
 
-        fun updateRecordTime(time: Long)
+        fun updateRecordTime(time: Long, status: Int)
 
         fun onRecordCompleted()
     }

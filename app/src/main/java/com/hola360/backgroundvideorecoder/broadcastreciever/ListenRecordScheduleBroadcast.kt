@@ -4,17 +4,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.hola360.backgroundvideorecoder.MainActivity
-import com.hola360.backgroundvideorecoder.service.RecordService
-import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
+import com.hola360.backgroundvideorecoder.utils.Constants
+import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
 class ListenRecordScheduleBroadcast:BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         intent?.let {
-            if(intent.getBooleanExtra(ScheduleVideo.SCHEDULE_VIDEO, true)){
+            if(intent.getBooleanExtra(Constants.SCHEDULE_TYPE, true)){
                 context?.let {
-                    val intent= Intent(context, RecordService::class.java)
-                    intent.putExtra("Video_status", MainActivity.RECORD_VIDEO)
-                    it.startService(intent)
+                    VideoRecordUtils.startRecordIntent(it, MainActivity.RECORD_VIDEO)
                 }
             }
         }
