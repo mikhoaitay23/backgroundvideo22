@@ -108,20 +108,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun saveSchedule() {
-        if (calendar.timeInMillis < System.currentTimeMillis()) {
-            Utils.showInvalidateTime(binding!!.root)
-        } else {
-            binding!!.schedule = true
-            setSwitchThumb()
-            recordSchedule = RecordSchedule().apply {
-                isVideo = true
-                scheduleTime = calendar.timeInMillis
-            }
-            binding!!.scheduleCard.schedule = recordSchedule
-            val scheduleValue = Gson().toJson(recordSchedule)
-            dataPref!!.putSchedule(scheduleValue)
-            setScheduleBroadcast(calendar.timeInMillis)
-        }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -171,7 +158,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
                 onSoundModeChange()
             }
             R.id.setSchedule -> {
-                saveSchedule()
+                startRecordOrSetSchedule()
             }
             R.id.cancelSchedule -> {
                 if (!showDialog) {
@@ -188,6 +175,24 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
                     confirmCancelSchedule.show(requireActivity().supportFragmentManager, "Confirm")
                 }
             }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun startAction() {
+        if (calendar.timeInMillis < System.currentTimeMillis()) {
+            Utils.showInvalidateTime(binding!!.root)
+        } else {
+            binding!!.schedule = true
+            setSwitchThumb()
+            recordSchedule = RecordSchedule().apply {
+                isVideo = true
+                scheduleTime = calendar.timeInMillis
+            }
+            binding!!.scheduleCard.schedule = recordSchedule
+            val scheduleValue = Gson().toJson(recordSchedule)
+            dataPref!!.putSchedule(scheduleValue)
+            setScheduleBroadcast(calendar.timeInMillis)
         }
     }
 

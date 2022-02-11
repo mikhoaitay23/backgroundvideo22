@@ -48,7 +48,7 @@
                     <TextView
                         style="@style/TextRecordProperties2"
                         android:textColor="@{isRecording? @color/un_clickable: @color/colorAccent}"
-                        android:text="@{configuration.back? @string/video_record_configuration_front: @string/video_record_configuration_back}"/>
+                        android:text="@{configuration.back? @string/video_record_configuration_back: @string/video_record_configuration_front}"/>
 
                 </LinearLayout>
 

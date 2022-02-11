@@ -156,11 +156,12 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             is VideoRecordEvent.Status->{
                 callback.onRecording(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000,
                     totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.totalTime)
-                if(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000> videoRecordConfiguration.totalTime){
+                if(videoRecordConfiguration.totalTime!= 0L &&
+                    totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000> videoRecordConfiguration.totalTime){
                     close()
                     callback.onFinishRecord()
                 }
-                if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.timePerVideo){
+                if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.timePerVideo-INTERVAL_TIME_ADJUST){
                     if(newInterval){
                         stopRecording()
                         startRecording()
@@ -171,7 +172,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         }
     }
 
-    fun stopRecording(){
+    private fun stopRecording(){
         if (currentRecording == null || recordingState is VideoRecordEvent.Finalize) {
             return
         }
@@ -217,6 +218,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
 
     companion object{
         const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+        const val INTERVAL_TIME_ADJUST=200L
     }
 
     interface RecordAction{

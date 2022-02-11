@@ -5,14 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
-import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
@@ -129,17 +126,12 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
                 onSoundModeChange()
             }
             R.id.start->{
-                if(SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)){
-                    startRecordVideo()
-                }else{
-                    getCameraPermission.launch(Constants.CAMERA_RECORD_PERMISSION)
-                }
+                startRecordOrSetSchedule()
             }
         }
     }
 
-    @SuppressLint("UnspecifiedImmutableFlag")
-    private fun startRecordVideo(){
+    override fun startAction() {
         if(!binding!!.isRecording){
             (requireActivity() as MainActivity).handleRecordVideoIntent(MainActivity.RECORD_VIDEO)
         }else{
@@ -150,13 +142,5 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         binding!!.isRecording= !binding!!.isRecording
     }
 
-    private val getCameraPermission = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { result: Map<String?, Boolean?>? ->
-        if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
-            startRecordVideo()
-        } else {
-            SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
-        }
-    }
+
 }

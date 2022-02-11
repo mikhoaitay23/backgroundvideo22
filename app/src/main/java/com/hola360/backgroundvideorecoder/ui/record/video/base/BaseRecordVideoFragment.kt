@@ -14,11 +14,13 @@ import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat.startActivityForResult
 
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.activity.result.contract.ActivityResultContracts
+import com.hola360.backgroundvideorecoder.utils.Constants
+import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
 
@@ -68,6 +70,12 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
         super.onCreate(savedInstanceState)
         videoConfiguration = VideoRecordUtils.getVideoConfiguration(requireContext())
         recordSchedule= VideoRecordUtils.getVideoSchedule(requireContext())
+    }
+
+    override fun onResume() {
+        super.onResume()
+        videoConfiguration = VideoRecordUtils.getVideoConfiguration(requireContext())
+        applyNewVideoConfiguration()
     }
 
     protected fun saveNewVideoConfiguration(){
@@ -125,5 +133,42 @@ abstract class BaseRecordVideoFragment<V: ViewDataBinding?>: BaseRecordPageFragm
         applyNewVideoConfiguration()
         saveNewVideoConfiguration()
     }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    protected val requestCameraPermission = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { result: Map<String?, Boolean?>? ->
+        if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
+            requestOverlayPermission()
+        } else {
+            SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun requestOverlayPermission(){
+        if (!Settings.canDrawOverlays(requireContext())) {
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:" + requireContext().packageName)
+            )
+            startActivityForResult(intent, 0)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    protected fun startRecordOrSetSchedule(){
+        if(SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)){
+            if(!Settings.canDrawOverlays(requireContext())){
+                requestOverlayPermission()
+            }else{
+                startAction()
+            }
+        }else{
+            requestCameraPermission.launch(Constants.CAMERA_RECORD_PERMISSION)
+        }
+    }
+
+    abstract fun startAction()
 
 }
