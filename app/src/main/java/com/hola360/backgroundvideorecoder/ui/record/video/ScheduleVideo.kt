@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
@@ -21,21 +22,30 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
 
     override val layoutId: Int = R.layout.layout_schedule_video
     private var calendar: Calendar = Calendar.getInstance()
-    private val confirmCancelSchedule: ConfirmDialog by lazy {
-        ConfirmDialog(object : ConfirmDialog.OnConfirmOke {
-            override fun onConfirm() {
-                cancelSchedule()
-            }
-        }, dismissCallback)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (requireActivity() as MainActivity).recordStatusLiveData.observe(this, {
+            when(it.status){
+                MainActivity.RECORD_VIDEO->{
+                    if(!binding!!.isRecording && it.time>0){
+                        binding!!.isRecording = true
+                    }
+                }
+                MainActivity.NO_RECORDING->{
+                    binding!!.isRecording=false
+                    checkScheduleWhenRecordStop()
+                }
+            }
+        })
     }
 
-    fun checkScheduleWhenRecordStop(){
-        val videoSchedule= VideoRecordUtils.getVideoSchedule(requireContext())
-        binding?.schedule= videoSchedule.scheduleTime>System.currentTimeMillis()
+    private fun checkScheduleWhenRecordStop(){
+        if(binding!!.schedule && recordSchedule!!.scheduleTime<System.currentTimeMillis()){
+            binding!!.schedule=false
+            recordSchedule= RecordSchedule()
+            dataPref!!.putSchedule("")
+        }
     }
 
     override fun initView() {
@@ -100,6 +110,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
             { _, hourOfDay, minute ->
                 calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 calendar.set(Calendar.MINUTE, minute)
+                calendar.set(Calendar.SECOND, 0)
                 if (calendar.timeInMillis < Calendar.getInstance().timeInMillis) {
                     Utils.showInvalidateTime(binding!!.root)
                 } else {
@@ -138,37 +149,27 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
                 startRecordOrSetSchedule()
             }
             R.id.cancelSchedule -> {
-                if (!showDialog) {
-                    showDialog = true
-                    val messages =
-                        if (recordSchedule!!.scheduleTime != 0L && recordSchedule!!.scheduleTime < System.currentTimeMillis()
-                            && (recordSchedule!!.scheduleTime + videoConfiguration!!.totalTime) > System.currentTimeMillis()
-                        ) {
-                            resources.getString(R.string.video_record_schedule_cancel_progress_message)
-                        } else {
-                            resources.getString(R.string.video_record_schedule_cancel_message)
-                        }
-                    confirmCancelSchedule.setMessages(messages)
-                    confirmCancelSchedule.show(requireActivity().supportFragmentManager, "Confirm")
-                }
+                showCancelDialog()
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun startAction() {
-        if (calendar.timeInMillis < System.currentTimeMillis()) {
-            Utils.showInvalidateTime(binding!!.root)
-        } else {
-            binding!!.schedule = true
-            recordSchedule = RecordSchedule().apply {
-                isVideo = true
-                scheduleTime = calendar.timeInMillis
+        if(!binding!!.isRecording){
+            if (calendar.timeInMillis < System.currentTimeMillis()) {
+                    Utils.showInvalidateTime(binding!!.root)
+            } else {
+                binding!!.schedule = true
+                recordSchedule = RecordSchedule().apply {
+                    isVideo = true
+                    scheduleTime = calendar.timeInMillis
+                }
+                binding!!.scheduleCard.schedule = recordSchedule
+                val scheduleValue = Gson().toJson(recordSchedule)
+                dataPref!!.putSchedule(scheduleValue)
+                setScheduleBroadcast(calendar.timeInMillis)
             }
-            binding!!.scheduleCard.schedule = recordSchedule
-            val scheduleValue = Gson().toJson(recordSchedule)
-            dataPref!!.putSchedule(scheduleValue)
-            setScheduleBroadcast(calendar.timeInMillis)
         }
     }
 
@@ -178,14 +179,22 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         VideoRecordUtils.setAlarmSchedule(requireContext(), time)
     }
 
-    private fun cancelSchedule() {
+    override fun generateCancelDialogMessages(): String {
+            return if (recordSchedule!!.scheduleTime != 0L && recordSchedule!!.scheduleTime < System.currentTimeMillis()
+                && (recordSchedule!!.scheduleTime + videoConfiguration!!.totalTime) > System.currentTimeMillis()
+            ) {
+                resources.getString(R.string.video_record_schedule_cancel_progress_message)
+            } else {
+                resources.getString(R.string.video_record_schedule_cancel_message)
+            }
+    }
+
+    override fun onCancelSchedule() {
         binding!!.schedule = false
         calendar.timeInMillis = System.currentTimeMillis().also {
             binding!!.scheduleTime=it
         }
-        dataPref!!.putSchedule("")
-        (requireActivity() as MainActivity).handleRecordStatus(MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO)
-        VideoRecordUtils.cancelAlarmSchedule(requireContext())
+        cancelSchedule()
     }
 
     companion object{

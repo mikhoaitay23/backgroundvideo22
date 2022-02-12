@@ -117,15 +117,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         binding?.toolbar?.showToolbarMenu(menuCode)
     }
 
-    fun startRecordVideo(status: Int) {
-        recordStatus = status
-        if (recordService != null) {
-            handleRecordStatus(status)
-        } else {
-            bindService()
-        }
-    }
-
     fun startRecordAudio(status: Int) {
         if (recordService != null) {
             val intent = Intent(this, RecordService::class.java)

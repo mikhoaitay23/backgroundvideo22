@@ -22,14 +22,13 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         (requireActivity() as MainActivity).recordStatusLiveData.observe(this, {
             when(it.status){
                 MainActivity.RECORD_VIDEO->{
-                    Log.d("abcVideo", "update time ")
                     if(!binding!!.isRecording && it.time>0){
                         binding!!.isRecording = true
                     }
                     binding!!.recordTime.text= VideoRecordUtils.generateRecordTime(it.time)
                 }
                 MainActivity.NO_RECORDING->{
-                    Log.d("abcVideo", "Stop recording: record ")
+                    Log.d("abcVideo", "record stop")
                     binding!!.isRecording=false
                     binding!!.recordTime.text= getString(R.string.video_record_time_zero)
                 }
@@ -92,13 +91,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         }
     }
 
-
-
-    fun onRecordCompleted(){
-        binding?.isRecording=false
-        binding?.recordTime?.text= resources.getString(R.string.video_record_time_zero)
-    }
-
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onClick(p0: View?) {
         when (p0?.id) {
@@ -128,13 +120,25 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 
     override fun startAction() {
         if(!binding!!.isRecording){
-            (requireActivity() as MainActivity).handleRecordStatus(MainActivity.RECORD_VIDEO)
+            if(recordSchedule!!.scheduleTime>0L && System.currentTimeMillis()+ videoConfiguration!!.totalTime> recordSchedule!!.scheduleTime){
+                showCancelDialog()
+            }else{
+                (requireActivity() as MainActivity).handleRecordStatus(MainActivity.RECORD_VIDEO)
+            }
         }else{
             (requireActivity() as MainActivity).handleRecordStatus(MainActivity.STOP_VIDEO_RECORD)
-            (requireActivity() as MainActivity).recordStatus= MainActivity.NO_RECORDING
+            (requireActivity() as MainActivity).onRecordCompleted()
             binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
         }
         binding!!.isRecording= !binding!!.isRecording
+    }
+
+    override fun generateCancelDialogMessages(): String {
+        return getString(R.string.video_record_schedule_cancel_message)
+    }
+
+    override fun onCancelSchedule() {
+        cancelSchedule()
     }
 
 }

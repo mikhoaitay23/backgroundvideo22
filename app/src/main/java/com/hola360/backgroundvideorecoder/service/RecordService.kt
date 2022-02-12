@@ -78,14 +78,16 @@ class RecordService : Service(), AudioRecordUtils.Listener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let {
-            val status = it.getIntExtra(Constants.VIDEO_STATUS, 0)
-            recordVideo(status)
-
-            val statusAudio = it.getIntExtra("Audio", 0)
-            if (statusAudio == 0)
-                startRecording(
-                    getFilePath()!!
-                )
+            val type= it.getBooleanExtra(Constants.RECORD_VIDEO_TYPE, true)
+            if(type){
+                val status = it.getIntExtra(Constants.VIDEO_STATUS, 0)
+                recordVideo(status)
+            }
+//            val statusAudio = it.getIntExtra("Audio", 0)
+//            if (statusAudio == 0)
+//                startRecording(
+//                    getFilePath()!!
+//                )
         }
         return START_NOT_STICKY
     }

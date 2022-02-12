@@ -180,7 +180,7 @@ object VideoRecordUtils {
 
     fun startRecordIntent(context: Context, status:Int) {
         val intent=  Intent(context, RecordService::class.java).apply {
-            putExtra(Constants.RECORD_TYPE, true)
+            putExtra(Constants.RECORD_VIDEO_TYPE, true)
             putExtra(Constants.VIDEO_STATUS, status)
         }
         context.startService(intent)
