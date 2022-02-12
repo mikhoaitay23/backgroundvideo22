@@ -4,21 +4,19 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutScheduleVideoBinding
-import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import java.util.*
 
-class ScheduleVideo(val recordVideoFragment:VideoRecordFragment) : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View.OnClickListener {
+class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View.OnClickListener {
 
     override val layoutId: Int = R.layout.layout_schedule_video
     private var calendar: Calendar = Calendar.getInstance()

@@ -3,17 +3,15 @@ package com.hola360.backgroundvideorecoder.ui.record.video
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.Observer
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
-class RecordVideo(val recordVideoFragment:VideoRecordFragment) : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener{
+class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener{
 
     override val layoutId: Int = R.layout.layout_record_video
 
