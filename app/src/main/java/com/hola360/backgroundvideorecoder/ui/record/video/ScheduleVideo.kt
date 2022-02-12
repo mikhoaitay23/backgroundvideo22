@@ -18,7 +18,7 @@ import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import java.util.*
 
-class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View.OnClickListener {
+class ScheduleVideo(val recordVideoFragment:VideoRecordFragment) : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View.OnClickListener {
 
     override val layoutId: Int = R.layout.layout_schedule_video
     private var calendar: Calendar = Calendar.getInstance()
@@ -180,9 +180,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
     }
 
     override fun generateCancelDialogMessages(): String {
-            return if (recordSchedule!!.scheduleTime != 0L && recordSchedule!!.scheduleTime < System.currentTimeMillis()
-                && (recordSchedule!!.scheduleTime + videoConfiguration!!.totalTime) > System.currentTimeMillis()
-            ) {
+            return if (recordSchedule!!.scheduleTime != 0L && binding!!.isRecording) {
                 resources.getString(R.string.video_record_schedule_cancel_progress_message)
             } else {
                 resources.getString(R.string.video_record_schedule_cancel_message)
@@ -190,11 +188,17 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
     }
 
     override fun onCancelSchedule() {
-        binding!!.schedule = false
-        calendar.timeInMillis = System.currentTimeMillis().also {
-            binding!!.scheduleTime=it
+        if(!binding!!.isRecording){
+            binding!!.schedule = false
+            calendar.timeInMillis = System.currentTimeMillis().also {
+                binding!!.scheduleTime=it
+            }
+            cancelSchedule()
+        }else{
+            (requireActivity() as MainActivity).handleRecordStatus(MainActivity.STOP_VIDEO_RECORD)
+            (requireActivity() as MainActivity).onRecordCompleted()
         }
-        cancelSchedule()
+
     }
 
     companion object{

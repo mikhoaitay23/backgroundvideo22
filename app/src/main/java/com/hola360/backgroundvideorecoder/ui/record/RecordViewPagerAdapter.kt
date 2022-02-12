@@ -8,16 +8,24 @@ import com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord.RecordAudi
 import com.hola360.backgroundvideorecoder.ui.record.audio.audioschedule.ScheduleAudio
 import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
+import com.hola360.backgroundvideorecoder.ui.record.video.VideoRecordFragment
 
 class RecordViewPagerAdapter(private val fragmentManager: FragmentManager, private val lifecycle: Lifecycle): FragmentStateAdapter(fragmentManager, lifecycle) {
 
     private val fragments= mutableListOf<Fragment>()
+    private var videoRecordFragment:VideoRecordFragment?=null
+
+    fun setVideoRecordFragment(videoRecordFragment: VideoRecordFragment){
+        this.videoRecordFragment= videoRecordFragment
+    }
 
     fun updateFragment(recordVideo:Boolean){
         fragments.clear()
         if(recordVideo){
-            fragments.add(RecordVideo())
-            fragments.add(ScheduleVideo())
+            videoRecordFragment?.let {
+                fragments.add(RecordVideo(it))
+                fragments.add(ScheduleVideo(it))
+            }
         }else{
             fragments.add(RecordAudio())
             fragments.add(ScheduleAudio())

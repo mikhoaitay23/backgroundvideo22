@@ -13,7 +13,7 @@ import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
-class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener{
+class RecordVideo(val recordVideoFragment:VideoRecordFragment) : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener{
 
     override val layoutId: Int = R.layout.layout_record_video
 
@@ -28,7 +28,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
                     binding!!.recordTime.text= VideoRecordUtils.generateRecordTime(it.time)
                 }
                 MainActivity.NO_RECORDING->{
-                    Log.d("abcVideo", "record stop")
                     binding!!.isRecording=false
                     binding!!.recordTime.text= getString(R.string.video_record_time_zero)
                 }
@@ -128,9 +127,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         }else{
             (requireActivity() as MainActivity).handleRecordStatus(MainActivity.STOP_VIDEO_RECORD)
             (requireActivity() as MainActivity).onRecordCompleted()
-            binding!!.recordTime.text = resources.getString(R.string.video_record_time_zero)
         }
-        binding!!.isRecording= !binding!!.isRecording
     }
 
     override fun generateCancelDialogMessages(): String {

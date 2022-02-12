@@ -1,10 +1,13 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
+import androidx.lifecycle.MutableLiveData
 import androidx.viewpager2.widget.ViewPager2
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.FragmentVideoRecordBinding
 import com.hola360.backgroundvideorecoder.ui.base.basefragment.BaseFragment
+import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.RecordViewPagerAdapter
+import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 
 class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
 
@@ -16,9 +19,12 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
     override val menuCode: Int = 0
     private val adapter: RecordViewPagerAdapter by lazy {
         RecordViewPagerAdapter(childFragmentManager, lifecycle).apply {
+            setVideoRecordFragment(this@VideoRecordFragment)
             updateFragment(true)
         }
     }
+    var videoRecordConfiguration= MutableLiveData<VideoRecordConfiguration>()
+    var recordSchedule= MutableLiveData<RecordSchedule>()
 
     override fun initViewModel() {
 
