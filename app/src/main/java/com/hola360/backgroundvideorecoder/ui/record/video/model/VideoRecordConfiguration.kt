@@ -7,6 +7,7 @@ import com.hola360.backgroundvideorecoder.ui.dialog.VideoIntervalDurationDialog
 
 class VideoRecordConfiguration() : Parcelable {
     var isBack:Boolean= true
+    var videoOrientation:Int=0
     var cameraQuality:Int=0
     var zoomScale:Float=0f
     var totalTime:Long=0

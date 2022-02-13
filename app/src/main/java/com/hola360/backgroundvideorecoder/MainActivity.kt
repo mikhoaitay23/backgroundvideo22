@@ -29,6 +29,7 @@ import com.hola360.backgroundvideorecoder.ui.record.video.VideoRecordFragment
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.hola360.backgroundvideorecoder.widget.Toolbar
+import com.zlw.main.recorderlib.BuildConfig
 import com.zlw.main.recorderlib.recorder.RecordConfig
 import java.util.*
 
@@ -46,7 +47,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     init {
         recordStatusLiveData.value = BackgroundRecordEvent()
     }
-    var recordStatus: Int = NO_RECORDING
     private var dataSharedPreferenceUtil: DataSharePreferenceUtil? = null
     var audioModel: AudioModel? = null
     private var recordManager = RecordManager()
@@ -196,6 +196,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     override fun updateRecordTime(time: Long, status: Int) {
+        val rotation= window?.decorView?.rotation
         if(curRecordEvent.status != status){
             curRecordEvent.status= status
         }

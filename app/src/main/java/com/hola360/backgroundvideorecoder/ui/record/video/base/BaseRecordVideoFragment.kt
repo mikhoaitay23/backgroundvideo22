@@ -145,6 +145,16 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    protected fun onPreviewModeChange() {
+        videoConfiguration!!.previewMode = !videoConfiguration!!.previewMode
+        applyNewVideoConfiguration()
+        saveNewVideoConfiguration()
+        if (videoConfiguration!!.previewMode) {
+            requestOverlayPermission()
+        }
+    }
+
     protected fun onFlashModeChange() {
         videoConfiguration!!.flash = !videoConfiguration!!.flash
         applyNewVideoConfiguration()

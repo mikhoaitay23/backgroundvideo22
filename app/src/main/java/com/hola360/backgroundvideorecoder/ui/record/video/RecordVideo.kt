@@ -54,16 +54,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         binding!!.soundSwitch.setThumbResource(switchThumb)
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun onPreviewModeChange() {
-        videoConfiguration!!.previewMode = !videoConfiguration!!.previewMode
-        applyNewVideoConfiguration()
-        saveNewVideoConfiguration()
-        if (videoConfiguration!!.previewMode) {
-            requestOverlayPermission()
-        }
-    }
-
     override fun initViewModel() {
     }
 

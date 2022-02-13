@@ -16,7 +16,7 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
     override val menuCode: Int = 0
     private val adapter: RecordViewPagerAdapter by lazy {
         RecordViewPagerAdapter(childFragmentManager, lifecycle).apply {
-            updateFragment(true)
+            updateFragment(RecordViewPagerAdapter.RECORD_VIDEO_PAGER)
         }
     }
 

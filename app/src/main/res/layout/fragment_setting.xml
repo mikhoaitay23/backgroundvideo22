@@ -2,12 +2,110 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-
+        <variable
+            name="position"
+            type="Integer" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:background="@color/colorAccent"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/record_bottom_pager_height">
+
+            <LinearLayout
+                android:id="@+id/general"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:src="@drawable/ic_video_record"
+                    android:layout_width="@dimen/record_bottom_icon_height"
+                    android:layout_height="@dimen/record_bottom_icon_height"
+                    android:pagerIconTint="@{position==0}"/>
+
+                <TextView
+                    style="@style/TextPager"
+                    android:textColor="@{position!=0? @color/bg_page_un_select: @color/md_white_1000}"
+                    android:text="@string/setting_general"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/video"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:src="@drawable/ic_video_record"
+                    android:layout_width="@dimen/record_bottom_icon_height"
+                    android:layout_height="@dimen/record_bottom_icon_height"
+                    android:pagerIconTint="@{position==1}"/>
+
+                <TextView
+                    style="@style/TextPager"
+                    android:textColor="@{position !=1? @color/bg_page_un_select: @color/md_white_1000}"
+                    android:text="@string/setting_video"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/audio"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:src="@drawable/ic_video_schedule"
+                    android:layout_width="@dimen/record_bottom_icon_height"
+                    android:layout_height="@dimen/record_bottom_icon_height"
+                    android:pagerIconTint="@{position==2}"/>
+
+                <TextView
+                    style="@style/TextPager"
+                    android:textColor="@{position != 2? @color/bg_page_un_select: @color/md_white_1000}"
+                    android:text="@string/setting_audio"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/about"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:src="@drawable/ic_video_record"
+                    android:layout_width="@dimen/record_bottom_icon_height"
+                    android:layout_height="@dimen/record_bottom_icon_height"
+                    android:pagerIconTint="@{position==3}"/>
+
+                <TextView
+                    style="@style/TextPager"
+                    android:textColor="@{position != 3? @color/bg_page_un_select: @color/md_white_1000}"
+                    android:text="@string/setting_about"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
 </layout>
