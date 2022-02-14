@@ -4,6 +4,9 @@
 
     <data>
 
+        <variable
+            name="isVideoDuration"
+            type="boolean" />
     </data>
 
     <LinearLayout
@@ -39,7 +42,7 @@
                 android:layout_width="0dp"
                 android:layout_height="10dp"
                 android:layout_marginHorizontal="@dimen/home_v_margin"
-                android:background="@drawable/video_duration_seekbar_progress"
+                android:background="@{isVideoDuration? @drawable/video_duration_seekbar_progress :@drawable/video_zoom_seekbar_bg}"
                 app:layout_constraintBottom_toBottomOf="@id/seekbar"
                 app:layout_constraintEnd_toEndOf="@id/seekbar"
                 app:layout_constraintStart_toStartOf="@id/seekbar"

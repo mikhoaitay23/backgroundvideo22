@@ -14,6 +14,7 @@ class VideoZoomScaleDialog(val callback: OnSelectZoomScale,
     private var zoomScale:Float=0f
 
     override fun initView() {
+        binding!!.isVideoDuration= false
         binding!!.title.text= getString(R.string.video_record_configuration_zoom)
         setupProgress(zoomScale)
         binding!!.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{

@@ -13,6 +13,7 @@ class RecordVideoDurationDialog(val callback:OnSelectDuration,
     private var totalTime:Long=0
 
     override fun initView() {
+        binding!!.isVideoDuration= true
         binding!!.seekbar.max= SEEKBAR_PROGRESS
         setupProgress(totalTime)
         binding!!.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
