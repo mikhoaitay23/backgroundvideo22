@@ -5,9 +5,9 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutSettingVideoBinding
+import com.hola360.backgroundvideorecoder.ui.dialog.VideoZoomDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
-import com.hola360.backgroundvideorecoder.ui.dialog.VideoZoomScaleDialog
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
@@ -61,12 +61,12 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
             }
         }, dismissCallback)
     }
-    private val zoomScaleDialog: VideoZoomScaleDialog by lazy {
-        VideoZoomScaleDialog(object : VideoZoomScaleDialog.OnSelectZoomScale{
-            override fun onSelectZoomScale(zoom: Float) {
-                videoConfiguration!!.zoomScale= zoom
-                applyNewVideoConfiguration()
+    private val zoomScaleDialog: VideoZoomDialog by lazy {
+        VideoZoomDialog(object : VideoZoomDialog.OnSelectZoomScale{
+            override fun onSelectZoomScale(scale:Float) {
+                videoConfiguration!!.zoomScale= scale
                 saveNewVideoConfiguration()
+                applyNewVideoConfiguration()
             }
         }, dismissCallback)
     }
@@ -160,7 +160,7 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
             R.id.zoomScale->{
                 if (!showDialog) {
                     showDialog = true
-                    zoomScaleDialog.setupZoomScale(videoConfiguration!!.zoomScale)
+                    zoomScaleDialog.setupZoomValue(videoConfiguration!!.zoomScale)
                     zoomScaleDialog.show(
                         requireActivity().supportFragmentManager,
                         "ZoomScale"

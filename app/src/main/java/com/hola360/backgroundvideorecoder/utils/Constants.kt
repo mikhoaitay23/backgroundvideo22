@@ -10,10 +10,21 @@ object Constants {
     var STORAGE_PERMISSION_STORAGE_SCOPE = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE
     )
-    val CAMERA_RECORD_PERMISSION = arrayOf(
-        Manifest.permission.CAMERA,
-        Manifest.permission.RECORD_AUDIO
-    )
+    val CAMERA_RECORD_PERMISSION = if(SystemUtils.isAndroidQ()){
+        arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+    }else{
+        arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+    }
+
 
     val RECORD_AUDIO_PERMISSION = Manifest.permission.RECORD_AUDIO
 

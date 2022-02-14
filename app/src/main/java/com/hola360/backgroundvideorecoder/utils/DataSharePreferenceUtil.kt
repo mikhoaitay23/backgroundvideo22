@@ -32,6 +32,14 @@ class DataSharePreferenceUtil private constructor(context: Context) {
         return getStringValue("Record_schedule")
     }
 
+    fun putGeneralSetting(value: String){
+        putStringValue("General_setting", value)
+    }
+
+    fun getGeneralSetting():String?{
+        return getStringValue("General_setting")
+    }
+
     fun putBooleanValue(key: String, value: Boolean) {
         val editor = sharedPreferences.edit()
         editor.putBoolean(key, value).apply()

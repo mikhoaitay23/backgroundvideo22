@@ -229,11 +229,14 @@ object VideoRecordUtils {
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     fun setAlarmSchedule(context: Context, time: Long){
         val alarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, getBroadcastPendingIntent(context))
+        if(SystemUtils.isAndroidO()){
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, getBroadcastPendingIntent(context))
+        }else{
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, getBroadcastPendingIntent(context))
+        }
     }
 
     fun cancelAlarmSchedule(context: Context){

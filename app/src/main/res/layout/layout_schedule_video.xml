@@ -42,16 +42,10 @@
 
             <LinearLayout
                 android:id="@+id/date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="@{!schedule}"
-                android:orientation="vertical">
+                style="@style/RecordLayoutStyle1"
+                android:clickable="@{!schedule}">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/home_v_margin"
-                    android:gravity="center_vertical">
+                <LinearLayout style="@style/RecordLayoutStyle2">
 
                     <TextView
                         style="@style/TextRecordProperties1"
@@ -70,16 +64,10 @@
 
             <LinearLayout
                 android:id="@+id/time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="@{!schedule}"
-                android:orientation="vertical">
+                style="@style/RecordLayoutStyle1"
+                android:clickable="@{!schedule}">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/home_v_margin"
-                    android:gravity="center_vertical">
+                <LinearLayout style="@style/RecordLayoutStyle2">
 
                     <TextView
                         style="@style/TextRecordProperties1"
@@ -98,16 +86,10 @@
 
             <LinearLayout
                 android:id="@+id/camera"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="@{!isRecording}"
-                android:orientation="vertical">
+                style="@style/RecordLayoutStyle1"
+                android:clickable="@{!isRecording}">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/home_v_margin"
-                    android:gravity="center_vertical">
+                <LinearLayout style="@style/RecordLayoutStyle2">
 
                     <TextView
                         style="@style/TextRecordProperties1"
@@ -126,16 +108,10 @@
 
             <LinearLayout
                 android:id="@+id/recordDuration"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="@{!isRecording}"
-                android:orientation="vertical">
+                style="@style/RecordLayoutStyle1"
+                android:clickable="@{!isRecording}">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/home_v_margin"
-                    android:gravity="center_vertical">
+                <LinearLayout style="@style/RecordLayoutStyle2">
 
                     <TextView
                         style="@style/TextRecordProperties1"
@@ -154,16 +130,10 @@
 
             <LinearLayout
                 android:id="@+id/intervalTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="@{!isRecording}"
-                android:orientation="vertical">
+                style="@style/RecordLayoutStyle1"
+                android:clickable="@{!isRecording}">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/home_v_margin"
-                    android:gravity="center_vertical">
+                <LinearLayout style="@style/RecordLayoutStyle2">
 
                     <TextView
                         style="@style/TextRecordProperties1"
@@ -182,16 +152,10 @@
 
             <LinearLayout
                 android:id="@+id/flash"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="@{!isRecording}"
-                android:orientation="vertical">
+                style="@style/RecordLayoutStyle1"
+                android:clickable="@{!isRecording}">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/home_v_margin"
-                    android:gravity="center_vertical">
+                <LinearLayout style="@style/RecordLayoutStyle2">
 
                     <TextView
                         style="@style/TextRecordProperties1"
@@ -213,16 +177,10 @@
 
             <LinearLayout
                 android:id="@+id/sound"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="@{!isRecording}"
-                android:orientation="vertical">
+                style="@style/RecordLayoutStyle1"
+                android:clickable="@{!isRecording}">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/home_v_margin"
-                    android:gravity="center_vertical">
+                <LinearLayout style="@style/RecordLayoutStyle2">
 
                     <TextView
                         style="@style/TextRecordProperties1"

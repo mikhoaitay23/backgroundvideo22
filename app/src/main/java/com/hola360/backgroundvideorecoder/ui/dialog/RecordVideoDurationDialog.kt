@@ -67,8 +67,8 @@ class RecordVideoDurationDialog(val callback:OnSelectDuration,
             resources.getString(R.string.video_record_configuration_un_limit)
         }
         binding!!.txtProgress.text= time
-        val position= (((binding!!.seekbar.right - binding!!.seekbar.left- 2*resources.getDimensionPixelSize(R.dimen.home_v_margin)).toFloat()/ binding!!.seekbar.max) * progress ).toInt()
-        binding!!.txtProgress.x= position.toFloat()
+        val position= (((binding!!.seekbar.right - binding!!.seekbar.left- 2*resources.getDimensionPixelSize(R.dimen.home_v_margin)).toFloat()/ binding!!.seekbar.max) * progress ).toInt() -binding!!.txtProgress.width/2*(progress/binding!!.seekbar.max.toFloat())
+        binding!!.txtProgress.x= position
     }
 
     override fun getLayout(): Int {

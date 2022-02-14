@@ -22,8 +22,11 @@
         <TextView
             android:id="@+id/itemName"
             android:layout_width="0dp"
-            android:paddingStart="@dimen/home_v_padding"
+            android:paddingStart="@dimen/home_v_margin"
             android:layout_weight="1"
+            android:textSize="18dp"
+            android:fontFamily="@font/roboto_medium"
+            android:textColor="@color/colorAccent"
             android:layout_height="wrap_content"/>
     </LinearLayout>
 

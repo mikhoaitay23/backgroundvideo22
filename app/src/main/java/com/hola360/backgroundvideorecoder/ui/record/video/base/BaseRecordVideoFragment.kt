@@ -146,20 +146,18 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     protected fun onPreviewModeChange() {
         videoConfiguration!!.previewMode = !videoConfiguration!!.previewMode
         applyNewVideoConfiguration()
         saveNewVideoConfiguration()
-        if (videoConfiguration!!.previewMode) {
+        if (SystemUtils.isAndroidO() && videoConfiguration!!.previewMode) {
             requestOverlayPermission()
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     protected fun checkPreviewMode(){
         if (videoConfiguration!!.previewMode) {
-            if (!Settings.canDrawOverlays(requireContext())) {
+            if (SystemUtils.isAndroidO() && !Settings.canDrawOverlays(requireContext())) {
                 videoConfiguration!!.previewMode = false
                 applyNewVideoConfiguration()
                 saveNewVideoConfiguration()
@@ -187,7 +185,6 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     protected val requestCameraPermission = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result: Map<String?, Boolean?>? ->
@@ -198,9 +195,8 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     protected fun requestOverlayPermission() {
-        if (!Settings.canDrawOverlays(requireContext())) {
+        if (SystemUtils.isAndroidO() && !Settings.canDrawOverlays(requireContext())) {
             val intent = Intent(
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:" + requireContext().packageName)
@@ -209,10 +205,9 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     protected fun startRecordOrSetSchedule() {
         if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
-            if (!Settings.canDrawOverlays(requireContext())) {
+            if (SystemUtils.isAndroidO() &&!Settings.canDrawOverlays(requireContext())) {
                 requestOverlayPermission()
             } else {
                 startAction()

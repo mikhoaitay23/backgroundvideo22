@@ -7,18 +7,20 @@ import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutVideoIntervalDurationBinding
 import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDialog
 
-class VideoIntervalDurationDialog(val callback: RecordVideoDurationDialog.OnSelectDuration,
-                                  private val dismissCallback:OnDialogDismiss): BaseBottomSheetDialog<LayoutVideoIntervalDurationBinding>() {
+class VideoZoomDialog(
+    private val callback: OnSelectZoomScale,
+    private val dismissCallback:OnDialogDismiss): BaseBottomSheetDialog<LayoutVideoIntervalDurationBinding>() {
 
-    private var intervalTime:Long=0
+    private var progress:Int=0
 
     override fun initView() {
-        binding!!.isZoom=false
-        binding!!.seekbar.max=9
-        setupProgress(intervalTime)
+        binding!!.isZoom=true
+        binding!!.seekbar.max=10
+        setupProgress()
         binding!!.seekbar.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                setupToolTipText(progress)
+                this@VideoZoomDialog.progress= progress
+                setupToolTipText()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -31,27 +33,27 @@ class VideoIntervalDurationDialog(val callback: RecordVideoDurationDialog.OnSele
             dismiss()
         }
         binding!!.oke.setOnClickListener {
-            callback.onSelectDuration((binding!!.seekbar.progress+1)*RecordVideoDurationDialog.TIME_SQUARE)
+            callback.onSelectZoomScale(progress.toFloat()/10)
             dismiss()
         }
     }
 
-    fun setupIntervalTime(intervalTime: Long){
-        this.intervalTime= intervalTime
+    fun setupZoomValue(zoomScale: Float){
+        this.progress= (zoomScale*10).toInt()
     }
 
-    private fun setupProgress(intervalTime: Long){
-        val progress= (intervalTime/RecordVideoDurationDialog.TIME_SQUARE).toInt()-1
+    private fun setupProgress(){
         binding!!.seekbar.progress= progress
+        setupToolTipText()
         Handler(Looper.getMainLooper()).postDelayed({
-            setupToolTipText(progress)
+            setupToolTipText()
         }, 100)
 
     }
 
-    private fun setupToolTipText(progress:Int){
-        binding!!.txtProgress.text= (progress+1).toString()
-        val position= (((binding!!.seekbar.right - binding!!.seekbar.left- 2*resources.getDimensionPixelSize(R.dimen.home_v_margin)).toFloat()/ binding!!.seekbar.max) * progress ).toInt() -binding!!.txtProgress.width/2*(progress/binding!!.seekbar.max.toFloat())
+    private fun setupToolTipText(){
+        binding!!.txtProgress.text= (progress.toFloat()/10).toString()
+        val position= (((binding!!.seekbar.right - binding!!.seekbar.left- 2*resources.getDimensionPixelSize(R.dimen.home_v_margin)).toFloat()/ binding!!.seekbar.max) * progress ).toInt() - binding!!.txtProgress.width/2*(progress/binding!!.seekbar.max.toFloat())
         binding!!.txtProgress.x= position
     }
 
@@ -62,6 +64,10 @@ class VideoIntervalDurationDialog(val callback: RecordVideoDurationDialog.OnSele
     override fun onDestroyView() {
         super.onDestroyView()
         dismissCallback.onDismiss()
+    }
+
+    interface OnSelectZoomScale{
+        fun onSelectZoomScale(scale:Float)
     }
 
 }

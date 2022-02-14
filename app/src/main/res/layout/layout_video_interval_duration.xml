@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="isZoom"
+            type="boolean" />
     </data>
 
     <LinearLayout
@@ -26,6 +28,8 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/video_duration_tooltip"
                 android:gravity="center"
+                android:textColor="@color/md_white_1000"
+                android:fontFamily="@font/roboto_medium"
                 android:paddingHorizontal="2dp"
                 app:layout_constraintBottom_toTopOf="@id/seekbar"
                 app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +39,7 @@
                 android:layout_width="0dp"
                 android:layout_height="10dp"
                 android:layout_marginHorizontal="@dimen/home_v_margin"
-                android:background="@drawable/video_interval_seekbar_bg"
+                android:background="@{isZoom? @drawable/video_zoom_seekbar_bg :@drawable/video_interval_seekbar_bg}"
                 app:layout_constraintBottom_toBottomOf="@id/seekbar"
                 app:layout_constraintEnd_toEndOf="@id/seekbar"
                 app:layout_constraintStart_toStartOf="@id/seekbar"

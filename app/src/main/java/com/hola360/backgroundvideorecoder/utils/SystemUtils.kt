@@ -161,6 +161,11 @@ object SystemUtils {
     }
 
     @JvmStatic
+    fun isAndroidO(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+    }
+
+    @JvmStatic
     fun isAndroidQ(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
     }

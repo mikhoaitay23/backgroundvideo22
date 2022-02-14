@@ -23,19 +23,19 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (requireActivity() as MainActivity).recordStatusLiveData.observe(this, {
-            when(it.status){
-                MainActivity.RECORD_VIDEO->{
-                    if(!binding!!.isRecording && it.time>0){
+        (requireActivity() as MainActivity).recordStatusLiveData.observe(this) {
+            when (it.status) {
+                MainActivity.RECORD_VIDEO -> {
+                    if (!binding!!.isRecording && it.time > 0) {
                         binding!!.isRecording = true
                     }
                 }
-                MainActivity.NO_RECORDING->{
-                    binding!!.isRecording=false
+                MainActivity.NO_RECORDING -> {
+                    binding!!.isRecording = false
                     checkScheduleWhenRecordStop()
                 }
             }
-        })
+        }
     }
 
     private fun checkScheduleWhenRecordStop(){
@@ -119,7 +119,6 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         timePicker.show()
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.date -> {
@@ -152,7 +151,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
+
     override fun startAction() {
         if(!binding!!.isRecording){
             if (calendar.timeInMillis < System.currentTimeMillis()) {
@@ -171,7 +170,6 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private fun setScheduleBroadcast(time:Long){
         (requireActivity() as MainActivity).handleRecordStatus(MainActivity.SCHEDULE_RECORD_VIDEO)
         VideoRecordUtils.setAlarmSchedule(requireContext(), time)

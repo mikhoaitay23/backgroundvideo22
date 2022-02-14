@@ -46,6 +46,21 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <style name="RecordLayoutStyle1">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="RecordLayoutStyle2">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingTop">@dimen/home_v_margin</item>
+        <item name="android:paddingBottom">@dimen/home_v_margin</item>
+    </style>
+
     <style name="TextRecordTitle">
         <item name="android:textSize">18dp</item>
         <item name="android:fontFamily">@font/roboto_medium</item>
@@ -163,7 +178,6 @@
     <style name="RecordDivineStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
-        <item name="android:layout_marginTop">@dimen/home_v_padding</item>
         <item name="android:background">@color/record_divine_color</item>
     </style>
 
@@ -171,6 +185,22 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="TextSetting1">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+    </style>
+
+    <style name="TextSetting2">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:textColor">#BDBDBD</item>
+        <item name="android:layout_marginTop">@dimen/home_v_padding</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
 
     <style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">

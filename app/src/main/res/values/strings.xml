@@ -114,6 +114,18 @@
     <string name="setting_video">VIDEO</string>
     <string name="setting_audio">AUDIO</string>
     <string name="setting_about">ABOUT</string>
+    <string name="setting_general_free_storage">Check free storage</string>
+    <string name="setting_general_battery_title">Check battery low</string>
+    <string name="setting_general_battery_text">Check battery status level</string>
+    <string name="setting_general_app_lock_title">App Lock</string>
+    <string name="setting_general_app_lock_text">Lock your app when exit</string>
+    <string name="setting_general_storage_path">Storage path</string>
+    <string name="setting_general_notification_title">Notification bar</string>
+    <string name="setting_general_notification_text">Notification when app running</string>
+    <array name="notification_importance">
+        <item>High</item>
+        <item>Low</item>
+    </array>
 
     <string name="my_file_title">My File</string>
 

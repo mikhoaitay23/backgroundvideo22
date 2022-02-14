@@ -17,20 +17,20 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (requireActivity() as MainActivity).recordStatusLiveData.observe(this, {
-            when(it.status){
-                MainActivity.RECORD_VIDEO->{
-                    if(!binding!!.isRecording && it.time>0){
+        (requireActivity() as MainActivity).recordStatusLiveData.observe(this) {
+            when (it.status) {
+                MainActivity.RECORD_VIDEO -> {
+                    if (!binding!!.isRecording && it.time > 0) {
                         binding!!.isRecording = true
                     }
-                    binding!!.recordTime.text= VideoRecordUtils.generateRecordTime(it.time)
+                    binding!!.recordTime.text = VideoRecordUtils.generateRecordTime(it.time)
                 }
-                MainActivity.NO_RECORDING->{
-                    binding!!.isRecording=false
-                    binding!!.recordTime.text= getString(R.string.video_record_time_zero)
+                MainActivity.NO_RECORDING -> {
+                    binding!!.isRecording = false
+                    binding!!.recordTime.text = getString(R.string.video_record_time_zero)
                 }
             }
-        })
+        }
     }
 
     override fun initView() {
@@ -61,15 +61,11 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         binding!!.configuration = videoConfiguration!!
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onResume() {
         super.onResume()
         checkPreviewMode()
     }
 
-
-
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.camera -> {

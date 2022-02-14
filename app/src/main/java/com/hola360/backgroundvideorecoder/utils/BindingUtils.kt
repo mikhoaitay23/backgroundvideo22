@@ -1,5 +1,6 @@
 package com.hola360.backgroundvideorecoder.utils
 
+import android.app.NotificationManager
 import android.os.Build
 import android.widget.ImageView
 import android.widget.TextView
@@ -139,6 +140,20 @@ object BindingUtils {
             } else {
                 textView.resources.getString(R.string.video_record_configuration_un_limit)
             }
+        }
+    }
+
+    @BindingAdapter("android:notificationLevel")
+    @JvmStatic
+    fun notificationLevel(textView: TextView, level:Int?) {
+        level?.let {
+            val listLevel= textView.resources.getStringArray(R.array.notification_importance)
+            val txtImportance= if(level==0){
+                listLevel[0]
+            }else{
+                ;listLevel[1]
+            }
+            textView.text= txtImportance
         }
     }
 
