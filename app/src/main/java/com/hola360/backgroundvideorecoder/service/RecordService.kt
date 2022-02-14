@@ -18,11 +18,11 @@ import com.hola360.backgroundvideorecoder.app.App
 import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
-import com.hola360.backgroundvideorecoder.ui.record.audio.utils.RecordHelper
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.zlw.main.recorderlib.recorder.RecordConfig
 import com.zlw.main.recorderlib.recorder.RecordConfig.RecordFormat
+import com.zlw.main.recorderlib.recorder.RecordHelper
 import com.zlw.main.recorderlib.recorder.listener.*
 import com.zlw.main.recorderlib.utils.FileUtils
 import java.text.SimpleDateFormat
@@ -83,11 +83,11 @@ class RecordService : Service(), AudioRecordUtils.Listener {
                 val status = it.getIntExtra(Constants.VIDEO_STATUS, 0)
                 recordVideo(status)
             }
-//            val statusAudio = it.getIntExtra("Audio", 0)
-//            if (statusAudio == 0)
-//                startRecording(
-//                    getFilePath()!!
-//                )
+            val statusAudio = it.getIntExtra("Audio", 0)
+            if (statusAudio == 0)
+                startRecording(
+                    getFilePath()!!
+                )
         }
         return START_NOT_STICKY
     }
@@ -135,20 +135,20 @@ class RecordService : Service(), AudioRecordUtils.Listener {
                 16000
             )
         )
-        RecordHelper().start(path, currentConfig)
+        RecordHelper.getInstance().start(path, currentConfig)
         startForeground(NOTIFICATION_ID, getNotification())
     }
 
     fun stopRecording() {
-        RecordHelper().stop()
+        RecordHelper.getInstance().stop()
     }
 
     fun resumeRecording() {
-        RecordHelper().resume()
+        RecordHelper.getInstance().resume()
     }
 
     fun pauseRecording() {
-        RecordHelper().pause()
+        RecordHelper.getInstance().pause()
     }
 
     /**
@@ -190,7 +190,7 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     }
 
     fun getState(): RecordHelper.RecordState? {
-        return RecordHelper().getState()
+        return RecordHelper.getInstance().state
     }
 
     private fun getNotification(): Notification {
@@ -237,23 +237,23 @@ class RecordService : Service(), AudioRecordUtils.Listener {
     }
 
     fun setRecordStateListener(recordStateListener: RecordStateListener?) {
-        RecordHelper().setRecordStateListener(recordStateListener)
+        RecordHelper.getInstance().setRecordStateListener(recordStateListener)
     }
 
     fun setRecordDataListener(recordDataListener: RecordDataListener?) {
-        RecordHelper().setRecordDataListener(recordDataListener)
+        RecordHelper.getInstance().setRecordDataListener(recordDataListener)
     }
 
     fun setRecordSoundSizeListener(recordSoundSizeListener: RecordSoundSizeListener?) {
-        RecordHelper().setRecordSoundSizeListener(recordSoundSizeListener)
+        RecordHelper.getInstance().setRecordSoundSizeListener(recordSoundSizeListener)
     }
 
     fun setRecordResultListener(recordResultListener: RecordResultListener?) {
-        RecordHelper().setRecordResultListener(recordResultListener)
+        RecordHelper.getInstance().setRecordResultListener(recordResultListener)
     }
 
     fun setRecordFftDataListener(recordFftDataListener: RecordFftDataListener?) {
-        RecordHelper().setRecordFftDataListener(recordFftDataListener)
+        RecordHelper.getInstance().setRecordFftDataListener(recordFftDataListener)
     }
 
     private fun getFilePath(): String? {

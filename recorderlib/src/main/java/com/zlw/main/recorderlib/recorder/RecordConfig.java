@@ -1,4 +1,4 @@
-package com.hola360.backgroundvideorecoder.ui.record.audio.utils;
+package com.zlw.main.recorderlib.recorder;
 
 import android.media.AudioFormat;
 import android.os.Environment;
@@ -6,15 +6,32 @@ import android.os.Environment;
 import java.io.Serializable;
 import java.util.Locale;
 
-
+/**
+ * @author zhaolewei on 2018/7/11.
+ */
 public class RecordConfig implements Serializable {
-
-
+    /**
+     * 录音格式 默认WAV格式
+     */
     private RecordFormat format = RecordFormat.WAV;
+    /**
+     * 通道数:默认单通道
+     */
     private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
+
+    /**
+     * 位宽
+     */
     private int encodingConfig = AudioFormat.ENCODING_PCM_16BIT;
+
+    /**
+     * 采样率
+     */
     private int sampleRate = 16000;
 
+    /*
+        * 录音文件存放路径，默认sdcard/Record
+     */
     private String recordDir = String.format(Locale.getDefault(),
             "%s/Record/",
             Environment.getExternalStorageDirectory().getAbsolutePath());
@@ -26,6 +43,16 @@ public class RecordConfig implements Serializable {
         this.format = format;
     }
 
+    /**
+     * @param format         录音文件的格式
+     * @param channelConfig  声道配置
+     *                       单声道：See {@link AudioFormat#CHANNEL_IN_MONO}
+     *                       双声道：See {@link AudioFormat#CHANNEL_IN_STEREO}
+     * @param encodingConfig 位宽配置
+     *                       8Bit： See {@link AudioFormat#ENCODING_PCM_8BIT}
+     *                       16Bit: See {@link AudioFormat#ENCODING_PCM_16BIT},
+     * @param sampleRate     采样率 hz: 8000/16000/44100
+     */
     public RecordConfig(RecordFormat format, int channelConfig, int encodingConfig, int sampleRate) {
         this.format = format;
         this.channelConfig = channelConfig;
@@ -42,6 +69,11 @@ public class RecordConfig implements Serializable {
         this.recordDir = recordDir;
     }
 
+    /**
+     * 获取当前录音的采样位宽 单位bit
+     *
+     * @return 采样位宽 0: error
+     */
     public int getEncoding() {
         if(format == RecordFormat.MP3){//mp3后期转换
             return 16;
@@ -56,6 +88,11 @@ public class RecordConfig implements Serializable {
         }
     }
 
+    /**
+     * 获取当前录音的采样位宽 单位bit
+     *
+     * @return 采样位宽 0: error
+     */
     public int getRealEncoding() {
         if (encodingConfig == AudioFormat.ENCODING_PCM_8BIT) {
             return 8;
@@ -66,6 +103,11 @@ public class RecordConfig implements Serializable {
         }
     }
 
+    /**
+     * 当前的声道数
+     *
+     * @return 声道数： 0：error
+     */
     public int getChannelCount() {
         if (channelConfig == AudioFormat.CHANNEL_IN_MONO) {
             return 1;
@@ -97,7 +139,7 @@ public class RecordConfig implements Serializable {
     }
 
     public int getEncodingConfig() {
-        if(format == RecordFormat.MP3){
+        if(format == RecordFormat.MP3){//mp3后期转换
             return AudioFormat.ENCODING_PCM_16BIT;
         }
         return encodingConfig;
@@ -124,8 +166,17 @@ public class RecordConfig implements Serializable {
     }
 
     public enum RecordFormat {
+        /**
+         * mp3格式
+         */
         MP3(".mp3"),
+        /**
+         * wav格式
+         */
         WAV(".wav"),
+        /**
+         * pcm格式
+         */
         PCM(".pcm");
 
         private String extension;

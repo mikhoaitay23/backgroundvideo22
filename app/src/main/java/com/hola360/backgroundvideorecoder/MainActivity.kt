@@ -12,6 +12,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ktx.BuildConfig
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
@@ -24,12 +25,11 @@ import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.BackgroundRecordEvent
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
-import com.hola360.backgroundvideorecoder.ui.record.audio.utils.RecordManager
-import com.hola360.backgroundvideorecoder.ui.record.video.VideoRecordFragment
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
-import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.hola360.backgroundvideorecoder.widget.Toolbar
+import com.zlw.main.recorderlib.RecordManager
 import com.zlw.main.recorderlib.recorder.RecordConfig
+import com.zlw.main.recorderlib.recorder.listener.RecordStateListener
 import java.util.*
 
 
@@ -40,16 +40,17 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     private var navHostFragment: Fragment? = null
     var recordService: RecordService? = null
     private var bound = false
-    private val curRecordEvent= BackgroundRecordEvent()
-    val recordStatusLiveData= MutableLiveData<BackgroundRecordEvent>()
+    private val curRecordEvent = BackgroundRecordEvent()
+    val recordStatusLiveData = MutableLiveData<BackgroundRecordEvent>()
 
     init {
         recordStatusLiveData.value = BackgroundRecordEvent()
     }
+
     var recordStatus: Int = NO_RECORDING
     private var dataSharedPreferenceUtil: DataSharePreferenceUtil? = null
     var audioModel: AudioModel? = null
-    private var recordManager = RecordManager()
+    private var recordManager = RecordManager.getInstance()
     private var audioRecordUtils = AudioRecordUtils()
 
 
@@ -191,21 +192,21 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     override fun onRecordStarted(status: Int) {
-        curRecordEvent.status= status
-        recordStatusLiveData.value= curRecordEvent
+        curRecordEvent.status = status
+        recordStatusLiveData.value = curRecordEvent
     }
 
     override fun updateRecordTime(time: Long, status: Int) {
-        if(curRecordEvent.status != status){
-            curRecordEvent.status= status
+        if (curRecordEvent.status != status) {
+            curRecordEvent.status = status
         }
-        curRecordEvent.time= time
-        recordStatusLiveData.value= curRecordEvent
+        curRecordEvent.time = time
+        recordStatusLiveData.value = curRecordEvent
     }
 
     override fun onRecordCompleted() {
-        curRecordEvent.status= NO_RECORDING
-        curRecordEvent.time= 0L
+        curRecordEvent.status = NO_RECORDING
+        curRecordEvent.time = 0L
         recordStatusLiveData.value = curRecordEvent
     }
 

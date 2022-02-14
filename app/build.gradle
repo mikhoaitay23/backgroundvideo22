@@ -5,6 +5,7 @@ plugins {
     id 'kotlin-android-extensions'
     id 'kotlin-kapt'
 }
+apply plugin: 'kotlin-android'
 
 android {
     compileSdk 31
@@ -45,6 +46,7 @@ android {
 
 dependencies {
 
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
@@ -91,5 +93,10 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'com.xw.repo:bubbleseekbar:3.20-lite'
 
-    implementation 'com.github.thanhnv130120:ZlwAudioRecorder:v1.09'
+    implementation project(path: ':recorderlib')
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }
