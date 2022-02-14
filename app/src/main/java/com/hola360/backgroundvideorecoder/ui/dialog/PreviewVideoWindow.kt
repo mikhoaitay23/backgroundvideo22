@@ -23,8 +23,12 @@ import androidx.core.util.Consumer
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
+import com.hola360.backgroundvideorecoder.ui.setting.GeneralSetting
+import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
+import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SystemUtils
+import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
-import java.io.File
 
 @SuppressLint("InflateParams")
 class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
@@ -44,6 +48,10 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         VideoRecordUtils.getCameraCapabilities(context, customLifeCycleOwner!!)
     }
     private lateinit var videoRecordConfiguration: VideoRecordConfiguration
+    private val generalSetting: SettingGeneralModel by lazy {
+        val dataPref= DataSharePreferenceUtil.getInstance(context)
+        Utils.getDataPrefGeneralSetting(dataPref!!)
+    }
     private var totalTimeRecord:Long= 0
     private var newInterval=false
 
@@ -118,6 +126,8 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
                 preview
             )
             cameraControl= camera.cameraControl
+            cameraControl?.enableTorch(videoRecordConfiguration.flash)
+            cameraControl?.setLinearZoom(videoRecordConfiguration.zoomScale)
         } catch (exc: Exception) {
             // we are on main thread, let's reset the controls on the UI.
             Log.e("CameraTest", "Use case binding failed", exc)
@@ -131,12 +141,12 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             currentRecording!!.stop()
             currentRecording = null
         }
-//        val mediaStoreOutput = VideoRecordUtils.generateMediaStoreOutput(context)
-        val file= File(context.cacheDir, "Record_video_${System.currentTimeMillis()}.mp4")
-        val fileOutputOptions= VideoRecordUtils.generateMediaStoreOutput(context)
-        cameraControl?.enableTorch(videoRecordConfiguration.flash)
+        val mediaStoreOutput = VideoRecordUtils.generateMediaStoreOutput(context)
+//        val file= File(context.cacheDir, "Record_video_${System.currentTimeMillis()}.mp4")
+//        val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
+
         currentRecording = videoCapture.output
-            .prepareRecording(context, fileOutputOptions)
+            .prepareRecording(context, mediaStoreOutput)
             .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
             .start(mainThreadExecutor, captureListener)
     }
@@ -145,10 +155,10 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         when(event){
             is VideoRecordEvent.Start->{
                 totalTimeRecord+= videoRecordConfiguration.timePerVideo
-                Log.d("abcVideo", "Start status: $totalTimeRecord")
                 newInterval=true
             }
             is VideoRecordEvent.Status->{
+                stopRecordWhenLowMemory()
                 callback.onRecording(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000,
                     totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.totalTime)
                 if(videoRecordConfiguration.totalTime!= 0L &&
@@ -176,6 +186,23 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             recording.stop()
             currentRecording = null
             recordingState= null
+        }
+    }
+
+    fun stopRecordWhenLowBattery():Boolean{
+        return if(generalSetting.checkBattery){
+            close()
+            true
+        }else{
+            false
+        }
+    }
+
+    private fun stopRecordWhenLowMemory(){
+        val memoryPercent= SystemUtils.getInternalStoragePercent(context.externalCacheDir!!)
+        if(memoryPercent>0.9f && generalSetting.checkStorage){
+            close()
+            callback.onStopRecordWhenLowMemory()
         }
     }
 
@@ -217,6 +244,8 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
 
     interface RecordAction{
         fun onRecording(time:Long, isComplete:Boolean)
+
+        fun onStopRecordWhenLowMemory()
 
         fun onFinishRecord()
     }

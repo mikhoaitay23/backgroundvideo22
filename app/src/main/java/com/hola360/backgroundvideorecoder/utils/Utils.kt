@@ -4,7 +4,9 @@ import android.os.Build
 import android.os.Environment
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
+import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import java.io.File
 import java.util.*
 
@@ -45,5 +47,17 @@ object Utils {
 
     fun showInvalidateTime(view:View){
         Snackbar.make(view, view.resources.getString(R.string.video_record_schedule_invalidate_time), Snackbar.LENGTH_SHORT).show()
+    }
+
+    fun getDataPrefGeneralSetting(dataPref:DataSharePreferenceUtil): SettingGeneralModel {
+        val value= dataPref.getGeneralSetting()
+        value?.let {
+            return if("" == it){
+                SettingGeneralModel()
+            }else{
+                Gson().fromJson(it, SettingGeneralModel::class.java)
+            }
+        }
+        return SettingGeneralModel()
     }
 }

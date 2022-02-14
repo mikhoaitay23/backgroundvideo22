@@ -13,7 +13,9 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.Parcelable
+import android.os.StatFs
 import android.provider.Settings
 import android.util.DisplayMetrics
 import android.util.TypedValue
@@ -375,6 +377,48 @@ object SystemUtils {
 //        emailIntent.putExtra(Intent.EXTRA_TEXT, content)
 //        context.startActivity(emailIntent)
 //    }
+
+    fun getInternalStorageInformation(file:File):String{
+        val iStat= StatFs(file.path)
+        val iBlockSize= iStat.blockSizeLong
+        val availableBlock= iStat.availableBlocksLong
+        val totalBlock= iStat.blockCountLong
+        val availableSpace= formatSize(availableBlock*iBlockSize)
+        val totalSpace= formatSize(totalBlock*iBlockSize)
+        return String.format("$availableSpace free of $totalSpace")
+    }
+
+    fun getInternalStoragePercent(file:File):Float{
+        val iStat= StatFs(file.path)
+        val availableBlock= iStat.availableBlocksLong
+        val totalBlock= iStat.blockCountLong
+        return availableBlock.toFloat()/totalBlock
+    }
+
+    private fun formatSize(storageSize: Long): String? {
+        var size = storageSize
+        var suffix: String? = null
+        if (size >= 1024) {
+            suffix = "KB"
+            size /= 1024
+            if (size >= 1024) {
+                suffix = "MB"
+                size /= 1024
+                if (size >= 1024) {
+                    suffix = "GB"
+                    size /= 1024
+                }
+            }
+        }
+        val resultBuffer = StringBuilder(size.toString())
+        var commaOffset = resultBuffer.length - 3
+        while (commaOffset > 0) {
+            resultBuffer.insert(commaOffset, ',')
+            commaOffset -= 3
+        }
+        if (suffix != null) resultBuffer.append(suffix)
+        return resultBuffer.toString()
+    }
 
     interface OnStorageRequestResult{
         fun onGranted()

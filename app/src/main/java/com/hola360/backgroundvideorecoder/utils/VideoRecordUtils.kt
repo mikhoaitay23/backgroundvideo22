@@ -75,13 +75,13 @@ object VideoRecordUtils {
     private fun getStringQuality(quality: Quality):String{
         return when(quality){
             Quality.SD->{
-                "SD (720x480)"
+                "Low"
             }
             Quality.HD->{
-                "HD (1280x720)"
+                "Medium"
             }
             Quality.FHD->{
-                "FHD (1920x1080)"
+                "High"
             }
             Quality.UHD->{
                 "UHD (3840x2160)"

@@ -16,6 +16,7 @@ import androidx.navigation.NavDeepLinkBuilder
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.app.App
+import com.hola360.backgroundvideorecoder.broadcastreciever.BatteryLevelReceiver
 import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.utils.Constants
@@ -36,6 +37,9 @@ class RecordService : Service(), RecordHelper.Listener {
     private val recordScheduleBroadcast: ListenRecordScheduleBroadcast by lazy {
         ListenRecordScheduleBroadcast()
     }
+    private val batteryLevelReceiver:BatteryLevelReceiver by lazy {
+        BatteryLevelReceiver()
+    }
     private var notificationTitle: String = ""
     private var notificationContent: String = ""
     var recordStatus: Int = MainActivity.NO_RECORDING
@@ -50,6 +54,13 @@ class RecordService : Service(), RecordHelper.Listener {
                     notificationContent = VideoRecordUtils.generateRecordTime(time)
                     notificationManager.notify(NOTIFICATION_ID, getNotification())
                 }
+            }
+
+            override fun onStopRecordWhenLowMemory() {
+                recordStatus = MainActivity.NO_RECORDING
+                VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
+                stopForeground(true)
+                notificationManager.cancel(NOTIFICATION_ID)
             }
 
             override fun onFinishRecord() {
@@ -69,11 +80,16 @@ class RecordService : Service(), RecordHelper.Listener {
 
     override fun onCreate() {
         super.onCreate()
-        val intentFilter = IntentFilter().apply {
+        val scheduleFilter = IntentFilter().apply {
             addAction(Constants.SCHEDULE_TYPE)
         }
-        registerReceiver(recordScheduleBroadcast, intentFilter)
+//        registerReceiver(recordScheduleBroadcast, intentFilter)
         RecordHelper.getInstance().setListener(this)
+        val batteryFilter= IntentFilter().apply {
+            addAction(Intent.ACTION_BATTERY_LOW)
+        }
+        registerReceiver(recordScheduleBroadcast, scheduleFilter)
+        registerReceiver(batteryLevelReceiver, batteryFilter)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -117,6 +133,15 @@ class RecordService : Service(), RecordHelper.Listener {
             }
             MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO -> {
                 stopForeground(true)
+            }
+            MainActivity.RECORD_VIDEO_LOW_BATTERY->{
+                val stop= previewVideoWindow.stopRecordWhenLowBattery()
+                if(stop){
+                    recordStatus = MainActivity.NO_RECORDING
+                    VideoRecordUtils.checkScheduleWhenRecordStop(this)
+                    stopForeground(true)
+                    notificationManager.cancel(NOTIFICATION_ID)
+                }
             }
         }
     }
@@ -262,6 +287,7 @@ class RecordService : Service(), RecordHelper.Listener {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(recordScheduleBroadcast)
+        unregisterReceiver(batteryLevelReceiver)
     }
 
     private fun getFilePath(): String? {
