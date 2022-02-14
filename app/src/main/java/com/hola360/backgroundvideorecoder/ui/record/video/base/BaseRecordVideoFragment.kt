@@ -11,6 +11,7 @@ import androidx.databinding.ViewDataBinding
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
+import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
@@ -152,6 +153,17 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         saveNewVideoConfiguration()
         if (videoConfiguration!!.previewMode) {
             requestOverlayPermission()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    protected fun checkPreviewMode(){
+        if (videoConfiguration!!.previewMode) {
+            if (!Settings.canDrawOverlays(requireContext())) {
+                videoConfiguration!!.previewMode = false
+                applyNewVideoConfiguration()
+                saveNewVideoConfiguration()
+            }
         }
     }
 

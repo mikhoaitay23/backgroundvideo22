@@ -8,7 +8,7 @@ import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 
 class ListSelectionBotDialog(val title:String, private val listItem:MutableList<String>,
                              val callback: ListSelectionAdapter.OnItemListSelection,
-                            val dismissCallback:OnDialogDismiss): BaseBottomSheetDialog<LayoutListSelectionDialogBinding>() {
+                             private val dismissCallback:OnDialogDismiss): BaseBottomSheetDialog<LayoutListSelectionDialogBinding>() {
 
     override fun getLayout(): Int {
         return R.layout.layout_list_selection_dialog

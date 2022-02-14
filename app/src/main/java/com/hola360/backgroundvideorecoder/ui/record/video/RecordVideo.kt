@@ -67,16 +67,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         checkPreviewMode()
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun checkPreviewMode(){
-        if (videoConfiguration!!.previewMode) {
-            if (!Settings.canDrawOverlays(requireContext())) {
-                videoConfiguration!!.previewMode = false
-                applyNewVideoConfiguration()
-                saveNewVideoConfiguration()
-            }
-        }
-    }
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onClick(p0: View?) {

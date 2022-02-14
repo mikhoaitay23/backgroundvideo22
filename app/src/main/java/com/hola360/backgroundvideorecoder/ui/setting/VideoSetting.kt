@@ -3,18 +3,14 @@ package com.hola360.backgroundvideorecoder.ui.setting
 import android.os.Build
 import android.view.View
 import androidx.annotation.RequiresApi
-import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutSettingVideoBinding
-import com.hola360.backgroundvideorecoder.generated.callback.OnClickListener
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
-import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
+import com.hola360.backgroundvideorecoder.ui.dialog.VideoZoomScaleDialog
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
-import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
-import kotlinx.android.synthetic.main.fragment_setting.*
 
 class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.OnClickListener{
 
@@ -65,6 +61,15 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
             }
         }, dismissCallback)
     }
+    private val zoomScaleDialog: VideoZoomScaleDialog by lazy {
+        VideoZoomScaleDialog(object : VideoZoomScaleDialog.OnSelectZoomScale{
+            override fun onSelectZoomScale(zoom: Float) {
+                videoConfiguration!!.zoomScale= zoom
+                applyNewVideoConfiguration()
+                saveNewVideoConfiguration()
+            }
+        }, dismissCallback)
+    }
 
     private fun setCameraQualityTextView(){
         binding!!.txtVideoQuality.text= if(videoConfiguration!!.isBack){
@@ -109,10 +114,15 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
     }
 
     override fun onCancelSchedule() {
-
     }
 
     override fun startAction() {
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onResume() {
+        super.onResume()
+        checkPreviewMode()
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -144,6 +154,16 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
                     cameraRotationDialog.show(
                         requireActivity().supportFragmentManager,
                         "VideoRotation"
+                    )
+                }
+            }
+            R.id.zoomScale->{
+                if (!showDialog) {
+                    showDialog = true
+                    zoomScaleDialog.setupZoomScale(videoConfiguration!!.zoomScale)
+                    zoomScaleDialog.show(
+                        requireActivity().supportFragmentManager,
+                        "ZoomScale"
                     )
                 }
             }
