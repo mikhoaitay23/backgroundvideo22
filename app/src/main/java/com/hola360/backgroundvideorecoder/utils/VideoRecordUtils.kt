@@ -59,6 +59,37 @@ object VideoRecordUtils {
         return cameraCapabilities
     }
 
+    fun getCameraQuality(isBack:Boolean, cameraCapabilities:MutableList<CameraCapability>):MutableList<String>{
+        val cameraQualities= if(isBack){
+            cameraCapabilities[0].qualities
+        }else{
+            cameraCapabilities[1].qualities
+        }
+        val qualitiesStrings= mutableListOf<String>()
+        for(item in cameraQualities){
+            qualitiesStrings.add(getStringQuality(item))
+        }
+        return qualitiesStrings
+    }
+
+    private fun getStringQuality(quality: Quality):String{
+        return when(quality){
+            Quality.SD->{
+                "SD (720x480)"
+            }
+            Quality.HD->{
+                "HD (1280x720)"
+            }
+            Quality.FHD->{
+                "FHD (1920x1080)"
+            }
+            Quality.UHD->{
+                "UHD (3840x2160)"
+            }
+            else -> {""}
+        }
+    }
+
     fun Quality.getAspectRatioString(quality: Quality, portraitMode:Boolean) :String {
         val hdQualities = arrayOf(Quality.UHD, Quality.FHD, Quality.HD)
         val ratio =
@@ -91,7 +122,7 @@ object VideoRecordUtils {
             1
         }
         val cameraSelector = cameraCapabilities[cameraIndex].camSelector
-        val quality: Quality = cameraCapabilities[cameraIndex].qualities[videoRecordConfiguration.cameraQuality]
+        val quality: Quality = cameraCapabilities[cameraIndex].qualities[videoRecordConfiguration.backCameraQuality]
         val qualitySelector = QualitySelector.from(quality)
 
         val recorder = Recorder.Builder()

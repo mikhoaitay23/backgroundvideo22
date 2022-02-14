@@ -66,7 +66,7 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
             }
         }, dismissCallback)
     }
-    private val dismissCallback = object : OnDialogDismiss {
+    protected val dismissCallback = object : OnDialogDismiss {
         override fun onDismiss() {
             showDialog = false
         }

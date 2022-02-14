@@ -64,7 +64,7 @@
 
                     <TextView
                         style="@style/TextRecordProperties2"
-                        android:text="@{configuration.back? @string/video_record_configuration_back: @string/video_record_configuration_front}"/>
+                        videoRotate="@{configuration.videoOrientation}"/>
 
                 </LinearLayout>
 
@@ -90,8 +90,8 @@
                         android:text="@string/video_record_configuration_quality"/>
 
                     <TextView
-                        style="@style/TextRecordProperties2"
-                        android:text="@{configuration.back? @string/video_record_configuration_back: @string/video_record_configuration_front}"/>
+                        android:id="@+id/txtVideoQuality"
+                        style="@style/TextRecordProperties2"/>
 
                 </LinearLayout>
 
@@ -118,7 +118,7 @@
 
                     <TextView
                         style="@style/TextRecordProperties2"
-                        android:text="@{configuration.back? @string/video_record_configuration_back: @string/video_record_configuration_front}"/>
+                        videoZoomScale="@{configuration.zoomScale}"/>
 
                 </LinearLayout>
 

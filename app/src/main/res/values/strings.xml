@@ -48,6 +48,11 @@
         <item>Front</item>
         <item>Back</item>
     </array>
+    <array name="camera_orientation">
+        <item>Auto</item>
+        <item>Portrait</item>
+        <item>Landscape</item>
+    </array>
     <string name="video_record_time_zero">00:00:00</string>
     <string name="video_record_notification_prefix">Record time:</string>
     <string name="video_record_complete_prefix">Record video complete</string>

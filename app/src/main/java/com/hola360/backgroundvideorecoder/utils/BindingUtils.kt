@@ -47,6 +47,23 @@ object BindingUtils {
         }
     }
 
+    @BindingAdapter("videoRotate")
+    @JvmStatic
+    fun videoRotate(textView: TextView, rotation: Int?) {
+        rotation?.let {
+            val rotateStrings= textView.resources.getStringArray(R.array.camera_orientation)
+            textView.text = rotateStrings[it]
+        }
+    }
+
+    @BindingAdapter("videoZoomScale")
+    @JvmStatic
+    fun videoZoomScale(textView: TextView, zoomScale:Float?) {
+        zoomScale?.let {
+            textView.text = it.toString()
+        }
+    }
+
     @BindingAdapter("android:setScheduleDate")
     @JvmStatic
     fun setScheduleDate(textView: TextView, time:Long?) {
