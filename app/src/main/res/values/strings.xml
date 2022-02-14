@@ -26,6 +26,9 @@
     <string name="video_record_page_schedule">SCHEDULE</string>
     <string name="video_record_configuration_title">Camera Information</string>
     <string name="video_record_configuration_camera">Camera</string>
+    <string name="video_record_configuration_rotation">Rotate video</string>
+    <string name="video_record_configuration_quality">Video quality</string>
+    <string name="video_record_configuration_zoom">Zoom scale</string>
     <string name="video_record_configuration_front">Front</string>
     <string name="video_record_configuration_back">Back</string>
     <string name="video_record_configuration_duration">Record Duration</string>
@@ -44,6 +47,11 @@
     <array name="camera_facing">
         <item>Front</item>
         <item>Back</item>
+    </array>
+    <array name="camera_orientation">
+        <item>Auto</item>
+        <item>Portrait</item>
+        <item>Landscape</item>
     </array>
     <string name="video_record_time_zero">00:00:00</string>
     <string name="video_record_notification_prefix">Record time:</string>
@@ -102,6 +110,10 @@
     </array>
 
     <string name="setting_title">Settings</string>
+    <string name="setting_general">GENERAL</string>
+    <string name="setting_video">VIDEO</string>
+    <string name="setting_audio">AUDIO</string>
+    <string name="setting_about">ABOUT</string>
 
     <string name="my_file_title">My File</string>
 

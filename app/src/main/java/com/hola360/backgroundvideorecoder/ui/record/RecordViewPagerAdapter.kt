@@ -8,35 +8,56 @@ import com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord.RecordAudi
 import com.hola360.backgroundvideorecoder.ui.record.audio.audioschedule.ScheduleAudio
 import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
-import com.hola360.backgroundvideorecoder.ui.record.video.VideoRecordFragment
+import com.hola360.backgroundvideorecoder.ui.setting.AboutSetting
+import com.hola360.backgroundvideorecoder.ui.setting.AudioSetting
+import com.hola360.backgroundvideorecoder.ui.setting.GeneralSetting
+import com.hola360.backgroundvideorecoder.ui.setting.VideoSetting
 
 class RecordViewPagerAdapter(private val fragmentManager: FragmentManager, private val lifecycle: Lifecycle): FragmentStateAdapter(fragmentManager, lifecycle) {
 
     private val fragments= mutableListOf<Fragment>()
-    private var videoRecordFragment:VideoRecordFragment?=null
+    private var type:Int=0
 
-    fun setVideoRecordFragment(videoRecordFragment: VideoRecordFragment){
-        this.videoRecordFragment= videoRecordFragment
-    }
-
-    fun updateFragment(recordVideo:Boolean){
+    fun updateFragment(type:Int){
+        this.type= type
         fragments.clear()
-        if(recordVideo){
-            videoRecordFragment?.let {
-                fragments.add(RecordVideo(it))
-                fragments.add(ScheduleVideo(it))
+        when(type){
+            RECORD_VIDEO_PAGER->{
+                fragments.add(RecordVideo())
+                fragments.add(ScheduleVideo())
             }
-        }else{
-            fragments.add(RecordAudio())
-            fragments.add(ScheduleAudio())
+            RECORD_AUDIO_PAGER->{
+                fragments.add(RecordAudio())
+                fragments.add(ScheduleAudio())
+            }
+            SETTING_PAGER->{
+                fragments.add(GeneralSetting())
+                fragments.add(VideoSetting())
+                fragments.add(AudioSetting())
+                fragments.add(AboutSetting())
+            }
+            MY_FILE_PAGER->{
+
+            }
         }
     }
 
     override fun getItemCount(): Int {
-        return 2
+        return if(type!= SETTING_PAGER){
+            2
+        }else{
+            4
+        }
     }
 
     override fun createFragment(position: Int): Fragment {
         return fragments[position]
+    }
+
+    companion object{
+        const val RECORD_VIDEO_PAGER=0
+        const val RECORD_AUDIO_PAGER=1
+        const val SETTING_PAGER= 2
+        const val MY_FILE_PAGER=3
     }
 }

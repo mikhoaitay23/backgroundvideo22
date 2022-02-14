@@ -197,8 +197,9 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     override fun updateRecordTime(time: Long, status: Int) {
-        if (curRecordEvent.status != status) {
-            curRecordEvent.status = status
+        val rotation= window?.decorView?.rotation
+        if(curRecordEvent.status != status){
+            curRecordEvent.status= status
         }
         curRecordEvent.time = time
         recordStatusLiveData.value = curRecordEvent

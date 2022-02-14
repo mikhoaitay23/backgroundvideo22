@@ -66,7 +66,7 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
             }
         }, dismissCallback)
     }
-    private val dismissCallback = object : OnDialogDismiss {
+    protected val dismissCallback = object : OnDialogDismiss {
         override fun onDismiss() {
             showDialog = false
         }
@@ -142,6 +142,16 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
                 requireActivity().supportFragmentManager,
                 "IntervalTime"
             )
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    protected fun onPreviewModeChange() {
+        videoConfiguration!!.previewMode = !videoConfiguration!!.previewMode
+        applyNewVideoConfiguration()
+        saveNewVideoConfiguration()
+        if (videoConfiguration!!.previewMode) {
+            requestOverlayPermission()
         }
     }
 

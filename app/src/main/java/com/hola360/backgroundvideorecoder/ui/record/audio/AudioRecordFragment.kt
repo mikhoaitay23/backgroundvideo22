@@ -17,7 +17,7 @@ class AudioRecordFragment : BaseFragment<FragmentAudioRecordBinding>() {
     override val menuCode: Int = R.drawable.ic_home_setting
     private val adapter: RecordViewPagerAdapter by lazy {
         RecordViewPagerAdapter(childFragmentManager, lifecycle).apply {
-            updateFragment(false)
+            updateFragment(RecordViewPagerAdapter.RECORD_AUDIO_PAGER)
         }
     }
     private var curPagerPage = 0

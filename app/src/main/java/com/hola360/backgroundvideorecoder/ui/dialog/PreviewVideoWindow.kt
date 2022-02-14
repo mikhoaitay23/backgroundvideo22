@@ -1,12 +1,10 @@
 package com.hola360.backgroundvideorecoder.ui.dialog
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Context
 import android.graphics.PixelFormat
 import android.os.Build
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -15,11 +13,6 @@ import java.lang.Exception
 import android.view.ViewGroup
 
 import android.content.Context.WINDOW_SERVICE
-import android.os.Handler
-import android.os.Looper
-import android.provider.MediaStore
-import android.widget.TextView
-import android.widget.Toast
 import androidx.camera.core.CameraControl
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -27,17 +20,11 @@ import androidx.camera.video.*
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
-import androidx.lifecycle.LifecycleOwner
-import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
-import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils.getAspectRatio
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 
 @SuppressLint("InflateParams")
 class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
@@ -92,7 +79,11 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         }else{
             1
         }
-        qualityIndex= videoRecordConfiguration.cameraQuality
+        qualityIndex= if(videoRecordConfiguration.isBack){
+            videoRecordConfiguration.backCameraQuality
+        }else{
+            videoRecordConfiguration.frontCameraQuality
+        }
         customLifeCycleOwner= CustomLifeCycleOwner().apply {
             doOnResume()
         }
