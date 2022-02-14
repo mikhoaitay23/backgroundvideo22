@@ -1,10 +1,7 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
-import androidx.annotation.RequiresApi
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding

@@ -14,9 +14,6 @@ import com.zlw.main.recorderlib.recorder.listener.RecordSoundSizeListener;
 import com.zlw.main.recorderlib.recorder.listener.RecordStateListener;
 import com.zlw.main.recorderlib.utils.Logger;
 
-/**
- * @author zhaolewei on 2018/7/10.
- */
 public class RecordManager {
     private static final String TAG = RecordManager.class.getSimpleName();
     @SuppressLint("StaticFieldLeak")

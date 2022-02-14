@@ -1,15 +1,12 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.utils
 
-import android.media.AudioFormat
 import android.os.Handler
 import android.os.Looper
-import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
-import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
-import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.zlw.main.recorderlib.RecordManager
 import com.zlw.main.recorderlib.recorder.RecordConfig
+import com.zlw.main.recorderlib.recorder.RecordHelper
 
-class AudioRecordUtils {
+class AudioRecordUtils(val listener: Listener) {
 
     private var isRecording: Boolean = false
     private var isPaused: Boolean = false
@@ -17,37 +14,22 @@ class AudioRecordUtils {
     var durationMills: Long = 0
     private var recordManager = RecordManager.getInstance()
     private var handler = Handler(Looper.getMainLooper())
-    private lateinit var listener: Listener
 
-    fun onStartRecording(audioModel: AudioModel) {
-        recordManager.changeFormat(RecordConfig.RecordFormat.MP3)
-        recordManager.changeRecordConfig(
-            recordManager.recordConfig!!.setSampleRate(
-                AudioQuality.obtainQuality(audioModel.quality).toInt()
-            )
-        )
-        recordManager.changeRecordConfig(
-            recordManager.recordConfig!!.setEncodingConfig(
-                AudioFormat.ENCODING_PCM_16BIT
-            )
-        )
-        recordManager.changeRecordConfig(
-            recordManager.recordConfig!!.setChannelConfig(AudioMode.obtainMode(audioModel.mode))
-        )
+    fun onStartRecording(path: String, currentConfig: RecordConfig) {
         if (isRecording) {
             durationMills += System.currentTimeMillis() - updateTime
             pauseRecordingTimer()
-            recordManager.pause()
+            RecordHelper.getInstance().pause()
             isPaused = true
             isRecording = false
         } else {
             if (isPaused) {
                 updateTime = System.currentTimeMillis()
-                recordManager.resume()
+                RecordHelper.getInstance().resume()
                 scheduleRecordingTimeUpdate()
             } else {
                 updateTime = System.currentTimeMillis()
-                recordManager.start()
+                RecordHelper.getInstance().start(path, currentConfig)
                 scheduleRecordingTimeUpdate()
             }
             isPaused = false
@@ -58,8 +40,24 @@ class AudioRecordUtils {
     fun onStopRecording() {
         if (isRecording || isPaused) {
             stopRecordingTimer()
-            recordManager.stop()
+            RecordHelper.getInstance().stop()
             isRecording = false
+            isPaused = false
+        }
+    }
+
+    fun onPauseRecording() {
+        if (isRecording) {
+            RecordHelper.getInstance().pause()
+            isRecording = false
+            isPaused = true
+        }
+    }
+
+    fun onResumeRecording() {
+        if (isPaused) {
+            RecordHelper.getInstance().resume()
+            isRecording = true
             isPaused = false
         }
     }
@@ -92,10 +90,6 @@ class AudioRecordUtils {
     private fun pauseRecordingTimer() {
         handler.removeCallbacksAndMessages(null)
         updateTime = 0
-    }
-
-    fun registerListener(listener: Listener) {
-        this.listener = listener
     }
 
     interface Listener {

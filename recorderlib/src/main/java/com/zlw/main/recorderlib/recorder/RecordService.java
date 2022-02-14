@@ -3,6 +3,7 @@ package com.zlw.main.recorderlib.recorder;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 
@@ -44,13 +45,22 @@ public class RecordService extends Service {
 
     private final static String PARAM_PATH = "path";
 
+    private final IBinder binder = new LocalBinder();
+
 
     public RecordService() {
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
+    }
+
+    public class LocalBinder extends Binder {
+        RecordService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return RecordService.this;
+        }
     }
 
     @Override
@@ -197,20 +207,16 @@ public class RecordService extends Service {
         RecordService.currentConfig = currentConfig;
     }
 
-    /**
-     * 根据当前的时间生成相应的文件名
-     * 实例 record_20160101_13_15_12
-     */
     private static String getFilePath() {
 
         String fileDir =
                 currentConfig.getRecordDir();
         if (!FileUtils.createOrExistsDir(fileDir)) {
-            Logger.w(TAG, "文件夹创建失败：%s", fileDir);
+            Logger.w(TAG, "File location is：%s", fileDir);
             return null;
         }
-        String fileName = String.format(Locale.getDefault(), "record_%s", FileUtils.getNowString(new SimpleDateFormat("yyyyMMdd_HH_mm_ss", Locale.SIMPLIFIED_CHINESE)));
-        return String.format(Locale.getDefault(), "%s%s%s", fileDir, fileName, currentConfig.getFormat().getExtension());
+        String fileName = String.format(Locale.getDefault(), "bg_audio_%s", FileUtils.getNowString(new SimpleDateFormat("yyyyMMdd_HH_mm_ss", Locale.US)));
+        return String.format(Locale.US, "%s%s%s", fileDir, fileName, currentConfig.getFormat().getExtension());
     }
 
 

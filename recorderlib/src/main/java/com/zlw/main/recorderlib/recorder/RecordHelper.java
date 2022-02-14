@@ -53,6 +53,8 @@ public class RecordHelper {
     private List<File> files = new ArrayList<>();
     private Mp3EncodeThread mp3EncodeThread;
 
+    private Listener listener;
+
     private RecordHelper() {
     }
 
@@ -231,13 +233,13 @@ public class RecordHelper {
         for (int i = offsetStart; i < length; i++) {
             sum += data[i] * data[i];
         }
-        ave = sum / (length - offsetStart) ;
+        ave = sum / (length - offsetStart);
         return (int) (Math.log10(ave) * 20);
     }
 
     private void initMp3EncoderThread(int bufferSize) {
         try {
-            mp3EncodeThread = new Mp3EncodeThread(resultFile, bufferSize);
+            mp3EncodeThread = new Mp3EncodeThread(resultFile, bufferSize, currentConfig);
             mp3EncodeThread.start();
         } catch (Exception e) {
             Logger.e(e, TAG, e.getMessage());
@@ -381,9 +383,6 @@ public class RecordHelper {
         Logger.i(TAG, "录音完成！ path: %s ； 大小：%s", resultFile.getAbsoluteFile(), resultFile.length());
     }
 
-    /**
-     * 添加Wav头文件
-     */
     private void makeWav() {
         if (!FileUtils.isFile(resultFile) || resultFile.length() == 0) {
             return;
@@ -392,9 +391,6 @@ public class RecordHelper {
         WavUtils.writeHeader(resultFile, header);
     }
 
-    /**
-     * 合并文件
-     */
     private void mergePcmFile() {
         boolean mergeSuccess = mergePcmFiles(resultFile, files);
         if (!mergeSuccess) {
@@ -402,13 +398,6 @@ public class RecordHelper {
         }
     }
 
-    /**
-     * 合并Pcm文件
-     *
-     * @param recordFile 输出文件
-     * @param files      多个文件源
-     * @return 是否成功
-     */
     private boolean mergePcmFiles(File recordFile, List<File> files) {
         if (recordFile == null || files == null || files.size() <= 0) {
             return false;
@@ -451,10 +440,6 @@ public class RecordHelper {
         return true;
     }
 
-    /**
-     * 根据当前的时间生成相应的文件名
-     * 实例 record_20160101_13_15_12
-     */
     private String getTempFilePath() {
         String fileDir = String.format(Locale.getDefault(), "%s/Record/", Environment.getExternalStorageDirectory().getAbsolutePath());
         if (!FileUtils.createOrExistsDir(fileDir)) {
@@ -464,30 +449,20 @@ public class RecordHelper {
         return String.format(Locale.getDefault(), "%s%s.pcm", fileDir, fileName);
     }
 
-    /**
-     * 表示当前状态
-     */
     public enum RecordState {
-        /**
-         * 空闲状态
-         */
         IDLE,
-        /**
-         * 录音中
-         */
         RECORDING,
-        /**
-         * 暂停中
-         */
         PAUSE,
-        /**
-         * 正在停止
-         */
         STOP,
-        /**
-         * 录音流程结束（转换结束）
-         */
         FINISH
+    }
+
+    public void setListener(Listener listener){
+        this.listener = listener;
+    }
+
+    public interface Listener{
+        void onRunning();
     }
 
 }

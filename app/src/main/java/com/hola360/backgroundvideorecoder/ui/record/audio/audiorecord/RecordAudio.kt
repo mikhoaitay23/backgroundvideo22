@@ -1,8 +1,8 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord
 
-import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.databinding.ktx.BuildConfig
 import androidx.lifecycle.ViewModelProvider
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
@@ -17,23 +17,22 @@ import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotD
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
 import com.hola360.backgroundvideorecoder.ui.record.audio.bottomsheet.AudioRecordBottomSheetFragment
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
+import com.hola360.backgroundvideorecoder.ui.record.audio.utils.RecordManager
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
-import com.zlw.main.recorderlib.RecordManager
 import com.zlw.main.recorderlib.recorder.RecordHelper
 import com.zlw.main.recorderlib.recorder.listener.RecordStateListener
 
 class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnClickListener {
 
     private var audioModel: AudioModel? = null
-    private var audioRecordUtils: AudioRecordUtils? = null
     private var recordVideoDurationDialog: RecordVideoDurationDialog? = null
     private lateinit var mainActivity: MainActivity
     private var listSelectionBottomSheet: ListSelectionBotDialog? = null
     private lateinit var viewModel: RecordAudioViewModel
     private var showBottomSheet = false
-    private var recordManager = RecordManager.getInstance()
     private var audioRecordBottomSheetFragment: AudioRecordBottomSheetFragment? = null
+    private var recordManager = RecordManager()
 
     override val layoutId: Int = R.layout.layout_record_audio
 
@@ -47,7 +46,6 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
     }
 
     override fun initView() {
-        audioRecordUtils = AudioRecordUtils()
         mainActivity = activity as MainActivity
 
         binding!!.btnQuality.setOnClickListener(this)
@@ -57,23 +55,12 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
 
         binding!!.lifecycleOwner = this
         binding!!.viewModel = viewModel
-    }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.getAudioConfig()
-        if (mainActivity.recordService == null) {
-            mainActivity.bindService()
-        }
-        recordManager!!.setRecordStateListener(object : RecordStateListener{
+        recordManager.init(requireActivity().application, BuildConfig.DEBUG)
+        recordManager.setRecordStateListener(object : RecordStateListener{
             override fun onStateChange(state: RecordHelper.RecordState?) {
-                when (state) {
-                    RecordHelper.RecordState.PAUSE -> {
-
-                    }
-                    RecordHelper.RecordState.RECORDING -> {
-                        onAudioRecordBottomSheet()
-                    }
+                if (state != RecordHelper.RecordState.IDLE){
+                    onAudioRecordBottomSheet()
                 }
             }
 
@@ -82,6 +69,14 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
             }
 
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getAudioConfig()
+        if (mainActivity.recordService == null) {
+            mainActivity.bindService()
+        }
     }
 
     private var resultLauncher =
@@ -128,7 +123,7 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
     }
 
     private fun onServiceStart() {
-        mainActivity.startRecordAudio(MainActivity.AUDIO_RECORD)
+        mainActivity.handleRecordStatus(MainActivity.AUDIO_RECORD)
     }
 
     private fun onQualityBottomSheet() {
@@ -153,7 +148,6 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
             requireActivity().supportFragmentManager,
             "bottomSheetAudioRecordQuality"
         )
-        Log.d("TAG", "onQualityBottomSheet: ${audioRecordUtils?.isRecording()}")
     }
 
     private fun onModeBottomSheet() {
@@ -207,5 +201,6 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
             "VideoDuration"
         )
     }
+
 
 }

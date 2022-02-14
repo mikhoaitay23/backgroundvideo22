@@ -34,6 +34,9 @@ object Constants {
     const val VIDEO_STATUS= "Video_status"
     const val SCHEDULE_TYPE= "Schedule_type"
 
+    const val RECORD_AUDIO_TYPE = "RECORD_AUDIO_TYPE"
+    const val RECORD_AUDIO_STATUS = "AUDIO_STATUS"
+
 
 
     val TIME_ZONE_OFFSET = TimeZone.getDefault().getOffset(Date().time)

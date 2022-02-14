@@ -4,9 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.media.AudioFormat
 import android.os.Bundle
-import android.os.Environment
 import android.os.IBinder
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -18,20 +16,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.google.gson.Gson
-import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
-import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.BackgroundRecordEvent
-import com.hola360.backgroundvideorecoder.ui.record.audio.utils.AudioRecordUtils
+import com.hola360.backgroundvideorecoder.ui.record.audio.utils.RecordManager
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.widget.Toolbar
-import com.zlw.main.recorderlib.RecordManager
-import com.zlw.main.recorderlib.recorder.RecordConfig
-import com.zlw.main.recorderlib.recorder.listener.RecordStateListener
-import java.util.*
-
 
 class MainActivity : AppCompatActivity(), RecordService.Listener {
 
@@ -50,8 +41,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     var recordStatus: Int = NO_RECORDING
     private var dataSharedPreferenceUtil: DataSharePreferenceUtil? = null
     var audioModel: AudioModel? = null
-    private var recordManager = RecordManager.getInstance()
-    private var audioRecordUtils = AudioRecordUtils()
+    private var recordManager = RecordManager()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,16 +108,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         binding?.toolbar?.showToolbarMenu(menuCode)
     }
 
-    fun startRecordAudio(status: Int) {
-        if (recordService != null) {
-            val intent = Intent(this, RecordService::class.java)
-            intent.putExtra("Audio", 0)
-            startService(intent)
-        } else {
-            bindService()
-        }
-    }
-
     private val mConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
             className: ComponentName,
@@ -150,31 +130,10 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
             SCHEDULE_RECORD_VIDEO, CANCEL_SCHEDULE_RECORD_VIDEO -> {
                 recordService!!.recordVideo(status)
             }
-            AUDIO_RECORD -> {
-                initRecord()
-            }
-            STOP_AUDIO_RECORD -> {
-
+            AUDIO_RECORD, AUDIO_STOP, AUDIO_RESUME, AUDIO_PAUSE -> {
+                recordService!!.recordAudio(status)
             }
         }
-    }
-
-    private fun initRecord() {
-        val recordDir = String.format(
-            Locale.getDefault(), "%s/Record/backgroundrecord/",
-            Environment.getExternalStorageDirectory().absolutePath
-        )
-        recordManager.changeRecordDir(recordDir)
-        recordManager.changeFormat(RecordConfig.RecordFormat.MP3)
-        recordManager.changeRecordConfig(
-            RecordConfig(
-                RecordConfig.RecordFormat.MP3,
-                AudioMode.obtainMode(audioModel!!.mode),
-                AudioFormat.ENCODING_PCM_16BIT,
-                AudioQuality.obtainQuality(audioModel!!.quality).toInt()
-            )
-        )
-        recordManager.start()
     }
 
     fun bindService() {
@@ -185,7 +144,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
 
     private fun unbindService() {
         if (bound) {
-//            recordService!!.registerListener(null)
             unbindService(mConnection)
             bound = false
         }
@@ -197,9 +155,9 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     override fun updateRecordTime(time: Long, status: Int) {
-        val rotation= window?.decorView?.rotation
-        if(curRecordEvent.status != status){
-            curRecordEvent.status= status
+        val rotation = window?.decorView?.rotation
+        if (curRecordEvent.status != status) {
+            curRecordEvent.status = status
         }
         curRecordEvent.time = time
         recordStatusLiveData.value = curRecordEvent
@@ -211,6 +169,10 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         recordStatusLiveData.value = curRecordEvent
     }
 
+    override fun onAudioRunning() {
+        Log.d("TAG", "onAudioRunning: ")
+    }
+
     companion object {
         const val PRIVACY = "privacy"
         const val NO_RECORDING = 0
@@ -219,6 +181,8 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         const val SCHEDULE_RECORD_VIDEO = 3
         const val CANCEL_SCHEDULE_RECORD_VIDEO = 4
         const val AUDIO_RECORD = 10
-        const val STOP_AUDIO_RECORD = 11
+        const val AUDIO_STOP = 11
+        const val AUDIO_RESUME = 12
+        const val AUDIO_PAUSE = 13
     }
 }
