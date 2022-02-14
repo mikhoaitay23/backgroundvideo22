@@ -15,7 +15,7 @@ class App: Application() {
     private fun createChannelNotification(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             val channel= NotificationChannel(CHANNEL_SERVICE_ID, "Channel",
-            NotificationManager.IMPORTANCE_NONE)
+            NotificationManager.IMPORTANCE_DEFAULT)
             val notificationManager= getSystemService(NotificationManager::class.java)
             notificationManager?.let {
                 it.createNotificationChannel(channel)

@@ -34,7 +34,9 @@
                             style="@style/TextSetting1"
                             android:text="@string/setting_general_free_storage" />
 
-                        <TextView style="@style/TextSetting2" />
+                        <TextView
+                            android:id="@+id/txtFreeStorage"
+                            style="@style/TextSetting2" />
 
                     </LinearLayout>
 

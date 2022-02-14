@@ -1,7 +1,5 @@
 package com.hola360.backgroundvideorecoder.ui.setting
 
-import android.app.NotificationManager
-import android.os.Build
 import android.view.View
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
@@ -11,15 +9,17 @@ import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
-import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
+import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SystemUtils
+import com.hola360.backgroundvideorecoder.utils.Utils
 
 class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), View.OnClickListener {
 
     override val layoutId: Int
         get() = R.layout.layout_setting_general
     private val generalSetting: SettingGeneralModel by lazy {
-        getDataPrefGeneralSetting()
+        Utils.getDataPrefGeneralSetting(dataPref!!)
     }
     private val notificationImportanceDialog: ListSelectionBotDialog by lazy {
         val title = resources.getString(R.string.setting_general_notification_title)
@@ -41,6 +41,7 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
 
     override fun initView() {
         binding!!.setting= generalSetting
+        binding!!.txtFreeStorage.text= SystemUtils.getInternalStorageInformation(requireContext().externalCacheDir!!)
         binding!!.freeStorage.setOnClickListener(this)
         binding!!.batteryLevel.setOnClickListener(this)
         binding!!.appLock.setOnClickListener(this)
@@ -52,7 +53,6 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
     }
 
     override fun initViewModel() {
-
     }
 
     override fun onClick(v: View?) {
@@ -83,18 +83,6 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
                 }
             }
         }
-    }
-
-    private fun getDataPrefGeneralSetting():SettingGeneralModel{
-        val value= dataPref!!.getGeneralSetting()
-        value?.let {
-             return if("" == it){
-                 SettingGeneralModel()
-            }else{
-                Gson().fromJson(it, SettingGeneralModel::class.java)
-            }
-        }
-        return SettingGeneralModel()
     }
 
     private fun updateDataAndUI(){

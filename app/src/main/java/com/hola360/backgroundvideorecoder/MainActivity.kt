@@ -218,6 +218,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         const val STOP_VIDEO_RECORD = 2
         const val SCHEDULE_RECORD_VIDEO = 3
         const val CANCEL_SCHEDULE_RECORD_VIDEO = 4
+        const val RECORD_VIDEO_LOW_BATTERY=5
         const val AUDIO_RECORD = 10
         const val STOP_AUDIO_RECORD = 11
     }

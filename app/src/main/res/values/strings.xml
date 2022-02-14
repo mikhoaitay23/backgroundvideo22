@@ -137,5 +137,7 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="tap_to_open_now">Tap to open now</string>
+    <string name="low_battery_title">Low Battery</string>
+    <string name="low_battery_text">Warning! 10% of battery remaining</string>
 
 </resources>

@@ -20,13 +20,24 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
         VideoRecordUtils.getCameraCapabilities(requireContext(), this)
     }
     private val frontCameraQuality: MutableList<String> by lazy {
-        VideoRecordUtils.getCameraQuality(false, cameraCapabilities)
+        generateCameraQualityList(VideoRecordUtils.getCameraQuality(false, cameraCapabilities))
+    }
+    private val frontCameraDiff:Int by lazy {
+        if(VideoRecordUtils.getCameraQuality(false, cameraCapabilities).size > frontCameraQuality.size){
+            VideoRecordUtils.getCameraQuality(false, cameraCapabilities).size - frontCameraQuality.size
+        }else{
+            0
+        }
     }
     private val frontCameraQualityDialog:ListSelectionBotDialog by lazy {
         val title= getString(R.string.video_record_configuration_quality)
         ListSelectionBotDialog(title, frontCameraQuality, object : ListSelectionAdapter.OnItemListSelection {
             override fun onSelection(position: Int) {
-                videoConfiguration!!.frontCameraQuality=position
+                videoConfiguration!!.frontCameraQuality= if(frontCameraDiff>0){
+                    position+ frontCameraDiff
+                }else{
+                    position
+                }
                 setCameraQualityTextView()
                 saveNewVideoConfiguration()
                 applyNewVideoConfiguration()
@@ -35,13 +46,24 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
         }, dismissCallback)
     }
     private val backCameraQuality:MutableList<String> by lazy {
-        VideoRecordUtils.getCameraQuality(true, cameraCapabilities)
+        generateCameraQualityList(VideoRecordUtils.getCameraQuality(true, cameraCapabilities))
+    }
+    private val backCameraDiff:Int by lazy {
+        if(VideoRecordUtils.getCameraQuality(true, cameraCapabilities).size > backCameraQuality.size){
+            VideoRecordUtils.getCameraQuality(true, cameraCapabilities).size - backCameraQuality.size
+        }else{
+            0
+        }
     }
     private val backCameraQualityDialog:ListSelectionBotDialog by lazy {
         val title= getString(R.string.video_record_configuration_quality)
         ListSelectionBotDialog(title, backCameraQuality, object : ListSelectionAdapter.OnItemListSelection {
             override fun onSelection(position: Int) {
-                videoConfiguration!!.backCameraQuality=position
+                videoConfiguration!!.backCameraQuality=if(backCameraDiff>0){
+                    position+ backCameraDiff
+                }else{
+                    position
+                }
                 setCameraQualityTextView()
                 saveNewVideoConfiguration()
                 applyNewVideoConfiguration()
@@ -71,11 +93,25 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
         }, dismissCallback)
     }
 
+    private fun generateCameraQualityList(data:MutableList<String>):MutableList<String>{
+        val newQualityList= mutableListOf<String>()
+        return if(data.size>3){
+            newQualityList.add(data[data.size-3])
+            newQualityList.add(data[data.size-2])
+            newQualityList.add(data[data.size-1])
+            newQualityList
+        }else{
+            newQualityList.apply {
+                addAll(data)
+            }
+        }
+    }
+
     private fun setCameraQualityTextView(){
         binding!!.txtVideoQuality.text= if(videoConfiguration!!.isBack){
-            backCameraQuality[videoConfiguration!!.backCameraQuality]
+            backCameraQuality[videoConfiguration!!.backCameraQuality- backCameraDiff]
         }else{
-            frontCameraQuality[videoConfiguration!!.frontCameraQuality]
+            frontCameraQuality[videoConfiguration!!.frontCameraQuality- frontCameraDiff]
         }
     }
 
@@ -97,11 +133,9 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
     }
 
     override fun updateSwitchThumb() {
-
     }
 
     override fun initViewModel() {
-
     }
 
     override fun applyNewVideoConfiguration() {
@@ -135,10 +169,10 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
                 if (!showDialog) {
                     showDialog = true
                     val dialog= if(videoConfiguration!!.isBack){
-                        backCameraQualityDialog.setSelectionPos(videoConfiguration!!.backCameraQuality)
+                        backCameraQualityDialog.setSelectionPos(videoConfiguration!!.backCameraQuality- backCameraDiff)
                         backCameraQualityDialog
                     }else{
-                        frontCameraQualityDialog.setSelectionPos(videoConfiguration!!.frontCameraQuality)
+                        frontCameraQualityDialog.setSelectionPos(videoConfiguration!!.frontCameraQuality- frontCameraDiff)
                         frontCameraQualityDialog
                     }
                     dialog.show(
