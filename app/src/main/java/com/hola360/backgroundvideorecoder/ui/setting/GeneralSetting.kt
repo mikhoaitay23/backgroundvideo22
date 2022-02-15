@@ -1,16 +1,27 @@
 package com.hola360.backgroundvideorecoder.ui.setting
 
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Environment
+import android.provider.Settings
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutSettingGeneralBinding
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.pickfolder.PickFolderDialog
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.FilePickerUtils
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
 
@@ -73,7 +84,11 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
                 updateDataAndUI()
             }
             R.id.storagePath->{
-
+                if (FilePickerUtils.storagePermissionGrant(requireContext())) {
+                    startPickFolder()
+                } else {
+                    requestPermission()
+                }
             }
             R.id.notificationLevel->{
                 if(!showDialog){
@@ -89,4 +104,72 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
         dataPref!!.putGeneralSetting(Gson().toJson(generalSetting))
         binding!!.setting= generalSetting
     }
+
+    private fun startPickFolder() {
+        val pickFolderDialog = PickFolderDialog.create()
+        pickFolderDialog.mOnPickPathResultListener= object :PickFolderDialog.OnPickPathResultListener{
+            override fun onPickPathResult(path: String?) {
+                binding!!.txtStoragePath.text= path
+            }
+        }
+        pickFolderDialog.show(requireActivity().supportFragmentManager, "PickFolder")
+    }
+
+    private val customContract = object : ActivityResultContract<String, Boolean>() {
+        override fun createIntent(context: Context, input: String): Intent {
+            val intent = Intent(input)
+            intent.addCategory("android.intent.category.DEFAULT")
+            intent.data = Uri.parse(
+                String.format(
+                    "package:%s",
+                    requireActivity().applicationContext.packageName
+                )
+            )
+            return intent
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Boolean =
+            if (SystemUtils.isAndroidR()) {
+                Environment.isExternalStorageManager()
+            } else {
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+
+    }
+
+    private val activityResultLauncher = registerForActivityResult(customContract) {
+        if (it) {
+            setupWhenPermissionGranted()
+        } else {
+            SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+        }
+    }
+
+    private val resultLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (FilePickerUtils.storagePermissionGrant(requireContext())
+            ) {
+                setupWhenPermissionGranted()
+            } else {
+                SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+            }
+        }
+
+    private fun setupWhenPermissionGranted(){}
+
+    private fun requestPermission() {
+        if (SystemUtils.isAndroidR()) {
+            activityResultLauncher.launch(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+        } else resultLauncher.launch(
+            arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        )
+    }
+
+
 }

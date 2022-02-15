@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -21,6 +22,7 @@ import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.BackgroundRecordEvent
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.utils.ToastUtils
+import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.hola360.backgroundvideorecoder.widget.Toolbar
 
@@ -50,7 +52,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         setupToolbar()
         setupPrivacy()
         bindService()
-
         dataSharedPreferenceUtil = DataSharePreferenceUtil.getInstance(this)
     }
 
@@ -75,6 +76,8 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
                 navController?.popBackStack()
             }
         })
+        SCREEN_WIDTH= SystemUtils.getScreenWidth(this)
+        SCREEN_HEIGHT= SystemUtils.getScreenHeight(this)
     }
 
     private fun setupPrivacy() {
@@ -105,14 +108,12 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
             className: ComponentName,
             service: IBinder
         ) {
-            Log.d("abcVideo", "Bind service")
             val binder: RecordService.LocalBinder = service as RecordService.LocalBinder
             recordService = binder.getServiceInstance()
             bound = true
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
-            Log.d("abcVideo", "Disconected service")
             bound = false
         }
     }
@@ -174,7 +175,15 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         }
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val newOrientation= newConfig.orientation
+        Log.d("abcVideo", "orientation: $newOrientation")
+    }
+
     companion object {
+        var SCREEN_WIDTH:Int=0
+        var SCREEN_HEIGHT:Int=0
         const val PRIVACY = "privacy"
         const val NO_RECORDING = 0
         const val RECORD_VIDEO = 1

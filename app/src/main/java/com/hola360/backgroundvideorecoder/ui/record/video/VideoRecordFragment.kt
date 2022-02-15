@@ -1,5 +1,7 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
+import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import androidx.viewpager2.widget.ViewPager2
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.FragmentVideoRecordBinding
@@ -24,6 +26,7 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
     }
 
     override fun initView() {
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
         binding!!.viewPager.adapter= adapter
         binding!!.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
@@ -42,5 +45,11 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
                 binding!!.position=1
             }
         }
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    override fun onDestroy() {
+        super.onDestroy()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
     }
 }

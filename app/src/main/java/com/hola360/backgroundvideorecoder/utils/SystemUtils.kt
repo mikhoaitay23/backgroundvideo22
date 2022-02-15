@@ -13,7 +13,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.os.Parcelable
 import android.os.StatFs
 import android.provider.Settings
@@ -27,9 +26,7 @@ import androidx.exifinterface.media.ExifInterface
 import com.google.android.material.snackbar.Snackbar
 import com.hola360.backgroundvideorecoder.R
 import java.io.*
-
 import java.text.SimpleDateFormat
-import java.util.ArrayList
 
 object SystemUtils {
     private const val FULL_DATE_TIME = "MMMM dd, yyyy, HH:mm"
@@ -418,6 +415,19 @@ object SystemUtils {
         }
         if (suffix != null) resultBuffer.append(suffix)
         return resultBuffer.toString()
+    }
+
+    fun getScreenWidth(activity: Activity):Int{
+        val displayMetrics = DisplayMetrics()
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics)
+        return displayMetrics.widthPixels
+    }
+
+    fun getScreenHeight(activity: Activity):Int{
+        val displayMetrics = DisplayMetrics()
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics)
+        val scale= displayMetrics.scaledDensity
+        return displayMetrics.heightPixels
     }
 
     interface OnStorageRequestResult{

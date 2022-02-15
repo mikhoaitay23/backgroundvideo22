@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.hola360.backgroundvideorecoder.ui.dialog.filepicker.pickfolder.PickFolderViewModel" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dp_8"
+        android:layout_marginVertical="@dimen/dp_16"
+        android:background="@drawable/bg_banner_home"
+        android:elevation="@dimen/dp_4"
+        android:orientation="vertical"
+        android:padding="@dimen/dp_8">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/dp_8">
+
+            <TextView
+                android:id="@+id/myTextViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:ellipsize="marquee"
+                android:gravity="center_vertical"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:paddingVertical="@dimen/dp_8"
+                android:singleLine="true"
+                android:text="@string/save_to"
+                android:textAppearance="?textAppearanceHeadline6" />
+
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/dp_8">
+
+            <ImageView
+                android:id="@+id/myImageViewStorage"
+                android:layout_width="@dimen/dp_36"
+                android:layout_height="@dimen/dp_36"
+                android:background="?selectableItemBackground"
+                android:onClick="@{()->viewModel.clickOnMemory()}"
+                android:padding="@dimen/dp_2"
+                android:scaleType="fitXY"
+                android:storageThumb="@{viewModel.storageBrowserModelLiveData}" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycleViewPath"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/dp_8"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycleView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_file_in_pick" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:background="?android:colorBackground"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="@{viewModel.isEmpty()?View.VISIBLE:View.GONE}">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/dp_16"
+                    android:text="@string/empty"
+                    android:textAppearance="?textAppearanceBody1" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/myButtonCancel"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dp_8"
+                android:layout_weight="1"
+                android:lines="1"
+                android:text="@string/cancel"
+                android:textAllCaps="false"
+                android:textAppearance="?textAppearanceBody2"
+                android:textColor="@color/black" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/myButtonSelect"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dp_8"
+                android:layout_weight="1"
+                android:lines="1"
+                android:text="@string/ok"
+                android:textAllCaps="false"
+                android:textAppearance="?textAppearanceBody2"
+                android:textColor="?android:colorBackground"
+                app:backgroundTint="?colorAccent"
+                app:iconGravity="end"
+                app:iconTint="?android:colorBackground" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</layout>

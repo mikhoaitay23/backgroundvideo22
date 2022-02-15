@@ -16,6 +16,14 @@ class DataSharePreferenceUtil private constructor(context: Context) {
         return sharedPreferences.getString(key, "")
     }
 
+    fun saveUriSdCard(value: String) {
+        putStringValue("key_sdcard", value)
+    }
+
+    fun getUriSdCard(): String {
+        return getStringValue("key_sdcard")?:""
+    }
+
     fun putVideoConfiguration(value: String) {
         putStringValue("Video_configuration", value)
     }
