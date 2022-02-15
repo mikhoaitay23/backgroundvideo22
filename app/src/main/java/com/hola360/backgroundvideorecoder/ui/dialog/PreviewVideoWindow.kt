@@ -116,6 +116,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         bindCaptureUserCase()
     }
 
+    @SuppressLint("RestrictedApi")
     private fun bindCaptureUserCase() {
         val cameraProvider = ProcessCameraProvider.getInstance(context).get()
         val cameraSelector = cameraCapabilities[cameraIndex].camSelector
@@ -133,6 +134,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             .build()
 
         videoCapture = VideoCapture.withOutput(recorder)
+        videoCapture.targetRotation= Surface.ROTATION_90
 
         try {
             cameraProvider.unbindAll()

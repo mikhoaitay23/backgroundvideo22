@@ -43,4 +43,8 @@
     <dimen name="dp_80">80dp</dimen>
     <dimen name="dp_120">120dp</dimen>
 
+    //folder picker
+    <dimen name="item_file_icon_in_pick">@dimen/dp_40</dimen>
+    <dimen name="item_album_width">240dp</dimen>
+
 </resources>

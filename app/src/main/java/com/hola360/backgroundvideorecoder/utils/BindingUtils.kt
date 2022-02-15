@@ -2,15 +2,23 @@ package com.hola360.backgroundvideorecoder.utils
 
 import android.app.NotificationManager
 import android.os.Build
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SwitchCompat
 import androidx.databinding.BindingAdapter
+import com.bumptech.glide.Glide
+import com.example.techtallfeb2022.data.model.StorageBrowserModel
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.model.ActionModel
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.FilePickerUtils
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.FilePickerUtils.updateSelectImage
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.ThumbnailUtil
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -154,6 +162,41 @@ object BindingUtils {
                 ;listLevel[1]
             }
             textView.text= txtImportance
+        }
+    }
+
+    @BindingAdapter("android:bindThumbnailFile")
+    @JvmStatic
+    fun ImageView.bindThumbnailFile(cFile: File) {
+        val defaultThumb = ThumbnailUtil.getDefaultThumbnail(cFile)
+        Glide.with(this).load(defaultThumb).into(this)
+    }
+
+    @BindingAdapter("android:iconForAction")
+    @JvmStatic
+    fun ImageView.iconForAction(actionModel: ActionModel) {
+        if (actionModel.icon == -1) {
+            visibility = View.GONE
+        } else {
+            visibility = View.VISIBLE
+            setImageResource(actionModel.icon)
+        }
+        if (actionModel.isSelectable) {
+            updateSelectImage(this, actionModel.isSelected)
+        } else {
+            updateSelectImage(this, false)
+        }
+    }
+
+    @BindingAdapter("android:storageThumb")
+    @JvmStatic
+    fun ImageView.storageThumb(storageBrowserModel: StorageBrowserModel?) {
+        if (storageBrowserModel != null) {
+            setImageResource(
+                FilePickerUtils.getStorageIcon(storageBrowserModel.curStorageModel())
+            )
+        } else {
+            setImageResource(R.drawable.ic_phone)
         }
     }
 

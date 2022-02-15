@@ -1,5 +1,6 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -98,7 +99,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
             if(recordSchedule!!.scheduleTime>0L && System.currentTimeMillis()+ videoConfiguration!!.totalTime> recordSchedule!!.scheduleTime){
                 showCancelDialog()
             }else{
-                Log.d("abcVideo", "Start Recording: ")
                 (requireActivity() as MainActivity).handleRecordStatus(MainActivity.RECORD_VIDEO)
             }
         }else{

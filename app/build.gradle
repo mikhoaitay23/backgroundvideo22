@@ -96,6 +96,9 @@ dependencies {
     implementation project(path: ':recorderlib')
     implementation "androidx.core:core-ktx:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    implementation "com.anggrayudi:storage:0.13.0"
+    implementation 'com.google.android.gms:play-services-basement:18.0.0'
 }
 repositories {
     mavenCentral()
