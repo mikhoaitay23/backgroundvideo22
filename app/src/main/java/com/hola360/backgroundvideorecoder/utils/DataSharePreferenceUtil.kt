@@ -88,6 +88,22 @@ class DataSharePreferenceUtil private constructor(context: Context) {
         return getStringValue("Audio_schedule")
     }
 
+    fun setParentPath(value: String) {
+        putStringValue("key_ParentPath", value)
+    }
+
+    fun getParentPath(): String? {
+        return getStringValue("key_ParentPath")
+    }
+
+    fun saveUriSdCard(value: String) {
+        putStringValue("key_sdcard", value)
+    }
+
+    fun getUriSdCard(): String? {
+        return getStringValue("key_sdcard")
+    }
+
     companion object {
         const val PREFERENCE_NAME = "FakeLive_pref"
         private var instance: DataSharePreferenceUtil? = null

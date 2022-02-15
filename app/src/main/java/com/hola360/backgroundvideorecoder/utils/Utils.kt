@@ -1,8 +1,13 @@
 package com.hola360.backgroundvideorecoder.utils
 
+import android.content.Context
+import android.content.UriPermission
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.view.View
+import androidx.documentfile.provider.DocumentFile
+import com.anggrayudi.storage.file.inSdCardStorage
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
@@ -14,6 +19,36 @@ object Utils {
 
     fun isAndroidQ(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    }
+
+    fun isAndroidO(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+    }
+
+    fun getDocumentFile(context: Context, path: String): DocumentFile? {
+        val documentFile = DocumentFile.fromFile(File(path))
+        val isFromSdCard = documentFile.inSdCardStorage(context)
+        return if (isFromSdCard) {
+            val uriSdCard = DataSharePreferenceUtil.getInstance(context)!!.getUriSdCard()
+            val rootUriTree = Uri.parse(uriSdCard)
+            var parentDocument =
+                DocumentFile.fromTreeUri(context, rootUriTree!!)
+            val parts: List<String> = path.split(Regex("/"))
+            for (i in 3 until parts.size) {
+                if (parentDocument != null) {
+                    parentDocument = parentDocument.findFile(parts[i])
+                }
+            }
+            parentDocument
+        } else {
+            documentFile
+        }
+    }
+
+    fun isGrantAccessSdCard(context: Context): Boolean {
+        val contentResolver = context.contentResolver
+        val permissions: List<UriPermission> = contentResolver.persistedUriPermissions
+        return permissions.isNotEmpty() && DataSharePreferenceUtil.getInstance(context)!!.getUriSdCard()!!.isNotEmpty()
     }
 
     fun getDocumentationFolder(): File {
@@ -59,5 +94,20 @@ object Utils {
             }
         }
         return SettingGeneralModel()
+    }
+
+    @JvmStatic
+    fun convertTime(time: Long): String {
+        val result: String
+        val hour = time / 3600
+        val remainSecond = time % 3600
+        val minutes = remainSecond / 60
+        val second = remainSecond % 60
+        result = if (hour > 0) {
+            String.format("%02d:%02d:%02d", hour, minutes, second)
+        } else {
+            String.format("%02d:%02d", minutes, second)
+        }
+        return result
     }
 }

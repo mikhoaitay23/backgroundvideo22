@@ -10,7 +10,6 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.ktx.BuildConfig
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
@@ -20,8 +19,8 @@ import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.BackgroundRecordEvent
-import com.hola360.backgroundvideorecoder.ui.record.audio.utils.RecordManager
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.ToastUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.hola360.backgroundvideorecoder.widget.Toolbar
 
@@ -31,16 +30,16 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     private var navController: NavController? = null
     private var navHostFragment: Fragment? = null
     var recordService: RecordService? = null
-    private var bound = false
+    var bound = false
     private val curRecordEvent = BackgroundRecordEvent()
     val recordStatusLiveData = MutableLiveData<BackgroundRecordEvent>()
 
     init {
         recordStatusLiveData.value = BackgroundRecordEvent()
     }
+
     private var dataSharedPreferenceUtil: DataSharePreferenceUtil? = null
     var audioModel: AudioModel? = null
-    private var recordManager = RecordManager()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,12 +52,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         bindService()
 
         dataSharedPreferenceUtil = DataSharePreferenceUtil.getInstance(this)
-        recordManager.init(application, BuildConfig.DEBUG)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        unbindService()
     }
 
     override fun onResume() {
@@ -115,7 +108,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
             Log.d("abcVideo", "Bind service")
             val binder: RecordService.LocalBinder = service as RecordService.LocalBinder
             recordService = binder.getServiceInstance()
-            recordService!!.registerListener(this@MainActivity)
             bound = true
         }
 
@@ -130,12 +122,9 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
             RECORD_VIDEO, STOP_VIDEO_RECORD,
             SCHEDULE_RECORD_VIDEO, CANCEL_SCHEDULE_RECORD_VIDEO -> {
                 VideoRecordUtils.startRecordIntent(this, status)
-                if(!bound){
+                if (!bound) {
                     bindService()
                 }
-            }
-            AUDIO_RECORD, AUDIO_STOP, AUDIO_RESUME, AUDIO_PAUSE -> {
-                recordService!!.recordAudio(status)
             }
         }
     }
@@ -143,13 +132,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     fun bindService() {
         Intent(this@MainActivity, RecordService::class.java).also {
             bindService(it, mConnection, Context.BIND_AUTO_CREATE)
-        }
-    }
-
-    private fun unbindService() {
-        if (bound) {
-            unbindService(mConnection)
-            bound = false
         }
     }
 
@@ -172,8 +154,24 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         recordStatusLiveData.value = curRecordEvent
     }
 
-    override fun onAudioRunning() {
-        Log.d("TAG", "onAudioRunning: ")
+    override fun onUpdateTime(fileName: String, duration: Long, curTime: Long) {
+
+    }
+
+    override fun onStopped() {
+
+    }
+
+    override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ToastUtils.getInstance(this)!!.release()
+        if (bound) {
+            unbindService(mConnection)
+        }
     }
 
     companion object {
@@ -183,7 +181,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         const val STOP_VIDEO_RECORD = 2
         const val SCHEDULE_RECORD_VIDEO = 3
         const val CANCEL_SCHEDULE_RECORD_VIDEO = 4
-        const val RECORD_VIDEO_LOW_BATTERY=5
+        const val RECORD_VIDEO_LOW_BATTERY = 5
         const val AUDIO_RECORD = 10
         const val AUDIO_STOP = 11
         const val AUDIO_RESUME = 12

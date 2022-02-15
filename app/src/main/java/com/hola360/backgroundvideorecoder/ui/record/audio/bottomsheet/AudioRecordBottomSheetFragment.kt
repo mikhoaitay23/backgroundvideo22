@@ -10,14 +10,12 @@ import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.FragmentBottomSheetRecordAudioBinding
 import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDialog
-import com.hola360.backgroundvideorecoder.ui.record.audio.utils.RecordManager
+import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
+import com.hola360.backgroundvideorecoder.ui.record.audio.utils.listener.RecordStateListener
 import com.hola360.backgroundvideorecoder.widget.bottomsheet.confirm.ConfirmBottomSheetFragment
-import com.zlw.main.recorderlib.BuildConfig
-import com.zlw.main.recorderlib.recorder.RecordHelper
-import com.zlw.main.recorderlib.recorder.listener.RecordStateListener
 import java.util.*
 
-class AudioRecordBottomSheetFragment :
+class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     BaseBottomSheetDialog<FragmentBottomSheetRecordAudioBinding>(), View.OnClickListener,
     ConfirmBottomSheetFragment.OnConfirmButtonClickListener {
 
@@ -49,6 +47,11 @@ class AudioRecordBottomSheetFragment :
     override fun onResume() {
         super.onResume()
         initRecordEvent()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dismissCallback.onDismiss()
     }
 
     override fun onClick(view: View?) {
@@ -87,7 +90,6 @@ class AudioRecordBottomSheetFragment :
     }
 
     private fun initRecord() {
-        recordManager.init(mainActivity.application, BuildConfig.DEBUG)
         val recordDir = String.format(
             Locale.getDefault(), "%s/Record/backgroundrecord/",
             Environment.getExternalStorageDirectory().absolutePath
