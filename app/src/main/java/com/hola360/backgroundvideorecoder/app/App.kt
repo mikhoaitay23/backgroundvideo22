@@ -9,13 +9,13 @@ class App: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        createChannelNotification()
+        createNoneChannelNotification()
     }
 
-    private fun createChannelNotification(){
+    private fun createNoneChannelNotification(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            val channel= NotificationChannel(CHANNEL_SERVICE_ID, "Channel",
-            NotificationManager.IMPORTANCE_DEFAULT)
+            val channel= NotificationChannel(NONE_SERVICE_CHANNEL_ID, "Channel_silence",
+            NotificationManager.IMPORTANCE_NONE)
             val notificationManager= getSystemService(NotificationManager::class.java)
             notificationManager?.let {
                 it.createNotificationChannel(channel)
@@ -24,6 +24,6 @@ class App: Application() {
     }
 
     companion object{
-        const val CHANNEL_SERVICE_ID= "channel_id"
+        const val NONE_SERVICE_CHANNEL_ID= "channel_id"
     }
 }

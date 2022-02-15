@@ -6,11 +6,8 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.media.AudioFormat
 import android.os.Binder
-import android.os.Environment
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.hola360.backgroundvideorecoder.MainActivity
@@ -254,7 +251,7 @@ class RecordService : Service(), RecordHelper.Listener {
             .setDestination(R.id.nav_video_record)
             .createPendingIntent()
 
-        return NotificationCompat.Builder(this, App.CHANNEL_SERVICE_ID)
+        return NotificationCompat.Builder(this, App.NONE_SERVICE_CHANNEL_ID)
             .setContentTitle(notificationTitle)
             .setContentText(notificationContent)
             .setContentIntent(pendingIntent)

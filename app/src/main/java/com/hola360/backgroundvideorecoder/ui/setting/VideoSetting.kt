@@ -20,7 +20,7 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
         VideoRecordUtils.getCameraCapabilities(requireContext(), this)
     }
     private val frontCameraQuality: MutableList<String> by lazy {
-        generateCameraQualityList(VideoRecordUtils.getCameraQuality(false, cameraCapabilities))
+        generateCameraQualityList(VideoRecordUtils.getCameraQuality(false, cameraCapabilities), false)
     }
     private val frontCameraDiff:Int by lazy {
         if(VideoRecordUtils.getCameraQuality(false, cameraCapabilities).size > frontCameraQuality.size){
@@ -46,7 +46,7 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
         }, dismissCallback)
     }
     private val backCameraQuality:MutableList<String> by lazy {
-        generateCameraQualityList(VideoRecordUtils.getCameraQuality(true, cameraCapabilities))
+        generateCameraQualityList(VideoRecordUtils.getCameraQuality(true, cameraCapabilities), true)
     }
     private val backCameraDiff:Int by lazy {
         if(VideoRecordUtils.getCameraQuality(true, cameraCapabilities).size > backCameraQuality.size){
@@ -93,12 +93,25 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
         }, dismissCallback)
     }
 
-    private fun generateCameraQualityList(data:MutableList<String>):MutableList<String>{
+    private fun generateCameraQualityList(data:MutableList<String>, isBack:Boolean):MutableList<String>{
         val newQualityList= mutableListOf<String>()
         return if(data.size>3){
             newQualityList.add(data[data.size-3])
             newQualityList.add(data[data.size-2])
             newQualityList.add(data[data.size-1])
+            if(isBack){
+                if(videoConfiguration!!.backCameraQuality< data.size-3){
+                    videoConfiguration!!.backCameraQuality= data.size-3
+                    applyNewVideoConfiguration()
+                    saveNewVideoConfiguration()
+                }
+            }else{
+                if(videoConfiguration!!.frontCameraQuality<data.size-3){
+                    videoConfiguration!!.frontCameraQuality= data.size-3
+                    applyNewVideoConfiguration()
+                    saveNewVideoConfiguration()
+                }
+            }
             newQualityList
         }else{
             newQualityList.apply {
@@ -109,9 +122,9 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
 
     private fun setCameraQualityTextView(){
         binding!!.txtVideoQuality.text= if(videoConfiguration!!.isBack){
-            backCameraQuality[videoConfiguration!!.backCameraQuality- backCameraDiff]
+            backCameraQuality[(videoConfiguration!!.backCameraQuality- backCameraDiff).coerceAtLeast(0)]
         }else{
-            frontCameraQuality[videoConfiguration!!.frontCameraQuality- frontCameraDiff]
+            frontCameraQuality[(videoConfiguration!!.frontCameraQuality- frontCameraDiff).coerceAtLeast(0)]
         }
     }
 
@@ -169,10 +182,10 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
                 if (!showDialog) {
                     showDialog = true
                     val dialog= if(videoConfiguration!!.isBack){
-                        backCameraQualityDialog.setSelectionPos(videoConfiguration!!.backCameraQuality- backCameraDiff)
+                        backCameraQualityDialog.setSelectionPos((videoConfiguration!!.backCameraQuality- backCameraDiff).coerceAtLeast(0))
                         backCameraQualityDialog
                     }else{
-                        frontCameraQualityDialog.setSelectionPos(videoConfiguration!!.frontCameraQuality- frontCameraDiff)
+                        frontCameraQualityDialog.setSelectionPos((videoConfiguration!!.frontCameraQuality- frontCameraDiff).coerceAtLeast(0))
                         frontCameraQualityDialog
                     }
                     dialog.show(

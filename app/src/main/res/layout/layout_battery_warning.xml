@@ -2,7 +2,9 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-
+        <variable
+            name="isBattery"
+            type="boolean" />
     </data>
 
     <LinearLayout
@@ -19,16 +21,17 @@
 
             <ImageView
                 android:layout_marginTop="@dimen/home_h_margin"
-                android:src="@drawable/ic_warn_low_battery"
+                android:src="@{isBattery? @drawable/ic_warn_low_battery: @drawable/ic_warn_storage_space}"
                 android:layout_width="70dp"
                 android:layout_height="70dp"/>
             
             <TextView
-                android:text="@string/low_battery_title"
+                android:text="@{isBattery? @string/low_battery_title: @string/low_storage_title}"
                 style="@style/WarnText1"/>
 
             <TextView
                 android:id="@+id/txtBatteryPercent"
+                android:text="@{isBattery? @string/low_battery_text: @string/low_storage_text}"
                 style="@style/WarnText2"/>
 
             <LinearLayout
@@ -51,7 +54,7 @@
                     android:id="@+id/oke"
                     style="@style/TextDialog1"
                     android:background="@drawable/bg_button_start"
-                    android:text="@string/ok"
+                    android:text="@string/dismiss"
                     android:textColor="@color/md_white_1000" />
 
             </LinearLayout>
