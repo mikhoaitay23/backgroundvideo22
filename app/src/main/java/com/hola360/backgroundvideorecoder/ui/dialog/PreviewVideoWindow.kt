@@ -5,14 +5,11 @@ import android.content.Context
 import android.graphics.PixelFormat
 import android.os.Build
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.WindowManager
 import com.hola360.backgroundvideorecoder.R
 import java.lang.Exception
-import android.view.ViewGroup
 
 import android.content.Context.WINDOW_SERVICE
+import android.view.*
 import androidx.camera.core.CameraControl
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -20,29 +17,31 @@ import androidx.camera.video.*
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
+import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
-import com.hola360.backgroundvideorecoder.ui.setting.GeneralSetting
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
-@SuppressLint("InflateParams")
+@SuppressLint("InflateParams", "ClickableViewAccessibility")
 class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
 
     private var view: View?= null
     private var windowManager: WindowManager?= null
     private var params: WindowManager.LayoutParams?=null
+    private var paramX:Int =0
+    private var paramY:Int =0
     private var cameraControl:CameraControl?=null
     private var cameraIndex = 0
     private var qualityIndex = 0
     private lateinit var videoCapture: VideoCapture<Recorder>
     private var currentRecording: Recording? = null
     private val mainThreadExecutor by lazy { ContextCompat.getMainExecutor(context) }
-    var recordingState:VideoRecordEvent?=null
+    private var recordingState:VideoRecordEvent?=null
     private var customLifeCycleOwner: CustomLifeCycleOwner?=null
     private val cameraCapabilities: MutableList<CameraCapability> by lazy {
         VideoRecordUtils.getCameraCapabilities(context, customLifeCycleOwner!!)
@@ -59,6 +58,24 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         windowManager= context.getSystemService(WINDOW_SERVICE) as WindowManager
         val layoutInflater= context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         view= layoutInflater.inflate(R.layout.layout_preview_video, null)
+        view!!.setOnTouchListener { v, event ->
+            event?.let {
+                if (it.action == MotionEvent.ACTION_DOWN) {
+                    paramX = it.x.toInt()
+                    paramY = it.y.toInt()
+                }
+                if (it.action == MotionEvent.ACTION_MOVE) {
+                    val dx = event.x - paramX
+                    val dy = event.y - paramY
+                    params!!.x= params!!.x +dx.toInt()
+                    params!!.y= params!!.y+dy.toInt()
+                    windowManager!!.updateViewLayout(view!!, params)
+                    paramX = it.x.toInt()
+                    paramY = it.y.toInt()
+                }
+            }
+            true
+        }
     }
 
     fun setupVideoConfiguration(){
@@ -66,7 +83,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         val layoutFlag =if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         } else {
-            WindowManager.LayoutParams.TYPE_PHONE;
+            WindowManager.LayoutParams.TYPE_PHONE
         }
         params= if(videoRecordConfiguration.previewMode){
             WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
@@ -80,8 +97,8 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT)
         }
-        params!!.verticalMargin= 0.3f
-        params!!.horizontalMargin= -0.3f
+        params!!.x= -(MainActivity.SCREEN_WIDTH +context.resources.getDimensionPixelSize(R.dimen.record_preview_height))/2+10
+        params!!.y= (MainActivity.SCREEN_HEIGHT - context.resources.getDimensionPixelSize(R.dimen.record_preview_height))/2 - context.resources.getDimensionPixelSize(R.dimen.record_bottom_pager_height)
         cameraIndex= if(videoRecordConfiguration.isBack){
             0
         }else{

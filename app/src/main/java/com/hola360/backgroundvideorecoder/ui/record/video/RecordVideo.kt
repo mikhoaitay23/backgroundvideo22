@@ -1,6 +1,8 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import com.hola360.backgroundvideorecoder.MainActivity
