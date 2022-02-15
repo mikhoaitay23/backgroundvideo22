@@ -22,6 +22,7 @@ import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.BackgroundRecordEvent
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.RecordManager
 import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.hola360.backgroundvideorecoder.widget.Toolbar
 
 class MainActivity : AppCompatActivity(), RecordService.Listener {
@@ -37,8 +38,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     init {
         recordStatusLiveData.value = BackgroundRecordEvent()
     }
-
-    var recordStatus: Int = NO_RECORDING
     private var dataSharedPreferenceUtil: DataSharePreferenceUtil? = null
     var audioModel: AudioModel? = null
     private var recordManager = RecordManager()
@@ -113,6 +112,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
             className: ComponentName,
             service: IBinder
         ) {
+            Log.d("abcVideo", "Bind service")
             val binder: RecordService.LocalBinder = service as RecordService.LocalBinder
             recordService = binder.getServiceInstance()
             recordService!!.registerListener(this@MainActivity)
@@ -120,6 +120,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
+            Log.d("abcVideo", "Disconected service")
             bound = false
         }
     }
@@ -128,7 +129,10 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         when (status) {
             RECORD_VIDEO, STOP_VIDEO_RECORD,
             SCHEDULE_RECORD_VIDEO, CANCEL_SCHEDULE_RECORD_VIDEO -> {
-                recordService!!.recordVideo(status)
+                VideoRecordUtils.startRecordIntent(this, status)
+                if(!bound){
+                    bindService()
+                }
             }
             AUDIO_RECORD, AUDIO_STOP, AUDIO_RESUME, AUDIO_PAUSE -> {
                 recordService!!.recordAudio(status)
@@ -155,7 +159,6 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     override fun updateRecordTime(time: Long, status: Int) {
-        val rotation = window?.decorView?.rotation
         if (curRecordEvent.status != status) {
             curRecordEvent.status = status
         }

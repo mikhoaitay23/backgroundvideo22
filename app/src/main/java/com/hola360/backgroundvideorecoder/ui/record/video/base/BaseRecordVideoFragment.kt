@@ -189,13 +189,17 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result: Map<String?, Boolean?>? ->
         if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
-            requestOverlayPermission()
+            if (SystemUtils.isAndroidO() &&!Settings.canDrawOverlays(requireContext())) {
+                requestOverlayPermission()
+            } else {
+                startAction()
+            }
         } else {
             SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
         }
     }
 
-    protected fun requestOverlayPermission() {
+    private fun requestOverlayPermission() {
         if (SystemUtils.isAndroidO() && !Settings.canDrawOverlays(requireContext())) {
             val intent = Intent(
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,

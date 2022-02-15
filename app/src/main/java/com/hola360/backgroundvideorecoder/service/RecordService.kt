@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.hola360.backgroundvideorecoder.MainActivity
@@ -285,6 +286,7 @@ class RecordService : Service(), RecordHelper.Listener {
         super.onDestroy()
         unregisterReceiver(recordScheduleBroadcast)
         unregisterReceiver(batteryLevelReceiver)
+        Log.d("abcVideo", "Service killed")
     }
 
     private fun getFilePath(): String? {
