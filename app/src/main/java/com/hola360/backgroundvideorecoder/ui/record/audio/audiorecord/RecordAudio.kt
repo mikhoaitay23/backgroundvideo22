@@ -1,6 +1,8 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord
 
 import android.Manifest
+import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
@@ -25,11 +27,11 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
     RecordService.Listener {
 
     private var audioModel: AudioModel? = null
-    private var recordVideoDurationDialog: RecordVideoDurationDialog? = null
-    private var listSelectionBottomSheet: ListSelectionBotDialog? = null
+    private var mRecordVideoDurationDialog: RecordVideoDurationDialog? = null
+    private var mListSelectionBottomSheet: ListSelectionBotDialog? = null
+    private var mAudioRecordBottomSheetFragment: AudioRecordBottomSheetFragment? = null
     private lateinit var viewModel: RecordAudioViewModel
     private var showBottomSheet = false
-    private var audioRecordBottomSheetFragment: AudioRecordBottomSheetFragment? = null
     private var isShow = false
 
     override val layoutId: Int = R.layout.layout_record_audio
@@ -55,18 +57,21 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
 
         binding!!.lifecycleOwner = this
         binding!!.viewModel = viewModel
+    }
 
-        if (mainActivity.recordService!!.getRecordState() == RecordService.RecordState.AudioRecording) {
-            onAudioRecordBottomSheet()
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mainActivity.recordService!!.registerListener(this)
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.getAudioConfig()
-        if (mainActivity.recordService == null) {
-            mainActivity.bindService()
-        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        isShow = false
     }
 
     private val resultRecordPermissionLauncher =
@@ -133,18 +138,19 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
                 storageList[0].getRootDocumentationFile(mainActivity).getAbsolutePath(mainActivity)
             SharedPreferenceUtils.getInstance(mainActivity)!!.setParentPath(defaultPath)
         }
-        mainActivity.recordService!!.startRecordAudio()
+        mainActivity.recordService!!.startRecordAudio(audioModel!!)
+        mainActivity.recordService!!.registerListener(this)
     }
 
     private fun onQualityBottomSheet() {
         val listSelection = resources.getStringArray(R.array.record_quality).toMutableList()
-        listSelectionBottomSheet = ListSelectionBotDialog(
+        mListSelectionBottomSheet = ListSelectionBotDialog(
             getString(R.string.record_quality),
             listSelection,
             object : ListSelectionAdapter.OnItemListSelection {
                 override fun onSelection(position: Int) {
                     viewModel.updateQuality(AudioQuality.getByInt(position))
-                    listSelectionBottomSheet!!.dialog!!.dismiss()
+                    mListSelectionBottomSheet!!.dialog!!.dismiss()
                 }
 
             }, object : OnDialogDismiss {
@@ -153,8 +159,8 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
                 }
 
             })
-        audioModel?.quality?.let { listSelectionBottomSheet!!.setSelectionPos(it.ordinal) }
-        listSelectionBottomSheet!!.show(
+        audioModel?.quality?.let { mListSelectionBottomSheet!!.setSelectionPos(it.ordinal) }
+        mListSelectionBottomSheet!!.show(
             requireActivity().supportFragmentManager,
             "bottomSheetAudioRecordQuality"
         )
@@ -162,13 +168,13 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
 
     private fun onModeBottomSheet() {
         val listSelection = resources.getStringArray(R.array.record_mode).toMutableList()
-        listSelectionBottomSheet = ListSelectionBotDialog(
+        mListSelectionBottomSheet = ListSelectionBotDialog(
             getString(R.string.record_mode),
             listSelection,
             object : ListSelectionAdapter.OnItemListSelection {
                 override fun onSelection(position: Int) {
                     viewModel.updateMode(AudioMode.getByInt(position))
-                    listSelectionBottomSheet!!.dialog!!.dismiss()
+                    mListSelectionBottomSheet!!.dialog!!.dismiss()
                 }
 
             }, object : OnDialogDismiss {
@@ -177,15 +183,15 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
                 }
 
             })
-        audioModel?.mode?.let { listSelectionBottomSheet!!.setSelectionPos(it.ordinal) }
-        listSelectionBottomSheet!!.show(
+        audioModel?.mode?.let { mListSelectionBottomSheet!!.setSelectionPos(it.ordinal) }
+        mListSelectionBottomSheet!!.show(
             requireActivity().supportFragmentManager,
             "bottomSheetAudioRecordMode"
         )
     }
 
     private fun onDurationBottomSheet() {
-        recordVideoDurationDialog =
+        mRecordVideoDurationDialog =
             RecordVideoDurationDialog(object : RecordVideoDurationDialog.OnSelectDuration {
                 override fun onSelectDuration(duration: Long) {
                     viewModel.updateDuration(duration)
@@ -196,8 +202,8 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
                         showBottomSheet = false
                     }
                 })
-        recordVideoDurationDialog!!.setupTotalTime(audioModel!!.duration)
-        recordVideoDurationDialog!!.show(
+        mRecordVideoDurationDialog!!.setupTotalTime(audioModel!!.duration)
+        mRecordVideoDurationDialog!!.show(
             requireActivity().supportFragmentManager,
             "VideoDuration"
         )
@@ -205,35 +211,26 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
 
     private fun onAudioRecordBottomSheet() {
         if (!isShow) {
-            audioRecordBottomSheetFragment =
+            mAudioRecordBottomSheetFragment =
                 AudioRecordBottomSheetFragment(object : OnDialogDismiss {
                     override fun onDismiss() {
                         isShow = false
                     }
 
                 })
-            audioRecordBottomSheetFragment!!.show(
+            mAudioRecordBottomSheetFragment!!.show(
                 requireActivity().supportFragmentManager,
                 "VideoDuration"
             )
+            mAudioRecordBottomSheetFragment!!.isCancelable = false
             isShow = true
         }
     }
-
-    override fun onRecordStarted(status: Int) {
-
-    }
-
-    override fun updateRecordTime(time: Long, status: Int) {
-
-    }
-
-    override fun onRecordCompleted() {
-
-    }
-
     override fun onUpdateTime(fileName: String, duration: Long, curTime: Long) {
-
+        if (mainActivity.isBound && mainActivity.recordService!!.isRecording() && mainActivity.window.decorView.isShown) {
+            onAudioRecordBottomSheet()
+        }
+        Log.d("TAG", "onUpdateTime: ")
     }
 
     override fun onStopped() {

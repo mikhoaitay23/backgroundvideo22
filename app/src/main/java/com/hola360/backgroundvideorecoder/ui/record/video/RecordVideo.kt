@@ -12,7 +12,7 @@ import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
-class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener{
+class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener {
 
     override val layoutId: Int = R.layout.layout_record_video
 
@@ -36,7 +36,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     }
 
     override fun initView() {
-        binding!!.isRecording= isRecording
+        binding!!.isRecording = isRecording
         applyNewVideoConfiguration()
         binding!!.camera.setOnClickListener(this)
         binding!!.recordDuration.setOnClickListener(this)
@@ -76,34 +76,33 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
             R.id.recordDuration -> {
                 onVideoRecordDurationSelect()
             }
-            R.id.intervalTime->{
+            R.id.intervalTime -> {
                 onVideoIntervalSelect()
             }
-            R.id.previewMode->{
+            R.id.previewMode -> {
                 onPreviewModeChange()
             }
-            R.id.flash->{
+            R.id.flash -> {
                 onFlashModeChange()
             }
-            R.id.sound->{
+            R.id.sound -> {
                 onSoundModeChange()
             }
-            R.id.start->{
+            R.id.start -> {
                 startRecordOrSetSchedule()
             }
         }
     }
 
     override fun startAction() {
-        if(!binding!!.isRecording){
-            if(recordSchedule!!.scheduleTime>0L && System.currentTimeMillis()+ videoConfiguration!!.totalTime> recordSchedule!!.scheduleTime){
+        if (!binding!!.isRecording) {
+            if (recordSchedule!!.scheduleTime > 0L && System.currentTimeMillis() + videoConfiguration!!.totalTime > recordSchedule!!.scheduleTime) {
                 showCancelDialog()
-            }else{
+            } else {
                 (requireActivity() as MainActivity).handleRecordStatus(MainActivity.RECORD_VIDEO)
             }
-        }else{
+        } else {
             (requireActivity() as MainActivity).handleRecordStatus(MainActivity.STOP_VIDEO_RECORD)
-            (requireActivity() as MainActivity).onRecordCompleted()
         }
     }
 

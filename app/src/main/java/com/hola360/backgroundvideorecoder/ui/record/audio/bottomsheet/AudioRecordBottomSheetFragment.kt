@@ -1,25 +1,25 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.bottomsheet
 
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
-import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.FragmentBottomSheetRecordAudioBinding
+import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
+import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.widget.bottomsheet.confirm.ConfirmBottomSheetFragment
-import java.util.*
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+
 
 class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     BaseBottomSheetDialog<FragmentBottomSheetRecordAudioBinding>(), View.OnClickListener,
-    ConfirmBottomSheetFragment.OnConfirmButtonClickListener {
+    ConfirmBottomSheetFragment.OnConfirmButtonClickListener, RecordService.Listener {
 
     private lateinit var viewModel: AudioRecordBottomSheetViewModel
-    private var audioModel: AudioModel? = null
     private lateinit var mainActivity: MainActivity
     private var confirmBottomSheetFragment: ConfirmBottomSheetFragment? = null
 
@@ -35,14 +35,10 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
         val factory = AudioRecordBottomSheetViewModel.Factory(requireActivity().application)
         viewModel =
             ViewModelProvider(this, factory)[AudioRecordBottomSheetViewModel::class.java]
-        audioModel = AudioModel()
 
+        mainActivity.recordService?.registerListener(this)
         initClick()
 
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     override fun onDestroy() {
@@ -53,11 +49,7 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     override fun onClick(view: View?) {
         when (view) {
             binding!!.btnPause -> {
-//                if (recordManager.getState() == RecordHelper.RecordState.RECORDING) {
-//                    (requireActivity() as MainActivity).handleRecordStatus(MainActivity.AUDIO_PAUSE)
-//                } else {
-//                    (requireActivity() as MainActivity).handleRecordStatus(MainActivity.AUDIO_RESUME)
-//                }
+
             }
             binding!!.btnAbort -> {
                 confirmBottomSheetFragment = ConfirmBottomSheetFragment.create(
@@ -71,10 +63,7 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
                 )
             }
             binding!!.btnSave -> {
-//                if (recordManager.getState() != RecordHelper.RecordState.IDLE) {
-//                    (requireActivity() as MainActivity).handleRecordStatus(MainActivity.AUDIO_STOP)
-//                }
-//                dismissAllowingStateLoss()
+                mainActivity.recordService?.stopRecording()
             }
         }
     }
@@ -85,9 +74,23 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
         binding!!.btnSave.setOnClickListener(this)
     }
 
-//    override fun updateTimer(time: Long) {
-//        binding!!.tvTime.text = Utils.formatTimeIntervalHourMinSec(time)
-//    }
+    override fun onUpdateTime(fileName: String, duration: Long, curTime: Long) {
+        if (mainActivity.isBound && mainActivity.recordService!!.isRecording()) {
+            binding!!.tvTime.text = Utils.convertTime(curTime / 1000)
+        }
+    }
+
+    override fun onStopped() {
+        dismissAllowingStateLoss()
+    }
+
+    override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {
+        val byteBuf: ByteBuffer = ByteBuffer.allocate(2 * buf!!.size)
+        byteBuf.order(ByteOrder.LITTLE_ENDIAN)
+        byteBuf.asShortBuffer().put(buf)
+        val bytes: ByteArray = byteBuf.array()
+        binding!!.audioVisualizer.setWaveData(bytes)
+    }
 
     override fun onPositiveClick() {
 
@@ -96,6 +99,4 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     override fun onNegativeClick() {
 
     }
-
-
 }

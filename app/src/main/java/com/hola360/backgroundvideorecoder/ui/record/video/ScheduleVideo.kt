@@ -40,10 +40,10 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         }
     }
 
-    private fun checkScheduleWhenRecordStop(){
-        if(binding!!.schedule && recordSchedule!!.scheduleTime<System.currentTimeMillis()){
-            binding!!.schedule=false
-            recordSchedule= RecordSchedule()
+    private fun checkScheduleWhenRecordStop() {
+        if (binding!!.schedule && recordSchedule!!.scheduleTime < System.currentTimeMillis()) {
+            binding!!.schedule = false
+            recordSchedule = RecordSchedule()
             dataPref!!.putSchedule("")
         }
     }
@@ -87,7 +87,8 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         val curDay = calendar.get(Calendar.DAY_OF_MONTH)
         val curMonth = calendar.get(Calendar.MONTH)
         val curYear = calendar.get(Calendar.YEAR)
-        val datePicker = DatePickerDialog(requireContext(), R.style.TimeAndDatePickerStyle,
+        val datePicker = DatePickerDialog(
+            requireContext(), R.style.TimeAndDatePickerStyle,
             { _, year, month, dayOfMonth ->
                 calendar.set(Calendar.YEAR, year)
                 calendar.set(Calendar.MONTH, month)
@@ -106,7 +107,8 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
     private fun selectTime() {
         val curHour = calendar.get(Calendar.HOUR_OF_DAY)
         val curMinute = calendar.get(Calendar.MINUTE)
-        val timePicker = TimePickerDialog(requireContext(), R.style.TimeAndDatePickerStyle,
+        val timePicker = TimePickerDialog(
+            requireContext(), R.style.TimeAndDatePickerStyle,
             { _, hourOfDay, minute ->
                 calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 calendar.set(Calendar.MINUTE, minute)
@@ -155,9 +157,9 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
 
 
     override fun startAction() {
-        if(!binding!!.isRecording){
+        if (!binding!!.isRecording) {
             if (calendar.timeInMillis < System.currentTimeMillis()) {
-                    Utils.showInvalidateTime(binding!!.root)
+                Utils.showInvalidateTime(binding!!.root)
             } else {
                 binding!!.schedule = true
                 recordSchedule = RecordSchedule().apply {
@@ -172,35 +174,34 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         }
     }
 
-    private fun setScheduleBroadcast(time:Long){
+    private fun setScheduleBroadcast(time: Long) {
         (requireActivity() as MainActivity).handleRecordStatus(MainActivity.SCHEDULE_RECORD_VIDEO)
         VideoRecordUtils.setAlarmSchedule(requireContext(), time)
     }
 
     override fun generateCancelDialogMessages(): String {
-            return if (recordSchedule!!.scheduleTime != 0L && binding!!.isRecording) {
-                resources.getString(R.string.video_record_schedule_cancel_progress_message)
-            } else {
-                resources.getString(R.string.video_record_schedule_cancel_message)
-            }
+        return if (recordSchedule!!.scheduleTime != 0L && binding!!.isRecording) {
+            resources.getString(R.string.video_record_schedule_cancel_progress_message)
+        } else {
+            resources.getString(R.string.video_record_schedule_cancel_message)
+        }
     }
 
     override fun onCancelSchedule() {
-        if(!binding!!.isRecording){
+        if (!binding!!.isRecording) {
             binding!!.schedule = false
             calendar.timeInMillis = System.currentTimeMillis().also {
-                binding!!.scheduleTime=it
+                binding!!.scheduleTime = it
             }
             cancelSchedule()
-        }else{
+        } else {
             (requireActivity() as MainActivity).handleRecordStatus(MainActivity.STOP_VIDEO_RECORD)
-            (requireActivity() as MainActivity).onRecordCompleted()
         }
 
     }
 
-    companion object{
-        const val BROADCAST_INTENT_REQUEST_CODE=1
+    companion object {
+        const val BROADCAST_INTENT_REQUEST_CODE = 1
     }
 
 }

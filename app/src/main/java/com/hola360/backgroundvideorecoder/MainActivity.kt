@@ -26,13 +26,13 @@ import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import com.hola360.backgroundvideorecoder.widget.Toolbar
 
-class MainActivity : AppCompatActivity(), RecordService.Listener {
+class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null
     private var navController: NavController? = null
     private var navHostFragment: Fragment? = null
     var recordService: RecordService? = null
-    var bound = false
+    var isBound = false
     private val curRecordEvent = BackgroundRecordEvent()
     val recordStatusLiveData = MutableLiveData<BackgroundRecordEvent>()
 
@@ -76,8 +76,8 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
                 navController?.popBackStack()
             }
         })
-        SCREEN_WIDTH= SystemUtils.getScreenWidth(this)
-        SCREEN_HEIGHT= SystemUtils.getScreenHeight(this)
+        SCREEN_WIDTH = SystemUtils.getScreenWidth(this)
+        SCREEN_HEIGHT = SystemUtils.getScreenHeight(this)
     }
 
     private fun setupPrivacy() {
@@ -110,11 +110,11 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         ) {
             val binder: RecordService.LocalBinder = service as RecordService.LocalBinder
             recordService = binder.getServiceInstance()
-            bound = true
+            isBound = true
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
-            bound = false
+            isBound = false
         }
     }
 
@@ -123,71 +123,40 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
             RECORD_VIDEO, STOP_VIDEO_RECORD,
             SCHEDULE_RECORD_VIDEO, CANCEL_SCHEDULE_RECORD_VIDEO -> {
                 VideoRecordUtils.startRecordIntent(this, status)
-                if (!bound) {
+                if (!isBound) {
                     bindService()
                 }
             }
         }
     }
 
-    fun bindService() {
-        Intent(this@MainActivity, RecordService::class.java).also {
-            bindService(it, mConnection, Context.BIND_AUTO_CREATE)
-        }
+    private fun bindService() {
+        val intent = Intent(this, RecordService::class.java)
+        startService(intent)
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
     }
 
     fun showToast(message: String) {
         ToastUtils.getInstance(this)!!.showToast(message)
     }
 
-    override fun onRecordStarted(status: Int) {
-        curRecordEvent.status = status
-        recordStatusLiveData.value = curRecordEvent
-    }
-
-    override fun updateRecordTime(time: Long, status: Int) {
-        if (curRecordEvent.status != status) {
-            curRecordEvent.status = status
-        }
-        curRecordEvent.time = time
-        recordStatusLiveData.value = curRecordEvent
-    }
-
-    override fun onRecordCompleted() {
-        curRecordEvent.status = NO_RECORDING
-        curRecordEvent.time = 0L
-        recordStatusLiveData.value = curRecordEvent
-    }
-
-    override fun onUpdateTime(fileName: String, duration: Long, curTime: Long) {
-
-    }
-
-    override fun onStopped() {
-
-    }
-
-    override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {
-
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         ToastUtils.getInstance(this)!!.release()
-        if (bound) {
+        if (isBound) {
             unbindService(mConnection)
         }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        val newOrientation= newConfig.orientation
+        val newOrientation = newConfig.orientation
         Log.d("abcVideo", "orientation: $newOrientation")
     }
 
     companion object {
-        var SCREEN_WIDTH:Int=0
-        var SCREEN_HEIGHT:Int=0
+        var SCREEN_WIDTH: Int = 0
+        var SCREEN_HEIGHT: Int = 0
         const val PRIVACY = "privacy"
         const val NO_RECORDING = 0
         const val RECORD_VIDEO = 1
@@ -195,9 +164,5 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         const val SCHEDULE_RECORD_VIDEO = 3
         const val CANCEL_SCHEDULE_RECORD_VIDEO = 4
         const val RECORD_VIDEO_LOW_BATTERY = 5
-        const val AUDIO_RECORD = 10
-        const val AUDIO_STOP = 11
-        const val AUDIO_RESUME = 12
-        const val AUDIO_PAUSE = 13
     }
 }
