@@ -10,6 +10,9 @@ import com.anggrayudi.storage.file.findFolder
 import com.anggrayudi.storage.file.getAbsolutePath
 import com.anggrayudi.storage.file.inSdCardStorage
 import com.anggrayudi.storage.file.toRawFile
+import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
+import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
+import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.io.FileWritableAccessIO
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.io.FileWritableInSdCardAccessIO
 import com.hola360.backgroundvideorecoder.utils.Configurations
@@ -23,7 +26,7 @@ import java.lang.Exception
 class SoundRecorder(
     val context: Context,
     fileName: String?,
-    val mSampleRate: Int,
+    val audioModel: AudioModel,
     val onRecorderListener: OnRecorderListener?
 ) {
 
@@ -72,7 +75,10 @@ class SoundRecorder(
             object : Thread() {
                 override fun run() {
                     minBufferSize = AudioRecord.getMinBufferSize(
-                        mSampleRate, AudioFormat.CHANNEL_IN_MONO,
+                        AudioQuality.obtainQuality(audioModel.quality).toInt(),
+                        if (audioModel.mode == AudioMode.MONO)
+                            AudioFormat.CHANNEL_IN_MONO
+                        else AudioFormat.CHANNEL_IN_STEREO,
                         AudioFormat.ENCODING_PCM_16BIT
                     )
                     if (minBufferSize < 0) {
@@ -82,13 +88,16 @@ class SoundRecorder(
                         return
                     }
                     audioRecord = AudioRecord(
-                        MediaRecorder.AudioSource.MIC, mSampleRate,
+                        MediaRecorder.AudioSource.MIC,
+                        AudioQuality.obtainQuality(audioModel.quality).toInt(),
                         AudioFormat.CHANNEL_IN_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT, minBufferSize * 2
+                        AudioFormat.ENCODING_PCM_16BIT,
+                        minBufferSize * 2
                     )
 
                     // PCM buffer size (5sec)
-                    val buffer = ShortArray(mSampleRate * 2 * 5)
+                    val buffer =
+                        ShortArray(AudioQuality.obtainQuality(audioModel.quality).toInt() * 2 * 5)
                     val mp3buffer = ByteArray((7200 + buffer.size * 2 * 1.25).toInt())
 
                     val outputFile = try {
@@ -121,10 +130,11 @@ class SoundRecorder(
                         return
                     }
                     androidLame = LameBuilder()
-                        .setInSampleRate(mSampleRate)
-                        .setOutChannels(1)
+                        .setInSampleRate(AudioQuality.obtainQuality(audioModel.quality).toInt())
+                        .setOutChannels(AudioMode.obtainMode(audioModel.mode))
                         .setOutBitrate(OUTPUT_BITRATE)
-                        .setOutSampleRate(mSampleRate).setScaleInput(5.0f)
+                        .setOutSampleRate(AudioQuality.obtainQuality(audioModel.quality).toInt())
+                        .setScaleInput(5.0f)
                         .build()
                     mIsRecording = true
                     try {

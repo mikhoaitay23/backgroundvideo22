@@ -137,7 +137,7 @@ object BindingUtils {
     fun setRecordAudioDuration(textView: TextView, audioModel: AudioModel?) {
         audioModel?.duration?.let {
             textView.text = if (it > 0) {
-                val time = it / 1000 / 60
+                val time = it / 1000
                 textView.resources.getQuantityString(
                     R.plurals.video_record_configuration_minute,
                     time.toInt(), time.toInt()

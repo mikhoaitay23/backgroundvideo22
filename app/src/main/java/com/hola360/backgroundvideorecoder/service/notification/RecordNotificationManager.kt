@@ -26,6 +26,10 @@ class RecordNotificationManager(private val mService: RecordService) {
         return builder.build()
     }
 
+    fun notifyNewStatus(notification: Notification){
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
     private fun buildNotification(
         title: String,
         des: String

@@ -33,6 +33,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
     private var view: View?= null
     private var windowManager: WindowManager?= null
     private var params: WindowManager.LayoutParams?=null
+    private var layoutFlag:Int=0
     private var paramX:Int =0
     private var paramY:Int =0
     private var cameraControl:CameraControl?=null
@@ -47,10 +48,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         VideoRecordUtils.getCameraCapabilities(context, customLifeCycleOwner!!)
     }
     private lateinit var videoRecordConfiguration: VideoRecordConfiguration
-    private val generalSetting: SettingGeneralModel by lazy {
-        val dataPref= SharedPreferenceUtils.getInstance(context)
-        Utils.getDataPrefGeneralSetting(dataPref!!)
-    }
     private var totalTimeRecord:Long= 0
     private var newInterval=false
 
@@ -76,26 +73,19 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             }
             true
         }
-    }
-
-    fun setupVideoConfiguration(){
-        videoRecordConfiguration= VideoRecordUtils.getVideoConfiguration(context)
-        val layoutFlag =if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        layoutFlag =if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         } else {
             WindowManager.LayoutParams.TYPE_PHONE
         }
+    }
+
+    fun setupVideoConfiguration(){
+        videoRecordConfiguration= VideoRecordUtils.getVideoConfiguration(context)
         params= if(videoRecordConfiguration.previewMode){
-            WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
-               WindowManager.LayoutParams.WRAP_CONTENT,
-                layoutFlag,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT)
+            visibleParams(layoutFlag)
         }else{
-            WindowManager.LayoutParams(1, 1,
-                layoutFlag,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT)
+            invisibleParams(layoutFlag)
         }
         params!!.x= -(MainActivity.SCREEN_WIDTH +context.resources.getDimensionPixelSize(R.dimen.record_preview_height))/2+10
         params!!.y= (MainActivity.SCREEN_HEIGHT - context.resources.getDimensionPixelSize(R.dimen.record_preview_height))/2 - context.resources.getDimensionPixelSize(R.dimen.record_bottom_pager_height)
@@ -132,7 +122,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         val recorder = Recorder.Builder()
             .setQualitySelector(qualitySelector)
             .build()
-
         videoCapture = VideoCapture.withOutput(recorder)
         videoCapture.targetRotation= Surface.ROTATION_90
 
@@ -160,6 +149,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             currentRecording!!.stop()
             currentRecording = null
         }
+        Log.d("abcVideo", "Start record")
         val mediaStoreOutput = VideoRecordUtils.generateMediaStoreOutput(context)
 //        val file= File(context.cacheDir, "Record_video_${System.currentTimeMillis()}.mp4")
 //        val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
@@ -177,7 +167,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
                 newInterval=true
             }
             is VideoRecordEvent.Status->{
-                stopRecordWhenLowMemory()
                 callback.onRecording(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000,
                     totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.totalTime)
                 if(videoRecordConfiguration.totalTime!= 0L &&
@@ -192,6 +181,9 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
                         newInterval=false
                     }
                 }
+            }
+            is VideoRecordEvent.Finalize->{
+                Log.d("abcVideo", "Error ${event.error}  ${event.cause}")
             }
         }
     }
@@ -208,21 +200,28 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         }
     }
 
-    fun stopRecordWhenLowBattery():Boolean{
-        return if(generalSetting.checkBattery){
-            close()
-            true
+    fun updateLayoutParams(visibility:Boolean){
+        params= if(visibility){
+             visibleParams(layoutFlag)
         }else{
-            false
+            invisibleParams(layoutFlag)
         }
+        windowManager!!.updateViewLayout(view!!, params!!)
     }
 
-    private fun stopRecordWhenLowMemory(){
-        val memoryPercent= SystemUtils.getInternalStoragePercent(context.externalCacheDir!!)
-        if(memoryPercent>0.9f && generalSetting.checkStorage){
-            close()
-            callback.onStopRecordWhenLowMemory()
-        }
+    private fun visibleParams(layoutFlag:Int):WindowManager.LayoutParams{
+        return WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            layoutFlag,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            PixelFormat.TRANSLUCENT)
+    }
+
+    private fun invisibleParams(layoutFlag:Int):WindowManager.LayoutParams{
+        return WindowManager.LayoutParams(1, 1,
+            layoutFlag,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            PixelFormat.TRANSLUCENT)
     }
 
     fun open(){
@@ -263,8 +262,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
 
     interface RecordAction{
         fun onRecording(time:Long, isComplete:Boolean)
-
-        fun onStopRecordWhenLowMemory()
 
         fun onFinishRecord()
     }

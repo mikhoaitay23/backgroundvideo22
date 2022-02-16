@@ -1,35 +1,22 @@
 package com.hola360.backgroundvideorecoder.service
 
-import android.app.Notification
-import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.*
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.navigation.NavDeepLinkBuilder
+import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
-import com.hola360.backgroundvideorecoder.R
-import com.hola360.backgroundvideorecoder.app.App
 import com.hola360.backgroundvideorecoder.broadcastreciever.BatteryLevelReceiver
-import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
+import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.service.notification.RecordNotificationManager
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.SoundRecorder
 import com.hola360.backgroundvideorecoder.utils.*
 import java.util.*
 
-
 class RecordService : Service() {
 
-    private val notificationManager: NotificationManager by lazy {
-        this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    }
-    private val recordScheduleBroadcast: ListenRecordScheduleBroadcast by lazy {
-        ListenRecordScheduleBroadcast()
-    }
     private val batteryLevelReceiver: BatteryLevelReceiver by lazy {
         BatteryLevelReceiver()
     }
@@ -38,47 +25,21 @@ class RecordService : Service() {
     }
     private var notificationTitle: String = ""
     private var notificationContent: String = ""
-    var recordStatus: Int = MainActivity.NO_RECORDING
     var mBinder = LocalBinder()
-
+    private var videoPreviewVideoWindow: PreviewVideoWindow?=null
     private var listener: Listener? = null
     private var time = 0L
+    private var recordState= RecordState.None
     var mSoundRecorder: SoundRecorder? = null
     private var mServiceManager: ServiceManager? = null
+    private var mAudioModel: AudioModel? = null
     private val handler = Handler(Looper.getMainLooper())
     private val runnable = Runnable {
         time = time.plus(TIME_LOOP)
         mServiceManager!!.updateProgress(Utils.convertTime(time / 1000))
         listener?.onUpdateTime("Info", 0, time)
         nextLoop()
-    }
-
-    private val previewVideoWindow: PreviewVideoWindow by lazy {
-        PreviewVideoWindow(this, object : PreviewVideoWindow.RecordAction {
-            override fun onRecording(time: Long, isComplete: Boolean) {
-                if (recordStatus != MainActivity.NO_RECORDING) {
-                    listener?.updateRecordTime(time, MainActivity.RECORD_VIDEO)
-                    notificationContent = VideoRecordUtils.generateRecordTime(time)
-                    notificationManager.notify(NOTIFICATION_ID, getNotification())
-                }
-            }
-
-            override fun onStopRecordWhenLowMemory() {
-                recordStatus = MainActivity.NO_RECORDING
-                VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
-                stopForeground(true)
-                notificationManager.cancel(NOTIFICATION_ID)
-            }
-
-            override fun onFinishRecord() {
-                listener?.onRecordCompleted()
-                notificationTitle =
-                    this@RecordService.resources.getString(R.string.video_record_complete_prefix)
-                VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
-                notificationManager.notify(NOTIFICATION_ID, getNotification())
-                stopForeground(true)
-            }
-        })
+        stopAudioRecordByTime(time)
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -127,11 +88,9 @@ class RecordService : Service() {
         val scheduleFilter = IntentFilter().apply {
             addAction(Constants.SCHEDULE_TYPE)
         }
-//        registerReceiver(recordScheduleBroadcast, intentFilter)
         val batteryFilter = IntentFilter().apply {
             addAction(Intent.ACTION_BATTERY_LOW)
         }
-        registerReceiver(recordScheduleBroadcast, scheduleFilter)
         registerReceiver(batteryLevelReceiver, batteryFilter)
         mServiceManager = ServiceManager()
     }
@@ -140,19 +99,83 @@ class RecordService : Service() {
         return START_NOT_STICKY
     }
 
-    fun startRecordAudio() {
+    fun startRecordVideo(){
+        if(recordState == RecordState.None){
+            mServiceManager!!.startRecord()
+            notificationTitle= "Video recording"
+            Log.d("abcVideo", "Start")
+            videoPreviewVideoWindow= PreviewVideoWindow(this, object :PreviewVideoWindow.RecordAction{
+                override fun onRecording(recordTime: Long, isComplete: Boolean) {
+                    notificationContent = if(isComplete){
+                        "Video record complete"
+                    }else{
+                        VideoRecordUtils.generateRecordTime(recordTime)
+                    }
+                    listener?.onUpdateTime("", 0L, recordTime)
+                    val notification= mRecordNotificationManager.getNotification(notificationTitle, notificationContent)
+                    mRecordNotificationManager.notifyNewStatus(notification)
+                }
+
+                override fun onFinishRecord() {
+                    listener?.onStopped()
+                }
+            })
+            videoPreviewVideoWindow!!.setupVideoConfiguration()
+            videoPreviewVideoWindow!!.open()
+            videoPreviewVideoWindow!!.startRecording()
+            recordState= RecordState.VideoRecording
+        }
+    }
+
+    fun stopRecordVideo(){
+        if(recordState== RecordState.VideoRecording){
+            videoPreviewVideoWindow?.close()
+            videoPreviewVideoWindow=null
+            listener?.onStopped()
+            recordState= RecordState.None
+            mServiceManager!!.stop()
+        }
+    }
+
+    fun updatePreviewVideoParams(visibility:Boolean){
+
+    }
+
+    fun setVideoSchedule(scheduleTime:Long){
+        if(recordState==RecordState.None){
+            time= scheduleTime
+            recordState= RecordState.VideoSchedule
+        }
+    }
+
+    fun cancelVideoSchedule(){
+        if(recordState== RecordState.VideoSchedule){
+            recordState=RecordState.None
+            time=0L
+        }
+    }
+
+    fun startRecordAudio(audioModel: AudioModel) {
+        mAudioModel = Gson().fromJson(
+            SharedPreferenceUtils.getInstance(this)?.getAudioConfig(),
+            AudioModel::class.java
+        )
         if (!isRecording()) {
             val mp3Name = String.format(
                 Configurations.TEMPLATE_AUDIO_FILE_NAME,
                 DateTimeUtils.getFullDate(Date().time)
             )
             mSoundRecorder =
-                SoundRecorder(this, mp3Name, 8000, object : SoundRecorder.OnRecorderListener {
-                    override fun onBuffer(buf: ShortArray?, minBufferSize: Int) {
-                        listener?.onByteBuffer(buf, minBufferSize)
-                    }
+                SoundRecorder(
+                    this,
+                    mp3Name,
+                    audioModel,
+                    object : SoundRecorder.OnRecorderListener {
+                        override fun onBuffer(buf: ShortArray?, minBufferSize: Int) {
+                            listener?.onByteBuffer(buf, minBufferSize)
+                        }
 
-                })
+                    })
             mSoundRecorder!!.setHandle(object : Handler(Looper.getMainLooper()) {
                 override fun handleMessage(msg: Message) {
                     when (msg.what) {
@@ -170,6 +193,7 @@ class RecordService : Service() {
                 }
             })
             time = 0
+            recordState= RecordState.AudioRecording
             mSoundRecorder!!.start()
             nextLoop()
         }
@@ -197,30 +221,19 @@ class RecordService : Service() {
     }
 
     fun isRecording(): Boolean {
-        return mSoundRecorder != null && mSoundRecorder!!.isRecording()
+        return recordState!= RecordState.VideoRecording && recordState!= RecordState.AudioRecording
     }
 
     fun getRecordState(): RecordState {
-        return if ((mSoundRecorder != null && mSoundRecorder!!.isRecording())) {
-            RecordState.AudioRecording
-        } else {
-            RecordState.None
-        }
+        return recordState
     }
 
-    private fun getNotification(): Notification {
-        val pendingIntent = NavDeepLinkBuilder(this)
-            .setComponentName(MainActivity::class.java)
-            .setGraph(R.navigation.nav_main_graph)
-            .setDestination(R.id.nav_video_record)
-            .createPendingIntent()
-
-        return NotificationCompat.Builder(this, App.NONE_SERVICE_CHANNEL_ID)
-            .setContentTitle(notificationTitle)
-            .setContentText(notificationContent)
-            .setContentIntent(pendingIntent)
-            .setSmallIcon(R.drawable.ic_schedule)
-            .build()
+    private fun stopAudioRecordByTime(time: Long) {
+        if (mAudioModel!!.duration != 0L) {
+            if (time == mAudioModel!!.duration) {
+                stopRecording()
+            }
+        }
     }
 
     inner class LocalBinder : Binder() {
@@ -232,12 +245,6 @@ class RecordService : Service() {
     }
 
     interface Listener {
-        fun onRecordStarted(status: Int)
-
-        fun updateRecordTime(time: Long, status: Int)
-
-        fun onRecordCompleted()
-
         fun onUpdateTime(fileName: String, duration: Long, curTime: Long)
 
         fun onStopped()
@@ -246,19 +253,17 @@ class RecordService : Service() {
     }
 
     companion object {
-        const val NOTIFICATION_ID = 1
         const val TIME_LOOP = 500L
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(recordScheduleBroadcast)
         unregisterReceiver(batteryLevelReceiver)
         Log.d("abcVideo", "Service killed")
     }
 
     enum class RecordState {
-        None, AudioRecording, VideoRecording
+        None, AudioRecording, VideoRecording, AudioSchedule, VideoSchedule
     }
 
 }
