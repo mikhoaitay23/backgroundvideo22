@@ -1,8 +1,7 @@
 package com.hola360.backgroundvideorecoder.service
 
-import android.app.Notification
-import android.app.NotificationManager
-import android.app.Service
+import android.app.*
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -20,6 +19,7 @@ import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.service.notification.RecordNotificationManager
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.SoundRecorder
+import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
 import com.hola360.backgroundvideorecoder.utils.*
 import java.util.*
 
@@ -49,6 +49,7 @@ class RecordService : Service() {
     private var mServiceManager: ServiceManager? = null
     private var mAudioModel: AudioModel? = null
     private val handler = Handler(Looper.getMainLooper())
+    var isRecordScheduleStart = false
     private val runnable = Runnable {
         time = time.plus(TIME_LOOP)
         mServiceManager!!.updateProgress(Utils.convertTime(time / 1000))
@@ -100,23 +101,47 @@ class RecordService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val scheduleFilter = IntentFilter().apply {
-            addAction(Constants.SCHEDULE_TYPE)
-        }
-//        registerReceiver(recordScheduleBroadcast, intentFilter)
         val batteryFilter = IntentFilter().apply {
             addAction(Intent.ACTION_BATTERY_LOW)
         }
-        registerReceiver(recordScheduleBroadcast, scheduleFilter)
         registerReceiver(batteryLevelReceiver, batteryFilter)
         mServiceManager = ServiceManager()
+        initReceiver()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return START_NOT_STICKY
     }
 
-    fun startRecordAudio(audioModel: AudioModel) {
+    private fun initReceiver() {
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(RecordNotificationManager.ACTION_STOP)
+        intentFilter.addAction(RecordNotificationManager.ACTION_RECORD_FROM_SCHEDULE)
+        registerReceiver(globalReceiver, intentFilter)
+    }
+
+    private val globalReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent != null) {
+                when (intent.action) {
+                    RecordNotificationManager.ACTION_STOP -> {
+                        stopRecording()
+                    }
+                    RecordNotificationManager.ACTION_RECORD_FROM_SCHEDULE -> {
+                        val type = intent.getBooleanExtra(Constants.SCHEDULE_TYPE, false)
+                        if (!type) {
+                            startRecordAudio()
+                            isRecordScheduleStart = true
+                        }
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    fun startRecordAudio() {
         mAudioModel = Gson().fromJson(
             SharedPreferenceUtils.getInstance(this)?.getAudioConfig(),
             AudioModel::class.java
@@ -130,7 +155,7 @@ class RecordService : Service() {
                 SoundRecorder(
                     this,
                     mp3Name,
-                    audioModel,
+                    mAudioModel!!,
                     object : SoundRecorder.OnRecorderListener {
                         override fun onBuffer(buf: ShortArray?, minBufferSize: Int) {
                             listener?.onByteBuffer(buf, minBufferSize)
@@ -146,6 +171,9 @@ class RecordService : Service() {
                         SoundRecorder.MSG_REC_STOPPED -> {
                             mServiceManager!!.stop()
                             listener?.onStopped()
+                            if (isRecordScheduleStart){
+                                SharedPreferenceUtils.getInstance(this@RecordService)!!.setAudioSchedule(null)
+                            }
                         }
                         SoundRecorder.MSG_ERROR_GET_MIN_BUFFER_SIZE, SoundRecorder.MSG_ERROR_CREATE_FILE, SoundRecorder.MSG_ERROR_REC_START, SoundRecorder.MSG_ERROR_AUDIO_RECORD, SoundRecorder.MSG_ERROR_AUDIO_ENCODE, SoundRecorder.MSG_ERROR_WRITE_FILE, SoundRecorder.MSG_ERROR_CLOSE_FILE -> {
                             recordAudioFailed()
@@ -203,6 +231,42 @@ class RecordService : Service() {
         }
     }
 
+    private fun getBroadcastPendingIntent(context: Context, isVideo: Boolean): PendingIntent {
+        val intent = Intent(RecordNotificationManager.ACTION_RECORD_FROM_SCHEDULE).apply {
+            putExtra(Constants.SCHEDULE_TYPE, isVideo)
+        }
+        return PendingIntent.getBroadcast(
+            context, 0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    }
+
+    fun setAlarmSchedule(context: Context, time: Long, isVideo: Boolean) {
+        val alarmManager =
+            context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        if (SystemUtils.isAndroidO()) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                time,
+                getBroadcastPendingIntent(context, isVideo)
+            )
+        } else {
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                time,
+                getBroadcastPendingIntent(context, isVideo)
+            )
+        }
+        mServiceManager!!.startSchedule(time)
+    }
+
+    fun cancelAlarmSchedule(context: Context, isVideo: Boolean) {
+        val alarmManager =
+            context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.cancel(getBroadcastPendingIntent(context, isVideo))
+    }
+
     inner class LocalBinder : Binder() {
         fun getServiceInstance(): RecordService = this@RecordService
     }
@@ -226,7 +290,7 @@ class RecordService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(recordScheduleBroadcast)
+        unregisterReceiver(globalReceiver)
         unregisterReceiver(batteryLevelReceiver)
         Log.d("abcVideo", "Service killed")
     }

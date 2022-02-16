@@ -2,7 +2,11 @@ package com.hola360.backgroundvideorecoder.utils
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.content.UriPermission
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -16,6 +20,8 @@ import com.anggrayudi.storage.file.inSdCardStorage
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
+import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
+import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import java.io.File
 import java.util.*
@@ -59,7 +65,8 @@ object Utils {
     fun isGrantAccessSdCard(context: Context): Boolean {
         val contentResolver = context.contentResolver
         val permissions: List<UriPermission> = contentResolver.persistedUriPermissions
-        return permissions.isNotEmpty() && SharedPreferenceUtils.getInstance(context)!!.getUriSdCard()!!.isNotEmpty()
+        return permissions.isNotEmpty() && SharedPreferenceUtils.getInstance(context)!!
+            .getUriSdCard()!!.isNotEmpty()
     }
 
     fun getDocumentationFolder(): File {
@@ -91,16 +98,20 @@ object Utils {
         }
     }
 
-    fun showInvalidateTime(view:View){
-        Snackbar.make(view, view.resources.getString(R.string.video_record_schedule_invalidate_time), Snackbar.LENGTH_SHORT).show()
+    fun showInvalidateTime(view: View) {
+        Snackbar.make(
+            view,
+            view.resources.getString(R.string.video_record_schedule_invalidate_time),
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
-    fun getDataPrefGeneralSetting(dataPref:SharedPreferenceUtils): SettingGeneralModel {
-        val value= dataPref.getGeneralSetting()
+    fun getDataPrefGeneralSetting(dataPref: SharedPreferenceUtils): SettingGeneralModel {
+        val value = dataPref.getGeneralSetting()
         value?.let {
-            return if("" == it){
+            return if ("" == it) {
                 SettingGeneralModel()
-            }else{
+            } else {
                 Gson().fromJson(it, SettingGeneralModel::class.java)
             }
         }

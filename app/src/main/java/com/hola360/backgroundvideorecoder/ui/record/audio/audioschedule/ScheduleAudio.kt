@@ -13,6 +13,7 @@ import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.databinding.LayoutScheduleAudioBinding
+import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
@@ -23,7 +24,7 @@ import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.utils.Utils
 import java.util.*
 
-class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View.OnClickListener {
+class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View.OnClickListener, RecordService.Listener {
 
     private lateinit var viewModel: ScheduleAudioViewModel
     private lateinit var mainActivity: MainActivity
@@ -38,6 +39,7 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
         ConfirmDialog(object : ConfirmDialog.OnConfirmOke {
             override fun onConfirm() {
                 viewModel.cancelSchedule()
+                mainActivity.recordService!!.cancelAlarmSchedule(requireContext(), false)
             }
         }, object : OnDialogDismiss {
             override fun onDismiss() {
@@ -59,6 +61,8 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
         binding!!.btnTime.setOnClickListener(this)
         binding!!.scheduleCard.cancelSchedule.setOnClickListener(this)
         binding!!.btnSetSchedule.setOnClickListener(this)
+
+        mainActivity.recordService!!.registerListener(this)
 
         binding!!.lifecycleOwner = this
         binding!!.viewModel = viewModel
@@ -137,6 +141,11 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
             }
             binding!!.scheduleCard.schedule = recordSchedule
             viewModel.setSchedule()
+            mainActivity.recordService!!.setAlarmSchedule(
+                requireContext(),
+                recordSchedule!!.scheduleTime,
+                false
+            )
         }
     }
 
@@ -244,5 +253,20 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
             }, curHour, curMinute, true
         )
         timePicker.show()
+    }
+
+    override fun onUpdateTime(fileName: String, duration: Long, curTime: Long) {
+
+    }
+
+    override fun onStopped() {
+        if (mainActivity.recordService!!.isRecordScheduleStart && isAdded && isVisible){
+            viewModel.cancelSchedule()
+            mainActivity.recordService!!.cancelAlarmSchedule(requireContext(), false)
+        }
+    }
+
+    override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {
+
     }
 }
