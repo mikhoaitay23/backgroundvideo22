@@ -1,16 +1,14 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.audioschedule
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import kotlinx.coroutines.launch
-import java.util.*
 
 class ScheduleAudioViewModel(val application: Application) : ViewModel() {
 
@@ -19,7 +17,7 @@ class ScheduleAudioViewModel(val application: Application) : ViewModel() {
     val recordAudioLiveData = MutableLiveData<AudioModel>()
     val recordScheduleLiveData = MutableLiveData<RecordSchedule>()
     val isRecordScheduleLiveData = MutableLiveData<Boolean>()
-    private val dataSharedPreferenceUtil = DataSharePreferenceUtil.getInstance(application)
+    private val dataSharedPreferenceUtil = SharedPreferenceUtils.getInstance(application)
 
     init {
         isRecordScheduleLiveData.value = false

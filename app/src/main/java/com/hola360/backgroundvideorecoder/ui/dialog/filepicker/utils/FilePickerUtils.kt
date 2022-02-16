@@ -17,7 +17,7 @@ import com.anggrayudi.storage.file.StorageId
 
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.data.model.StorageModel
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import kotlin.math.ln
 import kotlin.math.pow
 
@@ -95,7 +95,7 @@ object FilePickerUtils {
     fun isGrantAccessSdCard(context: Context): Boolean {
         val contentResolver = context.contentResolver
         val permissions: List<UriPermission> = contentResolver.persistedUriPermissions
-        return permissions.isNotEmpty() && DataSharePreferenceUtil.getInstance(context)!!.getUriSdCard().isNotEmpty()
+        return permissions.isNotEmpty() && SharedPreferenceUtils.getInstance(context)!!.getUriSdCard()!!.isNotEmpty()
     }
 
     fun fetchAccentColor(context: Context): Int {

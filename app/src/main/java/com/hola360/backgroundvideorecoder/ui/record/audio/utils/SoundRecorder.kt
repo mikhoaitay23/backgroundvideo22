@@ -13,7 +13,7 @@ import com.anggrayudi.storage.file.toRawFile
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.io.FileWritableAccessIO
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.io.FileWritableInSdCardAccessIO
 import com.hola360.backgroundvideorecoder.utils.Configurations
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
 import com.naman14.androidlame.AndroidLame
 import com.naman14.androidlame.LameBuilder
@@ -35,7 +35,7 @@ class SoundRecorder(
     private var outPutDocFile: DocumentFile? = null
 
     init {
-        val parentPath = DataSharePreferenceUtil.getInstance(context)?.getParentPath()
+        val parentPath = SharedPreferenceUtils.getInstance(context)?.getParentPath()
         val rootParentDocFile = Utils.getDocumentFile(context, parentPath!!)
         if (rootParentDocFile != null && rootParentDocFile.exists()) {
             try {

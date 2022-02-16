@@ -1,31 +1,31 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord
 
-import android.util.Log
+import android.Manifest
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
-import com.hola360.backgroundvideorecoder.MainActivity
+import com.anggrayudi.storage.file.getAbsolutePath
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordAudioBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
+import com.hola360.backgroundvideorecoder.ui.base.basefragment.BasePermissionRequestFragment
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.StorageUtils
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
-import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
 import com.hola360.backgroundvideorecoder.ui.record.audio.bottomsheet.AudioRecordBottomSheetFragment
-import com.hola360.backgroundvideorecoder.utils.Constants
-import com.hola360.backgroundvideorecoder.utils.SystemUtils
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
+import com.hola360.backgroundvideorecoder.utils.Utils
 
-class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnClickListener,
+class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), View.OnClickListener,
     RecordService.Listener {
 
     private var audioModel: AudioModel? = null
     private var recordVideoDurationDialog: RecordVideoDurationDialog? = null
-    private lateinit var mainActivity: MainActivity
     private var listSelectionBottomSheet: ListSelectionBotDialog? = null
     private lateinit var viewModel: RecordAudioViewModel
     private var showBottomSheet = false
@@ -33,6 +33,9 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
     private var isShow = false
 
     override val layoutId: Int = R.layout.layout_record_audio
+    override val showToolbar: Boolean = true
+    override val toolbarTitle: String = "Audio Record"
+    override val menuCode: Int = 0
 
     override fun initViewModel() {
         val factory = RecordAudioViewModel.Factory(requireActivity().application)
@@ -45,8 +48,6 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
     }
 
     override fun initView() {
-        mainActivity = activity as MainActivity
-
         binding!!.btnQuality.setOnClickListener(this)
         binding!!.btnMode.setOnClickListener(this)
         binding!!.btnDuration.setOnClickListener(this)
@@ -55,7 +56,7 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
         binding!!.lifecycleOwner = this
         binding!!.viewModel = viewModel
 
-        if (mainActivity.recordService!!.isRecording()) {
+        if (mainActivity.recordService!!.getRecordState() == RecordService.RecordState.AudioRecording) {
             onAudioRecordBottomSheet()
         }
     }
@@ -68,26 +69,27 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
         }
     }
 
-    private var resultLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { result ->
-            if (result) {
-                onServiceStart()
+    private val resultRecordPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (Utils.recordPermissionGrant(requireContext())
+            ) {
+                startRecord()
             } else {
-                SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+                showAlertPermissionNotGrant()
             }
         }
 
     override fun onClick(p0: View?) {
         when (p0) {
             binding!!.imgRecord -> {
-                if (SystemUtils.hasPermissions(
-                        requireContext(),
-                        Constants.RECORD_AUDIO_PERMISSION
-                    )
-                ) {
-                    onServiceStart()
+                if (mainActivity.recordService!!.isRecording()) {
+                    mainActivity.showToast(getString(R.string.recording_alert))
                 } else {
-                    resultLauncher.launch(Constants.RECORD_AUDIO_PERMISSION)
+                    if (Utils.storagePermissionGrant(requireContext())) {
+                        record()
+                    } else {
+                        requestPermission()
+                    }
                 }
             }
             binding!!.btnQuality -> {
@@ -111,8 +113,27 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
         }
     }
 
-    private fun onServiceStart() {
-        mainActivity.handleRecordStatus(MainActivity.AUDIO_RECORD)
+    private fun record() {
+        if (Utils.recordPermissionGrant(requireContext())) {
+            startRecord()
+        } else {
+            resultRecordPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.RECORD_AUDIO
+                )
+            )
+        }
+    }
+
+    private fun startRecord() {
+        val parentPath = SharedPreferenceUtils.getInstance(mainActivity)!!.getParentPath()
+        if (parentPath.isNullOrEmpty()) {
+            val storageList = StorageUtils.getAllStorages(mainActivity)
+            val defaultPath =
+                storageList[0].getRootDocumentationFile(mainActivity).getAbsolutePath(mainActivity)
+            SharedPreferenceUtils.getInstance(mainActivity)!!.setParentPath(defaultPath)
+        }
+        mainActivity.recordService!!.startRecordAudio()
     }
 
     private fun onQualityBottomSheet() {
@@ -221,6 +242,10 @@ class RecordAudio : BaseRecordPageFragment<LayoutRecordAudioBinding>(), View.OnC
 
     override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {
 
+    }
+
+    override fun setupWhenPermissionGranted() {
+        record()
     }
 
 

@@ -1,1 +1,1 @@
-include ':app', ':recorderlib'
+include ':app'

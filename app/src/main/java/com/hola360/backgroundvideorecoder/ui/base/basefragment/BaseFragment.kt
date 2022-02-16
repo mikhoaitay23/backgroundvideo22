@@ -10,12 +10,13 @@ import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.hola360.backgroundvideorecoder.MainActivity
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 
 abstract class BaseFragment<V : ViewDataBinding?> : Fragment() {
-    protected var dataPref: DataSharePreferenceUtil? = null
-
-    @JvmField
+    protected var dataPref: SharedPreferenceUtils? = null
+    protected val mainActivity by lazy {
+        requireActivity() as MainActivity
+    }
     protected var binding: V? = null
     protected abstract val layoutId: Int
     protected abstract val showToolbar: Boolean
@@ -24,7 +25,7 @@ abstract class BaseFragment<V : ViewDataBinding?> : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dataPref = DataSharePreferenceUtil.getInstance(requireActivity())
+        dataPref = SharedPreferenceUtils.getInstance(requireActivity())
         initViewModel()
     }
 

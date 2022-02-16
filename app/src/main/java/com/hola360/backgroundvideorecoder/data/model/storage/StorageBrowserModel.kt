@@ -1,11 +1,10 @@
-package com.hola360.backgroundvideorecoder.ui.dialog.filepicker.data.model
+package com.hola360.backgroundvideorecoder.data.model.storage
 
 import android.content.Context
 import android.os.Parcelable
 import androidx.documentfile.provider.DocumentFile
 import com.anggrayudi.storage.file.DocumentFileCompat
 import com.anggrayudi.storage.file.StorageId
-
 import com.google.android.gms.common.util.Base64Utils
 import com.hola360.backgroundvideorecoder.R
 import kotlinx.android.parcel.IgnoredOnParcel
@@ -21,7 +20,6 @@ data class StorageBrowserModel(
     Parcelable {
     @IgnoredOnParcel
     val curStack = mutableListOf<String>()
-
     private fun getSubPath() = if (curStack.isEmpty()) {
         ""
     } else {
@@ -42,7 +40,6 @@ data class StorageBrowserModel(
     }
 
     fun curStorageModel() = storageModels[curStorage]
-
     fun fullPathStack(context: Context): MutableList<String> {
         val paths = mutableListOf(
             if (curStorageModel().storageId == StorageId.PRIMARY) {

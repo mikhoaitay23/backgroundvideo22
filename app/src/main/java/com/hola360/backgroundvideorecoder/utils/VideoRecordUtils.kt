@@ -1,13 +1,11 @@
 package com.hola360.backgroundvideorecoder.utils
 
-import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.provider.MediaStore
-import android.util.DisplayMetrics
 import android.util.Log
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
@@ -173,7 +171,7 @@ object VideoRecordUtils {
 
 
     fun getVideoConfiguration(context: Context):VideoRecordConfiguration{
-        val dataPref = DataSharePreferenceUtil.getInstance(context)
+        val dataPref = SharedPreferenceUtils.getInstance(context)
         return if (dataPref?.getVideoConfiguration() != "") {
             Gson().fromJson(
                 dataPref!!.getVideoConfiguration(),
@@ -185,7 +183,7 @@ object VideoRecordUtils {
     }
 
     fun getVideoSchedule(context: Context):RecordSchedule{
-        val dataPref = DataSharePreferenceUtil.getInstance(context)
+        val dataPref = SharedPreferenceUtils.getInstance(context)
         return if(dataPref?.getSchedule() != ""){
             val schedule= Gson().fromJson(dataPref?.getSchedule(), RecordSchedule::class.java)
             if(schedule.scheduleTime+ getVideoConfiguration(context).totalTime< System.currentTimeMillis()){
@@ -199,7 +197,7 @@ object VideoRecordUtils {
     }
 
     fun generateScheduleTime(context: Context):String{
-        val dataPref = DataSharePreferenceUtil.getInstance(context)
+        val dataPref = SharedPreferenceUtils.getInstance(context)
         val videoSchedule= Gson().fromJson(dataPref!!.getSchedule(), RecordSchedule::class.java)
         val dateFormat= SimpleDateFormat(BindingUtils.DATE_FORMAT, Locale.getDefault())
         val timeFormat= SimpleDateFormat(BindingUtils.TIME_FORMAT, Locale.getDefault())
@@ -247,7 +245,7 @@ object VideoRecordUtils {
     fun checkScheduleWhenRecordStop(context: Context){
         val schedule= getVideoSchedule(context)
         if(schedule.scheduleTime != 0L && schedule.scheduleTime<  System.currentTimeMillis()){
-            val dataPref = DataSharePreferenceUtil.getInstance(context)
+            val dataPref = SharedPreferenceUtils.getInstance(context)
             dataPref!!.putSchedule("")
         }
     }
