@@ -22,6 +22,7 @@ import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
+import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -182,6 +183,19 @@ object VideoRecordUtils {
         } else {
             VideoRecordConfiguration()
         }
+    }
+
+    fun getSettingGeneralModel(context: Context):SettingGeneralModel{
+        val dataPref= DataSharePreferenceUtil.getInstance(context)
+        dataPref?.let {
+            val value= it.getGeneralSetting() ?: ""
+            return if(value != ""){
+                Gson().fromJson(value, SettingGeneralModel::class.java)
+            }else{
+                SettingGeneralModel()
+            }
+        }
+        return SettingGeneralModel()
     }
 
     fun getVideoSchedule(context: Context):RecordSchedule{
