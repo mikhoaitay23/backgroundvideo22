@@ -110,6 +110,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         ) {
             val binder: RecordService.LocalBinder = service as RecordService.LocalBinder
             recordService = binder.getServiceInstance()
+            recordService!!.registerListener(this@MainActivity)
             bound = true
         }
 
@@ -146,6 +147,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     override fun updateRecordTime(time: Long, status: Int) {
+        Log.d("abcVideo", "Update time: ")
         if (curRecordEvent.status != status) {
             curRecordEvent.status = status
         }
@@ -181,13 +183,13 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        val newOrientation= newConfig.orientation
-        Log.d("abcVideo", "orientation: $newOrientation")
+        SCREEN_ORIENTATION= newConfig.orientation
     }
 
     companion object {
         var SCREEN_WIDTH:Int=0
         var SCREEN_HEIGHT:Int=0
+        var SCREEN_ORIENTATION:Int=1
         const val PRIVACY = "privacy"
         const val NO_RECORDING = 0
         const val RECORD_VIDEO = 1

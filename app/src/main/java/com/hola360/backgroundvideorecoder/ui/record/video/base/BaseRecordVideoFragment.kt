@@ -200,7 +200,7 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
     }
 
     private fun requestOverlayPermission() {
-        if (SystemUtils.isAndroidO() && !Settings.canDrawOverlays(requireContext())) {
+        if (SystemUtils.isAndroidM() && !Settings.canDrawOverlays(requireContext())) {
             val intent = Intent(
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:" + requireContext().packageName)
@@ -211,7 +211,7 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
 
     protected fun startRecordOrSetSchedule() {
         if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
-            if (SystemUtils.isAndroidO() &&!Settings.canDrawOverlays(requireContext())) {
+            if (SystemUtils.isAndroidM() &&!Settings.canDrawOverlays(requireContext())) {
                 requestOverlayPermission()
             } else {
                 startAction()

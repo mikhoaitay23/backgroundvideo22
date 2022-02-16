@@ -184,7 +184,7 @@ object VideoRecordUtils {
     }
 
     fun getSettingGeneralModel(context: Context):SettingGeneralModel{
-        val dataPref= DataSharePreferenceUtil.getInstance(context)
+        val dataPref= SharedPreferenceUtils.getInstance(context)
         dataPref?.let {
             val value= it.getGeneralSetting() ?: ""
             return if(value != ""){

@@ -110,6 +110,7 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
         pickFolderDialog.mOnPickPathResultListener= object :PickFolderDialog.OnPickPathResultListener{
             override fun onPickPathResult(path: String?) {
                 binding!!.txtStoragePath.text= path
+                dataPref!!.setParentPath(path!!)
             }
         }
         pickFolderDialog.show(requireActivity().supportFragmentManager, "PickFolder")
