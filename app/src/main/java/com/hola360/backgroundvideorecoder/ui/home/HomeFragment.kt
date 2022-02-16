@@ -1,14 +1,9 @@
 package com.hola360.backgroundvideorecoder.ui.home
 
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.fragment.findNavController
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.FragmentHomeBinding
 import com.hola360.backgroundvideorecoder.ui.base.basefragment.BaseFragment
-import com.hola360.backgroundvideorecoder.utils.Constants
-import com.hola360.backgroundvideorecoder.utils.SystemUtils
-import java.util.jar.Manifest
 
 class HomeFragment: BaseFragment<FragmentHomeBinding>() {
 

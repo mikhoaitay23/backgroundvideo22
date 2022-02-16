@@ -15,7 +15,7 @@ import com.anggrayudi.storage.file.DocumentFileCompat
 import com.anggrayudi.storage.file.StorageId
 import com.anggrayudi.storage.file.getBasePath
 import com.anggrayudi.storage.file.inSdCardStorage
-import com.example.techtallfeb2022.data.model.StorageBrowserModel
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.data.model.StorageBrowserModel
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.data.model.StorageModel
 
 

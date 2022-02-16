@@ -3,7 +3,7 @@ package com.hola360.backgroundvideorecoder.utils
 import android.content.Context
 import android.content.SharedPreferences
 
-class DataSharePreferenceUtil private constructor(context: Context) {
+class SharedPreferenceUtils private constructor(context: Context) {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
 
@@ -14,14 +14,6 @@ class DataSharePreferenceUtil private constructor(context: Context) {
 
     fun getStringValue(key: String?): String? {
         return sharedPreferences.getString(key, "")
-    }
-
-    fun saveUriSdCard(value: String) {
-        putStringValue("key_sdcard", value)
-    }
-
-    fun getUriSdCard(): String {
-        return getStringValue("key_sdcard")?:""
     }
 
     fun putVideoConfiguration(value: String) {
@@ -114,10 +106,10 @@ class DataSharePreferenceUtil private constructor(context: Context) {
 
     companion object {
         const val PREFERENCE_NAME = "FakeLive_pref"
-        private var instance: DataSharePreferenceUtil? = null
-        fun getInstance(context: Context): DataSharePreferenceUtil? {
+        private var instance: SharedPreferenceUtils? = null
+        fun getInstance(context: Context): SharedPreferenceUtils? {
             if (instance == null) {
-                instance = DataSharePreferenceUtil(context)
+                instance = SharedPreferenceUtils(context)
             }
             return instance
         }

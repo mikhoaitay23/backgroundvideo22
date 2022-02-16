@@ -29,7 +29,7 @@ import com.hola360.backgroundvideorecoder.app.App
 import com.hola360.backgroundvideorecoder.databinding.LayoutPickFolderDialogBinding
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.StorageUtils
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.FilePickerUtils
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import java.io.File
 
 
@@ -199,7 +199,7 @@ class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
             it.data?.data?.also { uri ->
                 if (StorageUtils.checkIfSDCardRoot(uri)) {
                     contentResolver.takePersistableUriPermission(uri, takeFlags)
-                    DataSharePreferenceUtil.getInstance(requireContext())!!.saveUriSdCard(uri.toString())
+                    SharedPreferenceUtils.getInstance(requireContext())!!.saveUriSdCard(uri.toString())
                     mOnPickPathResultListener?.onPickPathResult(
                         getCurDocumentFile()!!.getAbsolutePath(mainActivity)
                     )

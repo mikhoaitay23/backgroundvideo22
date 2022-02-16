@@ -9,14 +9,14 @@ import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import kotlinx.coroutines.launch
 
 class RecordAudioViewModel(val application: Application) : ViewModel() {
 
     private var audioModel: AudioModel? = null
     val recordAudioLiveData = MutableLiveData<AudioModel>()
-    private val dataSharedPreferenceUtil = DataSharePreferenceUtil.getInstance(application)
+    private val dataSharedPreferenceUtil = SharedPreferenceUtils.getInstance(application)
 
     init {
 

@@ -20,7 +20,7 @@ import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.BackgroundRecordEvent
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.ToastUtils
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         recordStatusLiveData.value = BackgroundRecordEvent()
     }
 
-    private var dataSharedPreferenceUtil: DataSharePreferenceUtil? = null
+    private var dataSharedPreferenceUtils: SharedPreferenceUtils? = null
     var audioModel: AudioModel? = null
 
 
@@ -52,13 +52,13 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         setupToolbar()
         setupPrivacy()
         bindService()
-        dataSharedPreferenceUtil = DataSharePreferenceUtil.getInstance(this)
+        dataSharedPreferenceUtils = SharedPreferenceUtils.getInstance(this)
     }
 
     override fun onResume() {
         super.onResume()
-        audioModel = if (!dataSharedPreferenceUtil!!.getAudioConfig().isNullOrEmpty()) {
-            Gson().fromJson(dataSharedPreferenceUtil!!.getAudioConfig(), AudioModel::class.java)
+        audioModel = if (!dataSharedPreferenceUtils!!.getAudioConfig().isNullOrEmpty()) {
+            Gson().fromJson(dataSharedPreferenceUtils!!.getAudioConfig(), AudioModel::class.java)
         } else {
             AudioModel()
         }
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
     }
 
     private fun setupPrivacy() {
-        val dataPref = DataSharePreferenceUtil.getInstance(this)
+        val dataPref = SharedPreferenceUtils.getInstance(this)
         if (!dataPref!!.getBooleanValue(PRIVACY)) {
             navController!!.navigate(R.id.nav_confirm_privacy)
         }
@@ -134,6 +134,10 @@ class MainActivity : AppCompatActivity(), RecordService.Listener {
         Intent(this@MainActivity, RecordService::class.java).also {
             bindService(it, mConnection, Context.BIND_AUTO_CREATE)
         }
+    }
+
+    fun showToast(message: String) {
+        ToastUtils.getInstance(this)!!.showToast(message)
     }
 
     override fun onRecordStarted(status: Int) {

@@ -9,17 +9,17 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 
 abstract class BaseRecordPageFragment<V : ViewDataBinding?> : Fragment() {
-    protected var dataPref: DataSharePreferenceUtil?= null
+    protected var dataPref: SharedPreferenceUtils?= null
     @JvmField
     protected var binding: V? = null
     protected abstract val layoutId: Int
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dataPref= DataSharePreferenceUtil.getInstance(requireActivity())
+        dataPref= SharedPreferenceUtils.getInstance(requireActivity())
         initViewModel()
     }
 

@@ -6,7 +6,7 @@ import android.os.Message
 import android.os.Parcelable
 import androidx.lifecycle.*
 import com.anggrayudi.storage.file.toRawFile
-import com.example.techtallfeb2022.data.model.StorageBrowserModel
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.data.model.StorageBrowserModel
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.data.repository.InternalRepository
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.data.response.DataResponse
 import com.zippro.filemanager.data.response.LoadingStatus

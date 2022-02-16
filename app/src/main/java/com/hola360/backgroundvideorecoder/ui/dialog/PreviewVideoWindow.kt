@@ -22,7 +22,7 @@ import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
@@ -48,7 +48,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
     }
     private lateinit var videoRecordConfiguration: VideoRecordConfiguration
     private val generalSetting: SettingGeneralModel by lazy {
-        val dataPref= DataSharePreferenceUtil.getInstance(context)
+        val dataPref= SharedPreferenceUtils.getInstance(context)
         Utils.getDataPrefGeneralSetting(dataPref!!)
     }
     private var totalTimeRecord:Long= 0

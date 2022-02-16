@@ -5,12 +5,12 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
-import com.hola360.backgroundvideorecoder.utils.DataSharePreferenceUtil
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
 
 class App: Application() {
     private val generalSetting: SettingGeneralModel by lazy {
-        val dataPref= DataSharePreferenceUtil.getInstance(this)
+        val dataPref= SharedPreferenceUtils.getInstance(this)
         Utils.getDataPrefGeneralSetting(dataPref!!)
     }
 

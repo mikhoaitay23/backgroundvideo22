@@ -6,10 +6,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Binder
-import android.os.Handler
-import android.os.IBinder
-import android.os.Looper
+import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
@@ -21,10 +18,8 @@ import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordSchedule
 import com.hola360.backgroundvideorecoder.service.notification.RecordNotificationManager
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.SoundRecorder
-import com.hola360.backgroundvideorecoder.utils.Constants
-import com.hola360.backgroundvideorecoder.utils.ToastUtils
-import com.hola360.backgroundvideorecoder.utils.Utils
-import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
+import com.hola360.backgroundvideorecoder.utils.*
+import java.util.*
 
 
 class RecordService : Service() {
@@ -142,57 +137,43 @@ class RecordService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.let {
-            val type = it.getBooleanExtra(Constants.RECORD_VIDEO_TYPE, true)
-            if (type) {
-                val status = it.getIntExtra(Constants.VIDEO_STATUS, 0)
-                recordVideo(status)
-            }
-        }
         return START_NOT_STICKY
     }
 
-    fun recordVideo(status: Int) {
-        when (status) {
-            MainActivity.RECORD_VIDEO -> {
-                previewVideoWindow.setupVideoConfiguration()
-                previewVideoWindow.open()
-                previewVideoWindow.startRecording()
-                recordStatus = MainActivity.RECORD_VIDEO
-                notificationTitle = this.resources.getString(R.string.video_record_is_running)
-                startForeground(NOTIFICATION_ID, getNotification())
-            }
-            MainActivity.STOP_VIDEO_RECORD -> {
-                previewVideoWindow.close()
-                recordStatus = MainActivity.NO_RECORDING
-                VideoRecordUtils.checkScheduleWhenRecordStop(this)
-                stopForeground(true)
-                notificationManager.cancel(NOTIFICATION_ID)
-            }
-            MainActivity.SCHEDULE_RECORD_VIDEO -> {
-                notificationTitle =
-                    this.getString(R.string.video_record_schedule_notification_title)
-                notificationContent = VideoRecordUtils.generateScheduleTime(this)
-                startForeground(NOTIFICATION_ID, getNotification())
-            }
-            MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO -> {
-                stopForeground(true)
-            }
-            MainActivity.RECORD_VIDEO_LOW_BATTERY -> {
-                val stop = previewVideoWindow.stopRecordWhenLowBattery()
-                if (stop) {
-                    recordStatus = MainActivity.NO_RECORDING
-                    VideoRecordUtils.checkScheduleWhenRecordStop(this)
-                    stopForeground(true)
-                    notificationManager.cancel(NOTIFICATION_ID)
-                }
-            }
-        }
-    }
+    fun startRecordAudio() {
+        if (!isRecording()) {
+            val mp3Name = String.format(
+                Configurations.TEMPLATE_AUDIO_FILE_NAME,
+                DateTimeUtils.getFullDate(Date().time)
+            )
+            mSoundRecorder =
+                SoundRecorder(this, mp3Name, 8000, object : SoundRecorder.OnRecorderListener {
+                    override fun onBuffer(buf: ShortArray?, minBufferSize: Int) {
+                        listener?.onByteBuffer(buf, minBufferSize)
+                    }
 
-    private fun nextLoop() {
-        handler.removeCallbacks(runnable)
-        handler.postDelayed(runnable, TIME_LOOP)
+                })
+            mSoundRecorder!!.setHandle(object : Handler(Looper.getMainLooper()) {
+                override fun handleMessage(msg: Message) {
+                    when (msg.what) {
+                        SoundRecorder.MSG_REC_STARTED -> {
+                            mServiceManager!!.startRecord()
+                        }
+                        SoundRecorder.MSG_REC_STOPPED -> {
+                            mServiceManager!!.stop()
+                            listener?.onStopped()
+                        }
+                        SoundRecorder.MSG_ERROR_GET_MIN_BUFFER_SIZE, SoundRecorder.MSG_ERROR_CREATE_FILE, SoundRecorder.MSG_ERROR_REC_START, SoundRecorder.MSG_ERROR_AUDIO_RECORD, SoundRecorder.MSG_ERROR_AUDIO_ENCODE, SoundRecorder.MSG_ERROR_WRITE_FILE, SoundRecorder.MSG_ERROR_CLOSE_FILE -> {
+                            recordAudioFailed()
+                        }
+                    }
+                }
+            })
+            time = 0
+            mSoundRecorder!!.start()
+            nextLoop()
+        }
+
     }
 
     fun stopRecording() {
@@ -201,6 +182,11 @@ class RecordService : Service() {
             mSoundRecorder!!.stop()
         }
         handler.removeCallbacks(runnable)
+    }
+
+    private fun nextLoop() {
+        handler.removeCallbacks(runnable)
+        handler.postDelayed(runnable, TIME_LOOP)
     }
 
     private fun recordAudioFailed() {
@@ -214,10 +200,10 @@ class RecordService : Service() {
         return mSoundRecorder != null && mSoundRecorder!!.isRecording()
     }
 
-    fun getRecordState(): RecordState{
-        return if((mSoundRecorder != null && mSoundRecorder!!.isRecording())){
+    fun getRecordState(): RecordState {
+        return if ((mSoundRecorder != null && mSoundRecorder!!.isRecording())) {
             RecordState.AudioRecording
-        }else {
+        } else {
             RecordState.None
         }
     }
@@ -271,7 +257,7 @@ class RecordService : Service() {
         Log.d("abcVideo", "Service killed")
     }
 
-    enum class RecordState{
+    enum class RecordState {
         None, AudioRecording, VideoRecording
     }
 

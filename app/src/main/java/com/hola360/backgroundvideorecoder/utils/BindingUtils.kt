@@ -1,18 +1,15 @@
 package com.hola360.backgroundvideorecoder.utils
 
-import android.app.NotificationManager
 import android.os.Build
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.appcompat.widget.SwitchCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
-import com.example.techtallfeb2022.data.model.StorageBrowserModel
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.data.model.StorageBrowserModel
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
-import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.model.ActionModel
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.FilePickerUtils
