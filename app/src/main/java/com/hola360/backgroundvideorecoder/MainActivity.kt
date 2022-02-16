@@ -33,13 +33,6 @@ class MainActivity : AppCompatActivity() {
     private var navHostFragment: Fragment? = null
     var recordService: RecordService? = null
     var isBound = false
-    private val curRecordEvent = BackgroundRecordEvent()
-    val recordStatusLiveData = MutableLiveData<BackgroundRecordEvent>()
-
-    init {
-        recordStatusLiveData.value = BackgroundRecordEvent()
-    }
-
     private var dataSharedPreferenceUtils: SharedPreferenceUtils? = null
     var audioModel: AudioModel? = null
 
@@ -130,6 +123,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun updateRecordVideoPreview(inVideoRecord:Boolean){
+        val videoConfiguration= VideoRecordUtils.getVideoConfiguration(this)
+        if(videoConfiguration.previewMode){
+            if(inVideoRecord){
+                recordService!!.updatePreviewVideoParams(true)
+            }else{
+                recordService!!.updatePreviewVideoParams(false)
+            }
+        }
+    }
+
     private fun bindService() {
         val intent = Intent(this, RecordService::class.java)
         startService(intent)
@@ -150,13 +154,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        val newOrientation = newConfig.orientation
-        Log.d("abcVideo", "orientation: $newOrientation")
+        SCREEN_ORIENTATION= newConfig.orientation
     }
 
     companion object {
         var SCREEN_WIDTH: Int = 0
         var SCREEN_HEIGHT: Int = 0
+        var SCREEN_ORIENTATION:Int=1
         const val PRIVACY = "privacy"
         const val NO_RECORDING = 0
         const val RECORD_VIDEO = 1

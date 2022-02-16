@@ -25,19 +25,6 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (requireActivity() as MainActivity).recordStatusLiveData.observe(this) {
-            when (it.status) {
-                MainActivity.RECORD_VIDEO -> {
-                    if (!binding!!.isRecording && it.time > 0) {
-                        binding!!.isRecording = true
-                    }
-                }
-                MainActivity.NO_RECORDING -> {
-                    binding!!.isRecording = false
-                    checkScheduleWhenRecordStop()
-                }
-            }
-        }
     }
 
     private fun checkScheduleWhenRecordStop() {
