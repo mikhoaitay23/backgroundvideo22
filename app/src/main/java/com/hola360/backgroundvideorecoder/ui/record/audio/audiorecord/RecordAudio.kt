@@ -138,7 +138,7 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
                 storageList[0].getRootDocumentationFile(mainActivity).getAbsolutePath(mainActivity)
             SharedPreferenceUtils.getInstance(mainActivity)!!.setParentPath(defaultPath)
         }
-        mainActivity.recordService!!.startRecordAudio(audioModel!!)
+        mainActivity.recordService!!.startRecordAudio()
         mainActivity.recordService!!.registerListener(this)
     }
 
@@ -226,11 +226,13 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
             isShow = true
         }
     }
+
     override fun onUpdateTime(fileName: String, duration: Long, curTime: Long) {
-        if (mainActivity.isBound && mainActivity.recordService!!.isRecording() && mainActivity.window.decorView.isShown) {
+        if (mainActivity.isBound && mainActivity.recordService!!.isRecording()
+            && mainActivity.window.decorView.isShown && isVisible && isAdded
+        ) {
             onAudioRecordBottomSheet()
         }
-        Log.d("TAG", "onUpdateTime: ")
     }
 
     override fun onStopped() {
