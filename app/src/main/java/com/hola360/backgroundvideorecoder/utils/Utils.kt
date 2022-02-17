@@ -5,13 +5,14 @@ import android.app.Activity
 import android.content.Context
 import android.content.UriPermission
 import android.content.pm.PackageManager
-import android.content.res.Resources
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.documentfile.provider.DocumentFile
 import com.anggrayudi.storage.file.inSdCardStorage
 import com.google.android.material.snackbar.Snackbar
@@ -22,6 +23,7 @@ import java.io.File
 import java.util.*
 import kotlin.math.ln
 import kotlin.math.pow
+
 
 object Utils {
 
@@ -185,6 +187,33 @@ object Utils {
             String.format("%.2f%c", bytes / factor.pow(result), "KMGTPE"[result - 1])
                 .replace(",", ".")
         }
+    }
+
+    fun adjustAudio(context: Context, setMute: Boolean) {
+        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+        if (setMute) {
+            audioManager?.ringerMode = AudioManager.RINGER_MODE_SILENT
+        } else {
+            audioManager?.ringerMode = AudioManager.RINGER_MODE_NORMAL
+        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            val adJustMute: Int = if (setMute) {
+//                AudioManager.ADJUST_MUTE
+//            } else {
+//                AudioManager.ADJUST_UNMUTE
+//            }
+//            audioManager!!.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, adJustMute, 0)
+//            audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, adJustMute, 0)
+//            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, adJustMute, 0)
+//            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, adJustMute, 0)
+//            audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, adJustMute, 0)
+//        } else {
+//            audioManager!!.setStreamMute(AudioManager.STREAM_NOTIFICATION, setMute)
+//            audioManager.setStreamMute(AudioManager.STREAM_ALARM, setMute)
+//            audioManager.setStreamMute(AudioManager.STREAM_MUSIC, setMute)
+//            audioManager.setStreamMute(AudioManager.STREAM_RING, setMute)
+//            audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, setMute)
+//        }
     }
 
 }

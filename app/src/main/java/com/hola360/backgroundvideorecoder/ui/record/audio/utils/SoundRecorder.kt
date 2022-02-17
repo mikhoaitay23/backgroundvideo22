@@ -94,6 +94,7 @@ class SoundRecorder(
                         AudioFormat.ENCODING_PCM_16BIT,
                         minBufferSize * 2
                     )
+//                    Utils.adjustAudio(context, audioModel.isMuted)
 
                     // PCM buffer size (5sec)
                     val buffer =

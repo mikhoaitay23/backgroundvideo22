@@ -5,11 +5,166 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/home_v_margin">
 
+            <LinearLayout
+                android:id="@+id/btnPrivacyPolicy"
+                style="@style/RecordLayoutStyle1">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <LinearLayout style="@style/RecordLayoutStyle2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TextSetting1"
+                            android:text="@string/privacy_policy" />
+
+                        <TextView
+                            style="@style/TextSetting2"
+                            android:text="@string/privacy_policy_describe" />
+
+                    </LinearLayout>
+
+                    <TextView style="@style/TextRecordProperties2" />
+
+                </LinearLayout>
+
+                <View style="@style/RecordDivineStyle" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnTermOfService"
+                style="@style/RecordLayoutStyle1">
+
+                <LinearLayout style="@style/RecordLayoutStyle2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TextSetting1"
+                            android:text="@string/term_of_service" />
+
+                        <TextView
+                            style="@style/TextSetting2"
+                            android:text="@string/term_of_service_describe" />
+
+                    </LinearLayout>
+
+                    <TextView style="@style/TextRecordProperties2" />
+
+                </LinearLayout>
+
+                <View style="@style/RecordDivineStyle" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnContactUs"
+                style="@style/RecordLayoutStyle1">
+
+                <LinearLayout style="@style/RecordLayoutStyle2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TextSetting1"
+                            android:text="@string/contact_us" />
+
+                        <TextView
+                            style="@style/TextSetting2"
+                            android:text="@string/have_a_question" />
+
+                    </LinearLayout>
+
+                    <TextView style="@style/TextRecordProperties2" />
+
+                </LinearLayout>
+
+                <View style="@style/RecordDivineStyle" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnRateUs"
+                style="@style/RecordLayoutStyle1">
+
+                <LinearLayout style="@style/RecordLayoutStyle2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TextSetting1"
+                            android:text="@string/rate_us" />
+
+                        <TextView
+                            android:id="@+id/txtStoragePath"
+                            style="@style/TextSetting2"
+                            android:text="@string/rate_us_describe" />
+
+                    </LinearLayout>
+
+                    <TextView style="@style/TextRecordProperties2" />
+
+                </LinearLayout>
+
+                <View style="@style/RecordDivineStyle" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnShareApp"
+                style="@style/RecordLayoutStyle1">
+
+                <LinearLayout style="@style/RecordLayoutStyle2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TextSetting1"
+                            android:text="@string/share_app" />
+
+                        <TextView
+                            style="@style/TextSetting2"
+                            android:text="@string/share_app_with_friend" />
+
+                    </LinearLayout>
+
+                    <TextView style="@style/TextRecordProperties2" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 </layout>

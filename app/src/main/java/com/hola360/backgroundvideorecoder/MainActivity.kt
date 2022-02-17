@@ -7,23 +7,19 @@ import android.content.ServiceConnection
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
-import com.hola360.backgroundvideorecoder.ui.record.BackgroundRecordEvent
 import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
-import com.hola360.backgroundvideorecoder.utils.ToastUtils
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
-import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
+import com.hola360.backgroundvideorecoder.utils.ToastUtils
 import com.hola360.backgroundvideorecoder.widget.Toolbar
 
 class MainActivity : AppCompatActivity() {
@@ -50,8 +46,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setParentPath() {
-        val path= dataSharedPreferenceUtils!!.getParentPath()
-        if(path== null || path == ""){
+        val path = dataSharedPreferenceUtils!!.getParentPath()
+        if (path == null || path == "") {
             dataSharedPreferenceUtils!!.setParentPath(this.externalCacheDir!!.absolutePath)
         }
     }
@@ -139,7 +135,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        SCREEN_ORIENTATION= newConfig.orientation
+        SCREEN_ORIENTATION = newConfig.orientation
     }
 
     companion object {

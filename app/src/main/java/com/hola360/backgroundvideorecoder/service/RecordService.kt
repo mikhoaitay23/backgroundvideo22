@@ -230,7 +230,7 @@ class RecordService : Service() {
                             listener?.onStopped()
                             if (isRecordScheduleStart) {
                                 SharedPreferenceUtils.getInstance(this@RecordService)!!
-                                    .setAudioSchedule(null)
+                                    .putSchedule(null)
                             }
                             ToastUtils.getInstance(this@RecordService)!!
                                 .showToast(getString(R.string.recording_stop))
@@ -327,7 +327,7 @@ class RecordService : Service() {
         val alarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(getBroadcastPendingIntent(context, isVideo))
-        recordStateLiveData.value = RecordState.None
+        mServiceManager!!.stop()
     }
 
     inner class LocalBinder : Binder() {

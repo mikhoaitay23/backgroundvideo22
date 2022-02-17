@@ -3,11 +3,123 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.hola360.backgroundvideorecoder.ui.setting.audiosetting.AudioSettingViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/home_v_margin">
+
+            <LinearLayout
+                android:id="@+id/btnQuality"
+                style="@style/RecordLayoutStyle1">
+
+                <LinearLayout style="@style/RecordLayoutStyle2">
+
+                    <TextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/record_quality" />
+
+                    <TextView
+                        style="@style/TextRecordProperties2"
+                        android:setRecordQuality="@{viewModel.recordAudioLiveData}"
+                        android:textColor="@color/colorAccent" />
+
+                </LinearLayout>
+
+                <View style="@style/RecordDivineStyle" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnMode"
+                style="@style/RecordLayoutStyle1">
+
+                <LinearLayout style="@style/RecordLayoutStyle2">
+
+                    <TextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/mode" />
+
+                    <TextView
+                        style="@style/TextRecordProperties2"
+                        android:setRecordMode="@{viewModel.recordAudioLiveData}"
+                        android:textColor="@color/colorAccent" />
+
+                </LinearLayout>
+
+                <View style="@style/RecordDivineStyle" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnDuration"
+                style="@style/RecordLayoutStyle1">
+
+                <LinearLayout style="@style/RecordLayoutStyle2">
+
+                    <TextView
+                        style="@style/TextRecordProperties1"
+                        android:text="@string/record_duration" />
+
+                    <TextView
+                        style="@style/TextRecordProperties2"
+                        android:setRecordAudioDuration="@{viewModel.recordAudioLiveData}"
+                        android:textColor="@color/colorAccent" />
+
+                </LinearLayout>
+
+                <View style="@style/RecordDivineStyle" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/batteryLevel"
+                style="@style/RecordLayoutStyle1">
+
+                <LinearLayout style="@style/RecordLayoutStyle2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_light"
+                            android:text="@string/mute_ring_msg"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_light"
+                            android:text="@string/mute_ring_describe"
+                            android:textColor="#BDBDBD"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="@{viewModel.recordAudioLiveData.muted}"
+                        android:onClick="@{()->viewModel.updateMuted()}" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 </layout>

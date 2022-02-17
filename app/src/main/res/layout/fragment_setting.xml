@@ -73,7 +73,7 @@
                 android:layout_height="match_parent">
 
                 <ImageView
-                    android:src="@drawable/ic_video_schedule"
+                    android:src="@drawable/ic_micro"
                     android:layout_width="@dimen/record_bottom_icon_height"
                     android:layout_height="@dimen/record_bottom_icon_height"
                     android:pagerIconTint="@{position==2}"/>
