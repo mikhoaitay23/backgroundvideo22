@@ -119,29 +119,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun handleRecordStatus(status: Int) {
-        when (status) {
-            RECORD_VIDEO, STOP_VIDEO_RECORD,
-            SCHEDULE_RECORD_VIDEO, CANCEL_SCHEDULE_RECORD_VIDEO -> {
-                VideoRecordUtils.startRecordIntent(this, status)
-                if (!isBound) {
-                    bindService()
-                }
-            }
-        }
-    }
-
-    fun updateRecordVideoPreview(inVideoRecord:Boolean){
-        val videoConfiguration= VideoRecordUtils.getVideoConfiguration(this)
-        if(videoConfiguration.previewMode){
-            if(inVideoRecord){
-                recordService!!.updatePreviewVideoParams(true)
-            }else{
-                recordService!!.updatePreviewVideoParams(false)
-            }
-        }
-    }
-
     private fun bindService() {
         val intent = Intent(this, RecordService::class.java)
         startService(intent)
@@ -168,13 +145,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         var SCREEN_WIDTH: Int = 0
         var SCREEN_HEIGHT: Int = 0
-        var SCREEN_ORIENTATION:Int=1
+        var SCREEN_ORIENTATION:Int= Configuration.ORIENTATION_PORTRAIT
         const val PRIVACY = "privacy"
-        const val NO_RECORDING = 0
-        const val RECORD_VIDEO = 1
-        const val STOP_VIDEO_RECORD = 2
-        const val SCHEDULE_RECORD_VIDEO = 3
-        const val CANCEL_SCHEDULE_RECORD_VIDEO = 4
         const val RECORD_VIDEO_LOW_BATTERY = 5
     }
 }

@@ -171,7 +171,6 @@ class RecordService : Service() {
                 })
             videoPreviewVideoWindow!!.setupVideoConfiguration()
             videoPreviewVideoWindow!!.open()
-            videoPreviewVideoWindow!!.startRecording()
             recordStateLiveData.value = RecordState.VideoRecording
         }
     }

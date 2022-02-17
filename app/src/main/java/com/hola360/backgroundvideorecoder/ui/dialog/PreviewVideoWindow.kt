@@ -9,6 +9,7 @@ import com.hola360.backgroundvideorecoder.R
 import java.lang.Exception
 
 import android.content.Context.WINDOW_SERVICE
+import android.content.res.Configuration
 import android.view.*
 import androidx.camera.core.CameraControl
 import androidx.camera.core.Preview
@@ -17,15 +18,17 @@ import androidx.camera.video.*
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
+import androidx.documentfile.provider.DocumentFile
+import com.anggrayudi.storage.file.findFolder
+import com.anggrayudi.storage.file.getAbsolutePath
+import com.anggrayudi.storage.file.toRawFile
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
-import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
-import com.hola360.backgroundvideorecoder.utils.SystemUtils
-import com.hola360.backgroundvideorecoder.utils.Utils
-import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
+import com.hola360.backgroundvideorecoder.utils.*
+import java.util.*
 
 @SuppressLint("InflateParams", "ClickableViewAccessibility")
 class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
@@ -48,7 +51,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         VideoRecordUtils.getCameraCapabilities(context, customLifeCycleOwner!!)
     }
     private lateinit var videoRecordConfiguration: VideoRecordConfiguration
-    private var generalSetting:SettingGeneralModel?= null
     private var totalTimeRecord:Long= 0
     private var newInterval=false
 
@@ -80,6 +82,38 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         } else {
             WindowManager.LayoutParams.TYPE_PHONE
+        }
+    }
+
+    private fun generateOutputFilepath():DocumentFile?{
+        val parentPath = SharedPreferenceUtils.getInstance(context)?.getParentPath()
+        val rootParentDocFile = Utils.getDocumentFile(context, parentPath!!)
+        return if (rootParentDocFile != null && rootParentDocFile.exists()) {
+            try {
+                var parentRecordDocFile = rootParentDocFile.findFile(Configurations.RECORD_PATH)
+                if (parentRecordDocFile == null || !parentRecordDocFile.exists()) {
+                    parentRecordDocFile =
+                        rootParentDocFile.createDirectory(Configurations.RECORD_PATH)
+                }
+                var videoFolderDoc =
+                    parentRecordDocFile!!.findFolder(Configurations.RECORD_VIDEO_PATH)
+                if (videoFolderDoc == null || !videoFolderDoc.exists()) {
+                    videoFolderDoc =
+                        parentRecordDocFile.createDirectory(Configurations.RECORD_VIDEO_PATH)
+                }
+                val mimeType = "video/mp4"
+                videoFolderDoc =
+                    Utils.getDocumentFile(context, videoFolderDoc!!.getAbsolutePath(context))
+                val videoFileName = String.format(
+                    Configurations.TEMPLATE_VIDEO_FILE_NAME,
+                    DateTimeUtils.getFullDate(Date().time)
+                )
+                videoFolderDoc!!.createFile(mimeType, videoFileName)
+            } catch (ex: Exception) {
+                 null
+            }
+        } else {
+             null
         }
     }
 
@@ -126,7 +160,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             .setQualitySelector(qualitySelector)
             .build()
         videoCapture = VideoCapture.withOutput(recorder)
-        videoCapture.targetRotation= Surface.ROTATION_90
+//        videoCapture.targetRotation= getVideoRotation()
 
         try {
             cameraProvider.unbindAll()
@@ -145,21 +179,62 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         }
     }
 
+    private fun getVideoRotation():Int{
+        return when(videoRecordConfiguration.videoOrientation){
+            0->{
+                if(MainActivity.SCREEN_ORIENTATION== Configuration.ORIENTATION_PORTRAIT){
+                    Surface.ROTATION_0
+                    Log.d("abcVideo", "Rotate auto 0 ")
+                }else{
+                    Surface.ROTATION_180
+                    Log.d("abcVideo", "Rorate auto 90 ")
+                }
+            }
+            1->{
+                if(MainActivity.SCREEN_ORIENTATION== Configuration.ORIENTATION_PORTRAIT){
+                    Surface.ROTATION_0
+                    Log.d("abcVideo", "Rotate portrait 0 ")
+                }else{
+                    Surface.ROTATION_180
+                    Log.d("abcVideo", "Rotate portrait 180 ")
+                }
+            }
+            else->{
+                if(MainActivity.SCREEN_ORIENTATION== Configuration.ORIENTATION_LANDSCAPE){
+                    Surface.ROTATION_0
+                    Log.d("abcVideo", "Rotate landscape 90 ")
+                }else{
+                    Surface.ROTATION_90
+                    Log.d("abcVideo", "Rotate landscape 0 ")
+                }
+            }
+        }
+    }
+
     @SuppressLint("MissingPermission")
-    fun startRecording() {
+    private fun startRecording() {
         // configure Recorder and Start recording to the mediaStoreOutput.
         if(currentRecording!= null){
             currentRecording!!.stop()
             currentRecording = null
         }
-        val mediaStoreOutput = VideoRecordUtils.generateMediaStoreOutput(context)
-//        val file= File(context.cacheDir, "Record_video_${System.currentTimeMillis()}.mp4")
-//        val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
-
+        val mediaOutputs= VideoRecordUtils.generateMediaStoreOutput(context)
         currentRecording = videoCapture.output
-            .prepareRecording(context, mediaStoreOutput)
+            .prepareRecording(context, mediaOutputs)
             .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
             .start(mainThreadExecutor, captureListener)
+//        val file= generateOutputFilepath()!!.toRawFile(context)
+//        if(file != null){
+//            val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
+//
+//            currentRecording = videoCapture.output
+//                .prepareRecording(context, fileOutputOptions)
+//                .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
+//                .start(mainThreadExecutor, captureListener)
+//        }else{
+//            close()
+//            callback.onFinishRecord()
+//        }
     }
 
     private val captureListener = Consumer<VideoRecordEvent> { event ->
@@ -233,6 +308,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             if (view?.windowToken == null) {
                 if (view?.parent == null) {
                     windowManager?.addView(view, params!!)
+                    startRecording()
                 }
             }
         } catch (e: Exception) {
