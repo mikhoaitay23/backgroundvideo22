@@ -7,6 +7,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.FragmentVideoRecordBinding
+import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.base.basefragment.BaseFragment
 import com.hola360.backgroundvideorecoder.ui.record.RecordViewPagerAdapter
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils

@@ -208,14 +208,15 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
     }
 
     private fun visibleParams(layoutFlag:Int):WindowManager.LayoutParams{
-        return WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
+        val newParams= WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             layoutFlag,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT).apply {
-            x= paramX
-            y= paramY
         }
+        newParams.x= -(MainActivity.SCREEN_WIDTH +context.resources.getDimensionPixelSize(R.dimen.record_preview_height))/2+10
+        newParams.y= (MainActivity.SCREEN_HEIGHT - context.resources.getDimensionPixelSize(R.dimen.record_preview_height))/2 - context.resources.getDimensionPixelSize(R.dimen.record_bottom_pager_height)
+        return newParams
     }
 
     private fun invisibleParams(layoutFlag:Int):WindowManager.LayoutParams{
