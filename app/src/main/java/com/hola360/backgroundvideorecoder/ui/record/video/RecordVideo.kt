@@ -8,6 +8,7 @@ import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
+import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
 class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener, RecordService.Listener {
@@ -18,13 +19,13 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         super.onCreate(savedInstanceState)
         (requireActivity() as MainActivity).recordService!!.registerListener(this)
         (requireActivity() as MainActivity).recordService!!.getRecordState().observe(this) {
-            when(it){
-                RecordService.RecordState.VideoRecording->{
-                    binding!!.isRecording=true
+            when (it) {
+                RecordService.RecordState.VideoRecording -> {
+                    binding!!.isRecording = true
                 }
-                else->{
-                    binding!!.isRecording=false
-                    binding!!.recordTime.text= getString(R.string.video_record_time_zero)
+                else -> {
+                    binding!!.isRecording = false
+                    binding!!.recordTime.text = getString(R.string.video_record_time_zero)
                 }
             }
         }
@@ -89,8 +90,8 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     }
 
     override fun onUpdateTime(fileName: String, duration: Long, curTime: Long) {
-        if(!binding!!.isRecording && curTime>0){
-            binding!!.isRecording= true
+        if (!binding!!.isRecording && curTime > 0) {
+            binding!!.isRecording = true
         }
         binding!!.recordTime.text = VideoRecordUtils.generateRecordTime(curTime)
     }
@@ -100,7 +101,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     }
 
     override fun onStopped() {
-        binding!!.isRecording=false
     }
 
     override fun startAction() {
@@ -112,7 +112,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
             }
         } else {
             (requireActivity() as MainActivity).recordService!!.stopRecordVideo()
-            binding!!.recordTime.text= getString(R.string.video_record_time_zero)
+            binding!!.recordTime.text = getString(R.string.video_record_time_zero)
         }
     }
 
@@ -123,5 +123,4 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     override fun onCancelSchedule() {
         cancelSchedule()
     }
-
 }

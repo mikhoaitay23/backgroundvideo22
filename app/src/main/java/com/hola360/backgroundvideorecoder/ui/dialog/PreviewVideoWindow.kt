@@ -48,6 +48,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         VideoRecordUtils.getCameraCapabilities(context, customLifeCycleOwner!!)
     }
     private lateinit var videoRecordConfiguration: VideoRecordConfiguration
+    private var generalSetting:SettingGeneralModel?= null
     private var totalTimeRecord:Long= 0
     private var newInterval=false
 
@@ -57,18 +58,20 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         view= layoutInflater.inflate(R.layout.layout_preview_video, null)
         view!!.setOnTouchListener { v, event ->
             event?.let {
-                if (it.action == MotionEvent.ACTION_DOWN) {
-                    paramX = it.x.toInt()
-                    paramY = it.y.toInt()
-                }
-                if (it.action == MotionEvent.ACTION_MOVE) {
-                    val dx = event.x - paramX
-                    val dy = event.y - paramY
-                    params!!.x= params!!.x +dx.toInt()
-                    params!!.y= params!!.y+dy.toInt()
-                    windowManager!!.updateViewLayout(view!!, params)
-                    paramX = it.x.toInt()
-                    paramY = it.y.toInt()
+                when(it.action){
+                    MotionEvent.ACTION_DOWN->{
+                        paramX= event.rawX.toInt()
+                        paramY= event.rawY.toInt()
+                    }
+                    MotionEvent.ACTION_MOVE->{
+                        val dx= it.rawX.toInt()- paramX
+                        val dy= it.rawY.toInt() - paramY
+                        params!!.x= params!!.x + dx
+                        params!!.y= params!!.y +dy
+                        windowManager!!.updateViewLayout(view!!, params)
+                        paramX= event.rawX.toInt()
+                        paramY= event.rawY.toInt()
+                    }
                 }
             }
             true
@@ -166,8 +169,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
                 newInterval=true
             }
             is VideoRecordEvent.Status->{
-                callback.onRecording(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000,
-                    totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.totalTime)
+                callback.onRecording(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000)
                 if(videoRecordConfiguration.totalTime!= 0L &&
                     totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000> videoRecordConfiguration.totalTime){
                     close()
@@ -210,7 +212,10 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             WindowManager.LayoutParams.WRAP_CONTENT,
             layoutFlag,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            PixelFormat.TRANSLUCENT)
+            PixelFormat.TRANSLUCENT).apply {
+            x= paramX
+            y= paramY
+        }
     }
 
     private fun invisibleParams(layoutFlag:Int):WindowManager.LayoutParams{
@@ -257,7 +262,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
     }
 
     interface RecordAction{
-        fun onRecording(time:Long, isComplete:Boolean)
+        fun onRecording(recordTime:Long)
 
         fun onFinishRecord()
     }

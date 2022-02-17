@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Resources
@@ -12,6 +13,7 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.BatteryManager
 import android.os.Build
 import android.os.Parcelable
 import android.os.StatFs
@@ -426,8 +428,19 @@ object SystemUtils {
     fun getScreenHeight(activity: Activity):Int{
         val displayMetrics = DisplayMetrics()
         activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics)
-        val scale= displayMetrics.scaledDensity
         return displayMetrics.heightPixels
+    }
+
+    fun getBatteryPercent(context: Context):Int{
+        val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+            context.registerReceiver(null, ifilter)
+        }
+        val batteryPct = batteryStatus?.let { intent ->
+            val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+            level * 100 / scale.toFloat()
+        }
+        return batteryPct?.toInt() ?: 100
     }
 
     interface OnStorageRequestResult{

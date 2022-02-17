@@ -144,7 +144,7 @@ class RecordService : Service() {
                 this.resources.getString(R.string.video_record_notification_title)
             videoPreviewVideoWindow =
                 PreviewVideoWindow(this, object : PreviewVideoWindow.RecordAction {
-                    override fun onRecording(recordTime: Long, isComplete: Boolean) {
+                    override fun onRecording(recordTime: Long) {
                         if (recordStateLiveData.value == RecordState.VideoRecording) {
                             listener?.onUpdateTime("", 0L, recordTime)
                             notificationContent =
@@ -189,7 +189,7 @@ class RecordService : Service() {
     }
 
     fun updatePreviewVideoParams(visibility: Boolean) {
-
+        videoPreviewVideoWindow?.updateLayoutParams(visibility)
     }
 
     fun startRecordAudio() {

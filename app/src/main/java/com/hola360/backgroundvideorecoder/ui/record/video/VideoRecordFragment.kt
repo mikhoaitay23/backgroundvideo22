@@ -2,11 +2,14 @@ package com.hola360.backgroundvideorecoder.ui.record.video
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.os.Bundle
 import androidx.viewpager2.widget.ViewPager2
+import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.FragmentVideoRecordBinding
 import com.hola360.backgroundvideorecoder.ui.base.basefragment.BaseFragment
 import com.hola360.backgroundvideorecoder.ui.record.RecordViewPagerAdapter
+import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
 class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
 
@@ -20,6 +23,12 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
         RecordViewPagerAdapter(childFragmentManager, lifecycle).apply {
             updateFragment(RecordViewPagerAdapter.RECORD_VIDEO_PAGER)
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val previewMode = VideoRecordUtils.getVideoConfiguration(requireContext()).previewMode
+        (requireActivity() as MainActivity).recordService!!.updatePreviewVideoParams(previewMode)
     }
 
     override fun initViewModel() {
@@ -51,5 +60,6 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
     override fun onDestroy() {
         super.onDestroy()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+        (requireActivity() as MainActivity).recordService!!.updatePreviewVideoParams(false)
     }
 }
