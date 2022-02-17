@@ -182,9 +182,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
                     }
                 }
             }
-            is VideoRecordEvent.Finalize->{
-                Log.d("abcVideo", "Error ${event.error}  ${event.cause}")
-            }
         }
     }
 

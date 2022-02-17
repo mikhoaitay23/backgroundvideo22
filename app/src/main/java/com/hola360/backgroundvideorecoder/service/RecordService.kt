@@ -1,13 +1,18 @@
 package com.hola360.backgroundvideorecoder.service
 
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.*
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
+import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.broadcastreciever.BatteryLevelReceiver
+import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.service.notification.RecordNotificationManager
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
@@ -28,8 +33,8 @@ class RecordService : Service() {
     var mBinder = LocalBinder()
     private var videoPreviewVideoWindow: PreviewVideoWindow?=null
     private var listener: Listener? = null
-    private var time = 0L
-    private var recordState= RecordState.None
+    var time = 0L
+    private var recordStateLiveData= MutableLiveData<RecordState>()
     var mSoundRecorder: SoundRecorder? = null
     private var mServiceManager: ServiceManager? = null
     private var mAudioModel: AudioModel? = null
@@ -41,6 +46,7 @@ class RecordService : Service() {
         nextLoop()
         stopAudioRecordByTime(time)
     }
+    private val scheduleReceiver = ListenRecordScheduleBroadcast()
 
     override fun onBind(intent: Intent): IBinder {
         return mBinder
@@ -91,68 +97,84 @@ class RecordService : Service() {
         val batteryFilter = IntentFilter().apply {
             addAction(Intent.ACTION_BATTERY_LOW)
         }
+        registerReceiver(scheduleReceiver, scheduleFilter)
         registerReceiver(batteryLevelReceiver, batteryFilter)
         mServiceManager = ServiceManager()
+        recordStateLiveData.value= RecordState.None
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        intent?.let {
+            val status= it.getIntExtra(Constants.VIDEO_STATUS, 0)
+            if(status == MainActivity.RECORD_VIDEO){
+                startRecordVideo()
+            }
+        }
         return START_NOT_STICKY
     }
 
     fun startRecordVideo(){
-        if(recordState == RecordState.None){
+        if(recordStateLiveData.value == RecordState.None || recordStateLiveData.value == RecordState.VideoSchedule ){
             mServiceManager!!.startRecord()
-            notificationTitle= "Video recording"
-            Log.d("abcVideo", "Start")
+            notificationTitle= this.resources.getString(R.string.video_record_notification_title)
             videoPreviewVideoWindow= PreviewVideoWindow(this, object :PreviewVideoWindow.RecordAction{
                 override fun onRecording(recordTime: Long, isComplete: Boolean) {
-                    notificationContent = if(isComplete){
-                        "Video record complete"
-                    }else{
-                        VideoRecordUtils.generateRecordTime(recordTime)
+                    if (recordStateLiveData.value == RecordState.VideoRecording) {
+                        listener?.onUpdateTime("", 0L, recordTime)
+                        notificationContent = VideoRecordUtils.generateRecordTime(recordTime)
+                        val notification= mRecordNotificationManager.getNotification(notificationTitle, notificationContent)
+                        mRecordNotificationManager.notifyNewStatus(notification)
                     }
-                    listener?.onUpdateTime("", 0L, recordTime)
-                    val notification= mRecordNotificationManager.getNotification(notificationTitle, notificationContent)
-                    mRecordNotificationManager.notifyNewStatus(notification)
                 }
 
                 override fun onFinishRecord() {
                     listener?.onStopped()
+                    notificationTitle =
+                        this@RecordService.resources.getString(R.string.video_record_complete_prefix)
+                    VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
+                    val notification= mRecordNotificationManager.getNotification(notificationTitle, notificationContent)
+                    mRecordNotificationManager.notifyNewStatus(notification)
+                    stopForeground(true)
                 }
             })
             videoPreviewVideoWindow!!.setupVideoConfiguration()
             videoPreviewVideoWindow!!.open()
             videoPreviewVideoWindow!!.startRecording()
-            recordState= RecordState.VideoRecording
+            recordStateLiveData.value= RecordState.VideoRecording
         }
     }
 
     fun stopRecordVideo(){
-        if(recordState== RecordState.VideoRecording){
+        if(recordStateLiveData.value== RecordState.VideoRecording){
+            recordStateLiveData.value= RecordState.None
             videoPreviewVideoWindow?.close()
             videoPreviewVideoWindow=null
+            VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
             listener?.onStopped()
-            recordState= RecordState.None
+            mServiceManager!!.stop()
+        }
+    }
+
+    fun setVideoSchedule(scheduleTime:Long){
+        if(recordStateLiveData.value==RecordState.None){
+            time= scheduleTime
+            recordStateLiveData.value= RecordState.VideoSchedule
+            notificationTitle= this.resources.getString(R.string.video_record_schedule_notify_title)
+            notificationContent= this.resources.getString(R.string.video_record_schedule_video_title).plus(VideoRecordUtils.generateRecordTime(time))
+            mServiceManager!!.startSchedule(time)
+        }
+    }
+
+    fun cancelVideoSchedule(){
+        if(recordStateLiveData.value== RecordState.VideoSchedule){
+            recordStateLiveData.value=RecordState.None
+            time=0L
             mServiceManager!!.stop()
         }
     }
 
     fun updatePreviewVideoParams(visibility:Boolean){
 
-    }
-
-    fun setVideoSchedule(scheduleTime:Long){
-        if(recordState==RecordState.None){
-            time= scheduleTime
-            recordState= RecordState.VideoSchedule
-        }
-    }
-
-    fun cancelVideoSchedule(){
-        if(recordState== RecordState.VideoSchedule){
-            recordState=RecordState.None
-            time=0L
-        }
     }
 
     fun startRecordAudio(audioModel: AudioModel) {
@@ -193,7 +215,7 @@ class RecordService : Service() {
                 }
             })
             time = 0
-            recordState= RecordState.AudioRecording
+            recordStateLiveData.value= RecordState.AudioRecording
             mSoundRecorder!!.start()
             nextLoop()
         }
@@ -221,11 +243,11 @@ class RecordService : Service() {
     }
 
     fun isRecording(): Boolean {
-        return recordState!= RecordState.VideoRecording && recordState!= RecordState.AudioRecording
+        return recordStateLiveData.value== RecordState.VideoRecording || recordStateLiveData.value== RecordState.AudioRecording
     }
 
-    fun getRecordState(): RecordState {
-        return recordState
+    fun getRecordState(): MutableLiveData<RecordState> {
+        return recordStateLiveData
     }
 
     private fun stopAudioRecordByTime(time: Long) {
@@ -258,6 +280,7 @@ class RecordService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceiver(scheduleReceiver)
         unregisterReceiver(batteryLevelReceiver)
         Log.d("abcVideo", "Service killed")
     }

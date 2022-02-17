@@ -91,7 +91,7 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
     protected fun cancelSchedule() {
         recordSchedule = RecordSchedule()
         dataPref!!.putSchedule("")
-        (requireActivity() as MainActivity).handleRecordStatus(MainActivity.CANCEL_SCHEDULE_RECORD_VIDEO)
+        (requireActivity() as MainActivity).recordService!!.cancelVideoSchedule()
         VideoRecordUtils.cancelAlarmSchedule(requireContext())
     }
 

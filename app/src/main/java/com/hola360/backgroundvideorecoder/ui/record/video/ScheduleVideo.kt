@@ -12,6 +12,7 @@ import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutScheduleVideoBinding
+import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
 import com.hola360.backgroundvideorecoder.utils.Utils
@@ -25,13 +26,23 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-    }
-
-    private fun checkScheduleWhenRecordStop() {
-        if (binding!!.schedule && recordSchedule!!.scheduleTime < System.currentTimeMillis()) {
-            binding!!.schedule = false
-            recordSchedule = RecordSchedule()
-            dataPref!!.putSchedule("")
+        (requireActivity() as MainActivity).recordService!!.getRecordState().observe(this) {
+            val scheduleTime=  (requireActivity() as MainActivity).recordService!!.time
+            when(it){
+                RecordService.RecordState.VideoSchedule->{
+                    binding!!.schedule=true
+                }
+                RecordService.RecordState.VideoRecording->{
+                    binding!!.isRecording=true
+                    if(scheduleTime>0L){
+                        binding!!.schedule=true
+                    }
+                }
+                else->{
+                    binding!!.isRecording=false
+                    binding!!.schedule = (scheduleTime>0 && System.currentTimeMillis()< scheduleTime)
+                }
+            }
         }
     }
 
@@ -162,7 +173,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
     }
 
     private fun setScheduleBroadcast(time: Long) {
-        (requireActivity() as MainActivity).handleRecordStatus(MainActivity.SCHEDULE_RECORD_VIDEO)
+        (requireActivity() as MainActivity).recordService!!.setVideoSchedule(time)
         VideoRecordUtils.setAlarmSchedule(requireContext(), time)
     }
 
@@ -182,7 +193,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
             }
             cancelSchedule()
         } else {
-            (requireActivity() as MainActivity).handleRecordStatus(MainActivity.STOP_VIDEO_RECORD)
+            (requireActivity() as MainActivity).recordService!!.stopRecordVideo()
         }
 
     }
