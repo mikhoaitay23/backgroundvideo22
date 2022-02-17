@@ -43,7 +43,7 @@
             <LinearLayout
                 android:id="@+id/date"
                 style="@style/RecordLayoutStyle1"
-                android:clickable="@{!schedule || !isRecording}">
+                android:clickable="@{!schedule}">
 
                 <LinearLayout style="@style/RecordLayoutStyle2">
 
@@ -65,7 +65,7 @@
             <LinearLayout
                 android:id="@+id/time"
                 style="@style/RecordLayoutStyle1"
-                android:clickable="@{!schedule || !isRecording}">
+                android:clickable="@{!schedule}">
 
                 <LinearLayout style="@style/RecordLayoutStyle2">
 
