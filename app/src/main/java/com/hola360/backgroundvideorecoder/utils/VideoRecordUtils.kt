@@ -2,6 +2,7 @@ package com.hola360.backgroundvideorecoder.utils
 
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -15,6 +16,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
 import com.hola360.backgroundvideorecoder.service.RecordService
+import com.hola360.backgroundvideorecoder.service.notification.RecordNotificationManager
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
@@ -229,14 +231,13 @@ object VideoRecordUtils {
     }
 
     private fun getBroadcastPendingIntent(context: Context):PendingIntent{
-        val intent=  Intent(context, ListenRecordScheduleBroadcast::class.java).apply {
-            action = Constants.SCHEDULE_TYPE
+        val intent=  Intent(RecordNotificationManager.ACTION_RECORD_FROM_SCHEDULE).apply {
             putExtra(Constants.SCHEDULE_TYPE, true)
         }
         return PendingIntent.getBroadcast(
             context, ScheduleVideo.BROADCAST_INTENT_REQUEST_CODE,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 

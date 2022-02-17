@@ -1,6 +1,7 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
@@ -16,10 +17,20 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (requireActivity() as MainActivity).recordService!!.registerListener(this)
+        (requireActivity() as MainActivity).recordService!!.getRecordState().observe(this) {
+            when(it){
+                RecordService.RecordState.VideoRecording->{
+                    binding!!.isRecording=true
+                }
+                else->{
+                    binding!!.isRecording=false
+                    binding!!.recordTime.text= getString(R.string.video_record_time_zero)
+                }
+            }
+        }
     }
 
     override fun initView() {
-        binding!!.isRecording = (requireActivity() as MainActivity).recordService!!.getRecordState() == RecordService.RecordState.VideoRecording
         applyNewVideoConfiguration()
         binding!!.camera.setOnClickListener(this)
         binding!!.recordDuration.setOnClickListener(this)
@@ -78,6 +89,9 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     }
 
     override fun onUpdateTime(fileName: String, duration: Long, curTime: Long) {
+        if(!binding!!.isRecording && curTime>0){
+            binding!!.isRecording= true
+        }
         binding!!.recordTime.text = VideoRecordUtils.generateRecordTime(curTime)
     }
 
@@ -86,7 +100,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     }
 
     override fun onStopped() {
-
+        binding!!.isRecording=false
     }
 
     override fun startAction() {
@@ -100,7 +114,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
             (requireActivity() as MainActivity).recordService!!.stopRecordVideo()
             binding!!.recordTime.text= getString(R.string.video_record_time_zero)
         }
-        binding!!.isRecording= !binding!!.isRecording
     }
 
     override fun generateCancelDialogMessages(): String {

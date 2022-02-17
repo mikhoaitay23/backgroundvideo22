@@ -76,6 +76,7 @@ class RecordNotificationManager(private val mService: RecordService) {
     companion object {
         const val ACTION_STOP = "stop_record"
         const val ACTION_RECORD_FROM_SCHEDULE = "Action_schedule"
+        const val ACTION_RECORD_VIDEO_SCHEDULE = "Video_schedule"
         const val NOTIFICATION_ID = 234
         private const val CHANNEL_ID = "RecordBg"
         private const val REQUEST_CODE = 1212

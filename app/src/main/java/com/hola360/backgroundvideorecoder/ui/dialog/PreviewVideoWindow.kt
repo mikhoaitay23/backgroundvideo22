@@ -149,7 +149,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             currentRecording!!.stop()
             currentRecording = null
         }
-        Log.d("abcVideo", "Start record")
         val mediaStoreOutput = VideoRecordUtils.generateMediaStoreOutput(context)
 //        val file= File(context.cacheDir, "Record_video_${System.currentTimeMillis()}.mp4")
 //        val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
@@ -181,9 +180,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
                         newInterval=false
                     }
                 }
-            }
-            is VideoRecordEvent.Finalize->{
-                Log.d("abcVideo", "Error ${event.error}  ${event.cause}")
             }
         }
     }
