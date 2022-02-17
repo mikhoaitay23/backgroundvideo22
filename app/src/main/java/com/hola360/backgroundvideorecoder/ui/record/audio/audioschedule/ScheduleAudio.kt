@@ -24,7 +24,8 @@ import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.utils.Utils
 import java.util.*
 
-class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View.OnClickListener, RecordService.Listener {
+class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View.OnClickListener,
+    RecordService.Listener {
 
     private lateinit var viewModel: ScheduleAudioViewModel
     private lateinit var mainActivity: MainActivity
@@ -84,6 +85,17 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
         viewModel.isRecordScheduleLiveData.observe(this) {
             if (it) {
                 binding!!.scheduleCard.schedule = recordSchedule
+            }
+        }
+
+        (requireActivity() as MainActivity).recordService!!.getRecordState().observe(this) {
+            when (it) {
+                RecordService.RecordState.AudioSchedule -> {
+                    binding!!.isSchedule = true
+                }
+                else -> {
+                    binding!!.isSchedule = false
+                }
             }
         }
     }
@@ -240,11 +252,13 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
     private fun onTimePicker() {
         val curHour = calendar.get(Calendar.HOUR_OF_DAY)
         val curMinute = calendar.get(Calendar.MINUTE)
+        val curSec = calendar.get(0)
         val timePicker = TimePickerDialog(
             requireContext(), R.style.TimeAndDatePickerStyle,
             { _, hourOfDay, minute ->
                 calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 calendar.set(Calendar.MINUTE, minute)
+                calendar.set(Calendar.SECOND, curSec)
                 if (calendar.timeInMillis < Calendar.getInstance().timeInMillis) {
                     Utils.showInvalidateTime(binding!!.root)
                 } else {
@@ -260,7 +274,7 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
     }
 
     override fun onStopped() {
-        if (mainActivity.recordService!!.isRecordScheduleStart && isAdded && isVisible){
+        if (mainActivity.recordService!!.isRecordScheduleStart && isAdded && isVisible) {
             viewModel.cancelSchedule()
             mainActivity.recordService!!.cancelAlarmSchedule(requireContext(), false)
         }

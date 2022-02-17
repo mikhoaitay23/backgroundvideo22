@@ -24,7 +24,7 @@ class SharedPreferenceUtils private constructor(context: Context) {
         return getStringValue("Video_configuration")
     }
 
-    fun putSchedule(value: String) {
+    fun putSchedule(value: String?) {
         putStringValue("Record_schedule", value)
     }
 
@@ -78,14 +78,6 @@ class SharedPreferenceUtils private constructor(context: Context) {
 
     fun getAudioConfig(): String? {
         return getStringValue("Audio_config")
-    }
-
-    fun setAudioSchedule(value: String?) {
-        putStringValue("Audio_schedule", value)
-    }
-
-    fun getAudioSchedule(): String? {
-        return getStringValue("Audio_schedule")
     }
 
     fun setParentPath(value: String) {

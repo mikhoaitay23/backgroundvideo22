@@ -94,6 +94,7 @@
     <string name="video_record_is_running">Video record is running</string>
     <string name="recording_alert">Recording…</string>
     <string name="recording_stop">Recording stop</string>
+    <string name="mute_ring_describe">No ringtone on recording</string>
 
     //Audio Schedule
     <string name="schedule">Schedule</string>
@@ -153,5 +154,15 @@
     <string name="save_to">Save to</string>
     <string name="title_dialog_permission_sdcard">Permission to operate SD Card</string>
     <string name="msg_giant_sd_card">You must perform the certain steps to grant SD Card access rights</string>
+
+    //Setting
+    <string name="privacy_policy_describe">A privacy policy is a statement or legal document</string>
+    <string name="term_of_service_describe">Term of service are the legal agreements</string>
+    <string name="have_a_question">Have a question</string>
+    <string name="contact_us">Contact us</string>
+    <string name="rate_us">Rate us</string>
+    <string name="rate_us_describe">You are worth for the application</string>
+    <string name="share_app">Share app</string>
+    <string name="share_app_with_friend">Share app with friend</string>
 
 </resources>

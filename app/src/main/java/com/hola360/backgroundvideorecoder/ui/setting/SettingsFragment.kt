@@ -6,7 +6,7 @@ import com.hola360.backgroundvideorecoder.databinding.FragmentSettingBinding
 import com.hola360.backgroundvideorecoder.ui.base.basefragment.BaseFragment
 import com.hola360.backgroundvideorecoder.ui.record.RecordViewPagerAdapter
 
-class SettingsFragment: BaseFragment<FragmentSettingBinding>() {
+class SettingsFragment : BaseFragment<FragmentSettingBinding>() {
 
     override val layoutId: Int = R.layout.fragment_setting
     override val showToolbar: Boolean = true
@@ -25,10 +25,11 @@ class SettingsFragment: BaseFragment<FragmentSettingBinding>() {
     }
 
     override fun initView() {
-        binding!!.viewPager.adapter= adapter
-        binding!!.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+        binding!!.viewPager.adapter = adapter
+        binding!!.viewPager.registerOnPageChangeCallback(object :
+            ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                binding!!.position= position
+                binding!!.position = position
             }
         })
         binding!!.general.setOnClickListener {
@@ -45,10 +46,10 @@ class SettingsFragment: BaseFragment<FragmentSettingBinding>() {
         }
     }
 
-    private fun setSelectionPage(position:Int){
-        if(binding!!.position != position){
+    private fun setSelectionPage(position: Int) {
+        if (binding!!.position != position) {
             binding!!.viewPager.setCurrentItem(position, true)
-            binding!!.position=position
+            binding!!.position = position
         }
     }
 }

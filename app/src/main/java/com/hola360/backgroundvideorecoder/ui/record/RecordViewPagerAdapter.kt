@@ -9,7 +9,7 @@ import com.hola360.backgroundvideorecoder.ui.record.audio.audioschedule.Schedule
 import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
 import com.hola360.backgroundvideorecoder.ui.setting.AboutSetting
-import com.hola360.backgroundvideorecoder.ui.setting.AudioSetting
+import com.hola360.backgroundvideorecoder.ui.setting.audiosetting.AudioSetting
 import com.hola360.backgroundvideorecoder.ui.setting.GeneralSetting
 import com.hola360.backgroundvideorecoder.ui.setting.VideoSetting
 
