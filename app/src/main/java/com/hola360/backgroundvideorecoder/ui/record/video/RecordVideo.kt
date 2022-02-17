@@ -24,6 +24,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
                 }
                 else->{
                     binding!!.isRecording=false
+                    binding!!.recordTime.text= getString(R.string.video_record_time_zero)
                 }
             }
         }
@@ -100,7 +101,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 
     override fun onStopped() {
         binding!!.isRecording=false
-        binding!!.recordTime.text= getString(R.string.video_record_time_zero)
     }
 
     override fun startAction() {

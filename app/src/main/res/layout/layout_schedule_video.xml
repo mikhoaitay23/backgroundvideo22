@@ -43,7 +43,7 @@
             <LinearLayout
                 android:id="@+id/date"
                 style="@style/RecordLayoutStyle1"
-                android:clickable="@{!schedule}">
+                android:clickable="@{!schedule || !isRecording}">
 
                 <LinearLayout style="@style/RecordLayoutStyle2">
 
@@ -54,7 +54,7 @@
                     <TextView
                         style="@style/TextRecordProperties2"
                         android:setScheduleDate="@{scheduleTime}"
-                        android:textColor="@{schedule? @color/un_clickable: @color/colorAccent}" />
+                        android:textColor="@{schedule || isRecording? @color/un_clickable: @color/colorAccent}" />
 
                 </LinearLayout>
 
@@ -65,7 +65,7 @@
             <LinearLayout
                 android:id="@+id/time"
                 style="@style/RecordLayoutStyle1"
-                android:clickable="@{!schedule}">
+                android:clickable="@{!schedule || !isRecording}">
 
                 <LinearLayout style="@style/RecordLayoutStyle2">
 
@@ -76,7 +76,7 @@
                     <TextView
                         style="@style/TextRecordProperties2"
                         android:setScheduleTime="@{scheduleTime}"
-                        android:textColor="@{schedule? @color/un_clickable: @color/colorAccent}" />
+                        android:textColor="@{schedule || isRecording? @color/un_clickable: @color/colorAccent}" />
 
                 </LinearLayout>
 

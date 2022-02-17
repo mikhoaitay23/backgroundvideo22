@@ -11,7 +11,6 @@ import android.os.*
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.broadcastreciever.BatteryLevelReceiver
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
@@ -86,6 +85,7 @@ class RecordService : Service() {
         }
 
         fun stop() {
+            recordStateLiveData.value= RecordState.None
             stopForeground(true)
         }
     }
@@ -102,12 +102,6 @@ class RecordService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.let {
-            val status= it.getIntExtra(Constants.VIDEO_STATUS, 0)
-            if(status == MainActivity.RECORD_VIDEO){
-                startRecordVideo()
-            }
-        }
         return START_NOT_STICKY
     }
 
@@ -130,6 +124,9 @@ class RecordService : Service() {
                         if (!type) {
                             startRecordAudio()
                             isRecordScheduleStart = true
+                        }else{
+                            startRecordVideo()
+                            time= System.currentTimeMillis()
                         }
                     }
                 }
@@ -154,13 +151,12 @@ class RecordService : Service() {
                 }
 
                 override fun onFinishRecord() {
-                    listener?.onStopped()
                     notificationTitle =
                         this@RecordService.resources.getString(R.string.video_record_complete_prefix)
                     VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
                     val notification= mRecordNotificationManager.getNotification(notificationTitle, notificationContent)
                     mRecordNotificationManager.notifyNewStatus(notification)
-                    stopForeground(true)
+                    mServiceManager!!.stop()
                 }
             })
             videoPreviewVideoWindow!!.setupVideoConfiguration()
@@ -177,24 +173,7 @@ class RecordService : Service() {
             videoPreviewVideoWindow=null
             VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
             listener?.onStopped()
-            mServiceManager!!.stop()
-        }
-    }
-
-    fun setVideoSchedule(scheduleTime:Long){
-        if(recordStateLiveData.value==RecordState.None){
-            time= scheduleTime
-            recordStateLiveData.value= RecordState.VideoSchedule
-            notificationTitle= this.resources.getString(R.string.video_record_schedule_notify_title)
-            notificationContent= this.resources.getString(R.string.video_record_schedule_video_title).plus(VideoRecordUtils.generateRecordTime(time))
-            mServiceManager!!.startSchedule(time)
-        }
-    }
-
-    fun cancelVideoSchedule(){
-        if(recordStateLiveData.value== RecordState.VideoSchedule){
-            recordStateLiveData.value=RecordState.None
-            time=0L
+            time= 0L
             mServiceManager!!.stop()
         }
     }
@@ -303,8 +282,7 @@ class RecordService : Service() {
             context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (SystemUtils.isAndroidO()) {
             alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                time,
+                AlarmManager.RTC_WAKEUP, time,
                 getBroadcastPendingIntent(context, isVideo)
             )
         } else {
@@ -314,6 +292,11 @@ class RecordService : Service() {
                 getBroadcastPendingIntent(context, isVideo)
             )
         }
+        recordStateLiveData.value=if(isVideo){
+             RecordState.VideoSchedule
+        }else{
+            RecordState.AudioSchedule
+        }
         mServiceManager!!.startSchedule(time)
     }
 
@@ -321,6 +304,7 @@ class RecordService : Service() {
         val alarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(getBroadcastPendingIntent(context, isVideo))
+        recordStateLiveData.value=RecordState.None
     }
 
     inner class LocalBinder : Binder() {

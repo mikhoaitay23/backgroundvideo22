@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
@@ -173,8 +174,8 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
     }
 
     private fun setScheduleBroadcast(time: Long) {
-        (requireActivity() as MainActivity).recordService!!.setVideoSchedule(time)
-        VideoRecordUtils.setAlarmSchedule(requireContext(), time)
+        (requireActivity() as MainActivity).recordService!!.setAlarmSchedule(requireContext(), time, true)
+
     }
 
     override fun generateCancelDialogMessages(): String {
