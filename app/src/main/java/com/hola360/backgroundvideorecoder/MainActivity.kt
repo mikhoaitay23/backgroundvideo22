@@ -41,12 +41,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        dataSharedPreferenceUtils = SharedPreferenceUtils.getInstance(this)
         setupNavigation()
         setupToolbar()
         setupPrivacy()
         bindService()
         setParentPath()
-        dataSharedPreferenceUtils = SharedPreferenceUtils.getInstance(this)
     }
 
     private fun setParentPath() {
