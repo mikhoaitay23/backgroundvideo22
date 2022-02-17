@@ -6,6 +6,9 @@
         <variable
             name="setting"
             type="com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel" />
+        <variable
+            name="path"
+            type="String" />
     </data>
 
     <ScrollView
@@ -36,6 +39,7 @@
 
                         <TextView
                             android:id="@+id/txtFreeStorage"
+                            android:freeStorage="@{setting.storageId}"
                             style="@style/TextSetting2" />
 
                     </LinearLayout>
@@ -144,7 +148,7 @@
 
                         <TextView
                             android:id="@+id/txtStoragePath"
-                            android:text="@{setting.storagePath}"
+                            android:text="@{path}"
                             style="@style/TextSetting2" />
 
                     </LinearLayout>

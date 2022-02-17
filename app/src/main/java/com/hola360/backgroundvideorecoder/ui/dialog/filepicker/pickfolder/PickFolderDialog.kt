@@ -100,7 +100,8 @@ class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
             } else {
                 dismiss()
                 mOnPickPathResultListener?.onPickPathResult(
-                    getCurDocumentFile()!!.getAbsolutePath(mainActivity)
+                    getCurDocumentFile()!!.getAbsolutePath(mainActivity),
+                    mViewModel.storageBrowserModel!!.curStorageModel().storageId
                 )
             }
 
@@ -201,7 +202,8 @@ class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
                     contentResolver.takePersistableUriPermission(uri, takeFlags)
                     SharedPreferenceUtils.getInstance(requireContext())!!.saveUriSdCard(uri.toString())
                     mOnPickPathResultListener?.onPickPathResult(
-                        getCurDocumentFile()!!.getAbsolutePath(mainActivity)
+                        getCurDocumentFile()!!.getAbsolutePath(mainActivity),
+                        mViewModel.storageBrowserModel!!.curStorageModel().storageId
                     )
                 } else{
                     Toast.makeText(requireContext(), "Unsuccessful", Toast.LENGTH_SHORT).show()
@@ -250,6 +252,6 @@ class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
     }
 
     interface OnPickPathResultListener {
-        fun onPickPathResult(path: String?)
+        fun onPickPathResult(path: String?, storageId:String)
     }
 }

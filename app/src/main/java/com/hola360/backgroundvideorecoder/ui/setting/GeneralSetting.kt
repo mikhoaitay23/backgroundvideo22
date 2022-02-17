@@ -32,6 +32,9 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
     private val generalSetting: SettingGeneralModel by lazy {
         Utils.getDataPrefGeneralSetting(dataPref!!)
     }
+    private val parentPath: String by lazy {
+        dataPref!!.getParentPath()!!
+    }
     private val notificationImportanceDialog: ListSelectionBotDialog by lazy {
         val title = resources.getString(R.string.setting_general_notification_title)
         val itemList = resources.getStringArray(R.array.notification_importance).toMutableList()
@@ -52,6 +55,7 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
 
     override fun initView() {
         binding!!.setting= generalSetting
+        binding!!.path= parentPath
         binding!!.txtFreeStorage.text= SystemUtils.getInternalStorageInformation(requireContext().externalCacheDir!!)
         binding!!.freeStorage.setOnClickListener(this)
         binding!!.batteryLevel.setOnClickListener(this)
@@ -108,9 +112,11 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
     private fun startPickFolder() {
         val pickFolderDialog = PickFolderDialog.create()
         pickFolderDialog.mOnPickPathResultListener= object :PickFolderDialog.OnPickPathResultListener{
-            override fun onPickPathResult(path: String?) {
-                binding!!.txtStoragePath.text= path
-                dataPref!!.setParentPath(path!!)
+            override fun onPickPathResult(path: String?, storageId:String) {
+                generalSetting.storageId= storageId
+                binding!!.path= path!!
+                dataPref!!.setParentPath(path)
+                updateDataAndUI()
             }
         }
         pickFolderDialog.show(requireActivity().supportFragmentManager, "PickFolder")

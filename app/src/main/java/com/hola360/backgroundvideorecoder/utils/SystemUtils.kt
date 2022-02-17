@@ -394,7 +394,7 @@ object SystemUtils {
         return availableBlock.toFloat()/totalBlock
     }
 
-    private fun formatSize(storageSize: Long): String? {
+    fun formatSize(storageSize: Long): String? {
         var size = storageSize
         var suffix: String? = null
         if (size >= 1024) {

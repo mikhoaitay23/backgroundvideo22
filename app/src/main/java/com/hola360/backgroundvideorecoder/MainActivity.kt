@@ -45,7 +45,15 @@ class MainActivity : AppCompatActivity() {
         setupToolbar()
         setupPrivacy()
         bindService()
+        setParentPath()
         dataSharedPreferenceUtils = SharedPreferenceUtils.getInstance(this)
+    }
+
+    private fun setParentPath() {
+        val path= dataSharedPreferenceUtils!!.getParentPath()
+        if(path== null || path == ""){
+            dataSharedPreferenceUtils!!.setParentPath(this.externalCacheDir!!.absolutePath)
+        }
     }
 
     override fun onResume() {

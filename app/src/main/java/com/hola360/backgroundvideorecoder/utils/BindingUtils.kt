@@ -14,6 +14,7 @@ import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.model.ActionModel
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.FilePickerUtils
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.FilePickerUtils.updateSelectImage
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.StorageUtils
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.ThumbnailUtil
 import java.io.File
 import java.text.SimpleDateFormat
@@ -159,6 +160,19 @@ object BindingUtils {
                 ;listLevel[1]
             }
             textView.text= txtImportance
+        }
+    }
+
+    @BindingAdapter("android:freeStorage")
+    @JvmStatic
+    fun freeStorage(textView: TextView, storageId:String?) {
+        storageId?.let {
+            val free= StorageUtils.getFree(textView.context, storageId)
+            val total= StorageUtils.getTotal(textView.context, storageId)
+            val freeStr= SystemUtils.formatSize(free)
+            val totalStr= SystemUtils.formatSize(total)
+            textView.text= String.format(textView.resources.getString(R.string.setting_general_free_pattern),
+            freeStr, totalStr)
         }
     }
 

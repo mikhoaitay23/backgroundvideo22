@@ -119,6 +119,7 @@
     <string name="setting_audio">AUDIO</string>
     <string name="setting_about">ABOUT</string>
     <string name="setting_general_free_storage">Check free storage</string>
+    <string name="setting_general_free_pattern">%s free of %s</string>
     <string name="setting_general_battery_title">Check battery low</string>
     <string name="setting_general_battery_text">Check battery status level</string>
     <string name="setting_general_app_lock_title">App Lock</string>

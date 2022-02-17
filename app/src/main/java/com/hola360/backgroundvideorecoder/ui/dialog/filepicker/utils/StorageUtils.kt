@@ -30,7 +30,7 @@ object StorageUtils {
         return storageList
     }
 
-    private fun getTotal(context: Context, storageId: String): Long {
+    fun getTotal(context: Context, storageId: String): Long {
         return when (storageId) {
             StorageId.PRIMARY -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -48,7 +48,7 @@ object StorageUtils {
         }
     }
 
-    private fun getFree(context: Context, storageId: String): Long {
+    fun getFree(context: Context, storageId: String): Long {
         return when (storageId) {
             StorageId.PRIMARY -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
