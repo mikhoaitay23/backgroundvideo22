@@ -37,7 +37,7 @@ class RecordVideoDurationDialog(val callback:OnSelectDuration,
             val duration= if(binding!!.seekbar.progress> TIME_SEGMENT){
                 0L
             }else{
-                ((binding!!.seekbar.progress.toFloat()/308*120).toInt()+1)* TIME_SQUARE
+                ((binding!!.seekbar.progress.toFloat()/ TIME_SEGMENT* MAX_TIME).toInt()+1)* TIME_SQUARE
             }
             callback.onSelectDuration(duration)
             dismiss()
@@ -52,7 +52,7 @@ class RecordVideoDurationDialog(val callback:OnSelectDuration,
         val progress= if(totalTime==0L){
             SEEKBAR_PROGRESS-6
         }else{
-            (totalTime.toFloat()/ TIME_SQUARE/120* TIME_SEGMENT).toInt()
+            (totalTime.toFloat()/ TIME_SQUARE/ MAX_TIME* TIME_SEGMENT).toInt()
         }
         binding!!.seekbar.progress= progress
         Handler(Looper.getMainLooper()).postDelayed({
@@ -82,8 +82,8 @@ class RecordVideoDurationDialog(val callback:OnSelectDuration,
 
     companion object{
         const val SEEKBAR_PROGRESS=320
-        const val TIME_SEGMENT= SEEKBAR_PROGRESS- 13+1
-        const val MAX_TIME=120
+        const val TIME_SEGMENT= SEEKBAR_PROGRESS- 13
+        const val MAX_TIME=119
         const val TIME_SQUARE=1000L
     }
 
