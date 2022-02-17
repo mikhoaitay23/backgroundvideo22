@@ -15,9 +15,13 @@
         android:paddingVertical="@dimen/dp_20">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Audio record"
+            android:layout_marginHorizontal="@dimen/dp_24"
+            android:gravity="center"
+            android:maxLines="2"
+            android:text="@string/audio_record_title"
             android:textAppearance="?textAppearanceHeadline6"
             android:textColor="@color/signature_color" />
 
@@ -27,21 +31,30 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_6"
             android:text="00:00:00"
-            android:textAppearance="?textAppearanceSubtitle1"
+            android:textAppearance="?textAppearanceBody1"
             android:textColor="@color/signature_color" />
-
-        <com.hola360.backgroundvideorecoder.widget.AudioView
-            android:id="@+id/audioVisualizer"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_120"
-            android:layout_marginTop="@dimen/dp_6" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_40"
+            android:layout_marginTop="@dimen/dp_6"
+            android:background="@color/white_smoke">
+
+            <com.hola360.backgroundvideorecoder.widget.AudioView
+                android:id="@+id/audioVisualizer"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_120"
+                android:layout_marginHorizontal="@dimen/dp_20"
+                android:background="@color/white_smoke" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/dp_20">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/btnAbort"

@@ -10,10 +10,11 @@ import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.utils.Utils
+import com.hola360.backgroundvideorecoder.widget.AudioView
 import com.hola360.backgroundvideorecoder.widget.bottomsheet.confirm.ConfirmBottomSheetFragment
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-
+import java.nio.IntBuffer
 
 class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     BaseBottomSheetDialog<FragmentBottomSheetRecordAudioBinding>(), View.OnClickListener,
@@ -77,6 +78,9 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     override fun onUpdateTime(fileName: String, duration: Long, curTime: Long) {
         if (mainActivity.isBound && mainActivity.recordService!!.isRecording()) {
             binding!!.tvTime.text = Utils.convertTime(curTime / 1000)
+            if (fileName.isNotEmpty() && fileName != "") {
+                binding!!.tvTitle.text = fileName
+            }
         }
     }
 
@@ -85,11 +89,11 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     }
 
     override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {
-        val byteBuf: ByteBuffer = ByteBuffer.allocate(2 * buf!!.size)
-        byteBuf.order(ByteOrder.LITTLE_ENDIAN)
-        byteBuf.asShortBuffer().put(buf)
-        val bytes: ByteArray = byteBuf.array()
-        binding!!.audioVisualizer.setWaveData(bytes)
+        binding!!.audioVisualizer.setStyle(
+            AudioView.ShowStyle.STYLE_HOLLOW_LUMP,
+            AudioView.ShowStyle.STYLE_HOLLOW_LUMP
+        )
+        binding!!.audioVisualizer.setWaveData(buf)
     }
 
     override fun onPositiveClick() {

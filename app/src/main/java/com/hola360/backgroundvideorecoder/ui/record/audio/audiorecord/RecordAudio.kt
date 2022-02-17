@@ -61,12 +61,12 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainActivity.recordService!!.registerListener(this)
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.getAudioConfig()
+        mainActivity.recordService!!.registerListener(this)
     }
 
     override fun onDestroy() {
