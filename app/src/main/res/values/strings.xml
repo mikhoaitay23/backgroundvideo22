@@ -91,6 +91,7 @@
     <string name="audio_record_is_running">Audio record is running</string>
     <string name="video_record_is_running">Video record is running</string>
     <string name="recording_alert">Recording…</string>
+    <string name="recording_stop">Recording stop</string>
 
     //Audio Schedule
     <string name="schedule">Schedule</string>

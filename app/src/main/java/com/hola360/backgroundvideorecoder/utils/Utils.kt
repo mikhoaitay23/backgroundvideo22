@@ -2,13 +2,10 @@ package com.hola360.backgroundvideorecoder.utils
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
 import android.content.UriPermission
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -20,8 +17,6 @@ import com.anggrayudi.storage.file.inSdCardStorage
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
-import com.hola360.backgroundvideorecoder.broadcastreciever.ListenRecordScheduleBroadcast
-import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import java.io.File
 import java.util.*

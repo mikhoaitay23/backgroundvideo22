@@ -23,12 +23,12 @@ public class AudioView extends View {
      * 频谱数量
      */
     private static final int LUMP_COUNT = 128 * 2;
-    private static final int LUMP_WIDTH = 6;
+    private static final int LUMP_WIDTH = 3;
     private static final int LUMP_SPACE = 2;
     private static final int LUMP_MIN_HEIGHT = LUMP_WIDTH;
     private static final int LUMP_MAX_HEIGHT = 200;//TODO: HEIGHT
     private static final int LUMP_SIZE = LUMP_WIDTH + LUMP_SPACE;
-    private static final int LUMP_COLOR = Color.parseColor("#6de8fd");
+    private static final int LUMP_COLOR = Color.parseColor("#275459");
 
     private static final int WAVE_SAMPLING_INTERVAL = 5;
 
@@ -37,7 +37,7 @@ public class AudioView extends View {
     private ShowStyle upShowStyle = ShowStyle.STYLE_HOLLOW_LUMP;
     private ShowStyle downShowStyle = ShowStyle.STYLE_WAVE;
 
-    private byte[] waveData;
+    private short[] waveData;
     List<Point> pointList;
 
     private Paint lumpUpPaint, lumpDownPaint;
@@ -74,7 +74,7 @@ public class AudioView extends View {
         lumpDownPaint.setStyle(Paint.Style.STROKE);
     }
 
-    public void setWaveData(byte[] data) {
+    public void setWaveData(short[] data) {
         this.waveData = readyData(data);
         genSamplingPoint(data);
         invalidate();
@@ -84,10 +84,10 @@ public class AudioView extends View {
         this.upShowStyle = upShowStyle;
         this.downShowStyle = downShowStyle;
         if (upShowStyle == ShowStyle.STYLE_HOLLOW_LUMP || upShowStyle == ShowStyle.STYLE_ALL) {
-            lumpUpPaint.setColor(Color.parseColor("#A4D3EE"));
+            lumpUpPaint.setColor(Color.parseColor("#275459"));
         }
         if (downShowStyle == ShowStyle.STYLE_HOLLOW_LUMP || downShowStyle == ShowStyle.STYLE_ALL) {
-            lumpDownPaint.setColor(Color.parseColor("#A4D3EE"));
+            lumpDownPaint.setColor(Color.parseColor("#275459"));
         }
     }
 
@@ -148,15 +148,23 @@ public class AudioView extends View {
         }
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        final int height = LUMP_MAX_HEIGHT * 2;
+        final int width = getMeasuredWidth();
+        this.setMeasuredDimension(width, height);
+    }
+
     /**
      * 预处理数据
      *
      * @return
      */
-    private static byte[] readyData(byte[] fft) {
-        byte[] newData = new byte[LUMP_COUNT];
+    private static short[] readyData(short[] fft) {
+        short[] newData = new short[LUMP_COUNT];
         for (int i = 0; i < Math.min(fft.length, LUMP_COUNT); i++) {
-            newData[i] = (byte) Math.abs(fft[i]);
+            newData[i] = (short) Math.abs(fft[i]);
         }
         return newData;
     }
@@ -224,7 +232,7 @@ public class AudioView extends View {
      *
      * @param data
      */
-    private void genSamplingPoint(byte[] data) {
+    private void genSamplingPoint(short[] data) {
         if (upShowStyle != ShowStyle.STYLE_WAVE && downShowStyle != ShowStyle.STYLE_WAVE && upShowStyle != ShowStyle.STYLE_ALL && downShowStyle != ShowStyle.STYLE_ALL) {
             return;
         }
@@ -241,27 +249,10 @@ public class AudioView extends View {
     }
 
 
-    /**
-     * 可视化样式
-     */
     public enum ShowStyle {
-        /**
-         * 空心的矩形小块
-         */
         STYLE_HOLLOW_LUMP,
-
-        /**
-         * 曲线
-         */
         STYLE_WAVE,
-
-        /**
-         * 不显示
-         */
         STYLE_NOTHING,
-        /**
-         * 都显示
-         */
         STYLE_ALL;
 
         public static ShowStyle getStyle(String name) {
