@@ -284,7 +284,10 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
 
     }
 
-    override fun onBatteryLow(batteryPer: Float) {
+    override fun onBatteryLow() {
 
+    }
+
+    override fun onLowStorage() {
     }
 }

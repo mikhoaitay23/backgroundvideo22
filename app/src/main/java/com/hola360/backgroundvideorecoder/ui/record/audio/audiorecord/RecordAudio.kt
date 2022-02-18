@@ -17,7 +17,6 @@ import com.hola360.backgroundvideorecoder.ui.base.basefragment.BasePermissionReq
 import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
-import com.hola360.backgroundvideorecoder.ui.dialog.WarningDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.StorageUtils
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
@@ -262,7 +261,11 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
 
     }
 
-    override fun onBatteryLow(batteryPer: Float) {
+    override fun onBatteryLow() {
+
+    }
+
+    override fun onLowStorage() {
 
     }
 

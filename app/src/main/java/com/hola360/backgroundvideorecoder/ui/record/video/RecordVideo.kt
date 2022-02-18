@@ -1,7 +1,6 @@
 package com.hola360.backgroundvideorecoder.ui.record.video
 
 import android.os.Bundle
-import android.util.Log
 import android.view.OrientationEventListener
 import android.view.View
 import com.hola360.backgroundvideorecoder.MainActivity
@@ -14,7 +13,6 @@ import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFr
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
-import java.lang.IllegalStateException
 
 class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener, RecordService.Listener {
 
@@ -27,26 +25,9 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
             }
         }
     }
-    private var showBatteryAlertDialog=false
-    private var showStorageAlertDialog=false
-    private val batteryAlertDialog: RecordAlertDialog by lazy {
-        RecordAlertDialog(object : ConfirmDialog.OnConfirmOke{
-            override fun onConfirm() {
-                if((requireActivity() as MainActivity).recordService!!.getRecordState().value == RecordService.RecordState.VideoRecording){
-                    (requireActivity() as MainActivity).recordService!!.stopRecordVideo()
-                }else{
-                    (requireActivity() as MainActivity).recordService!!.stopRecording()
-                }
-            }
-        })
-    }
-    private val generalSetting: SettingGeneralModel by lazy {
-        VideoRecordUtils.getSettingGeneralModel(requireContext())
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (requireActivity() as MainActivity).recordService!!.registerListener(this)
         (requireActivity() as MainActivity).recordService!!.getRecordState().observe(this) {
             when (it) {
                 RecordService.RecordState.VideoRecording -> {
@@ -90,6 +71,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 
     override fun onResume() {
         super.onResume()
+        (requireActivity() as MainActivity).recordService!!.registerListener(this)
         checkPreviewMode()
     }
 
@@ -124,47 +106,22 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
             binding!!.isRecording = true
         }
         binding!!.recordTime.text = VideoRecordUtils.generateRecordTime(curTime)
-        checkBatteryPercent()
-        checkStoragePercent()
     }
 
     override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {
 
     }
 
-    override fun onBatteryLow(batteryPer: Float) {
+    override fun onBatteryLow() {
+        onLowBatteryAction()
+    }
 
+    override fun onLowStorage() {
+        onLowStorageAction()
     }
 
     override fun onStopped() {
-        showBatteryAlertDialog=false
-        showStorageAlertDialog=false
-    }
-
-    private fun checkBatteryPercent(){
-        if(context != null){
-            if(generalSetting.checkBattery && !showBatteryAlertDialog){
-                val curBatteryPercent= SystemUtils.getBatteryPercent(requireContext())
-                if(curBatteryPercent<= BATTERY_PERCENT_ALERT){
-                    showBatteryAlertDialog=true
-                    batteryAlertDialog.isBattery= true
-                    batteryAlertDialog.show((requireActivity() as MainActivity).supportFragmentManager, ALERT_TAG)
-                }
-            }
-        }
-    }
-
-    private fun checkStoragePercent(){
-        if(context!= null){
-            if(generalSetting.checkStorage && !showStorageAlertDialog){
-                val percent= SystemUtils.checkStoragePercent(requireContext(), generalSetting.storageId)
-                if(percent>= STORAGE_PERCENT_ALERT){
-                    showStorageAlertDialog=true
-                    batteryAlertDialog.isBattery= false
-                    batteryAlertDialog.show((requireActivity() as MainActivity).supportFragmentManager, ALERT_TAG)
-                }
-            }
-        }
+        onStopRecord()
     }
 
     override fun startAction() {
@@ -194,8 +151,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     }
 
     companion object{
-        const val BATTERY_PERCENT_ALERT= 10
-        const val STORAGE_PERCENT_ALERT= 0.9
         const val ALERT_TAG= "Alert_dialog"
     }
 }

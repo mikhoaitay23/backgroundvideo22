@@ -20,7 +20,7 @@ import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 import java.util.*
 
-class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View.OnClickListener {
+class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), View.OnClickListener, RecordService.Listener {
 
     override val layoutId: Int = R.layout.layout_schedule_video
     private var calendar: Calendar = Calendar.getInstance()
@@ -122,6 +122,11 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         timePicker.show()
     }
 
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as MainActivity).recordService!!.registerListener(this)
+    }
+
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.date -> {
@@ -153,7 +158,6 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
             }
         }
     }
-
 
     override fun startAction() {
         if (!binding!!.isRecording) {
@@ -201,6 +205,26 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
 
     companion object {
         const val BROADCAST_INTENT_REQUEST_CODE = 1
+    }
+
+    override fun onUpdateTime(fileName: String, duration: Long, curTime: Long) {
+
+    }
+
+    override fun onStopped() {
+        onStopRecord()
+    }
+
+    override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {
+
+    }
+
+    override fun onBatteryLow() {
+        onLowBatteryAction()
+    }
+
+    override fun onLowStorage() {
+        onLowStorageAction()
     }
 
 }

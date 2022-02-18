@@ -11,7 +11,7 @@ import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
-import com.hola360.backgroundvideorecoder.ui.dialog.WarningDialog
+import com.hola360.backgroundvideorecoder.ui.dialog.RecordAlertDialog
 import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.widget.AudioView
 import com.hola360.backgroundvideorecoder.widget.bottomsheet.confirm.ConfirmBottomSheetFragment
@@ -26,7 +26,7 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     private lateinit var viewModel: AudioRecordBottomSheetViewModel
     private lateinit var mainActivity: MainActivity
     private var confirmBottomSheetFragment: ConfirmBottomSheetFragment? = null
-    private var warningDialog: WarningDialog? = null
+    private var warningDialog: RecordAlertDialog? = null
 
     override fun getLayout() = R.layout.fragment_bottom_sheet_record_audio
 
@@ -100,20 +100,17 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
         binding!!.audioVisualizer.setWaveData(buf)
     }
 
-    override fun onBatteryLow(batteryPer: Float) {
-        warningDialog = WarningDialog(object : ConfirmDialog.OnConfirmOke {
+    override fun onBatteryLow() {
+        warningDialog = RecordAlertDialog(object : ConfirmDialog.OnConfirmOke {
             override fun onConfirm() {
                 mainActivity.recordService!!.stopRecording()
             }
-
-        }, object : OnDialogDismiss {
-            override fun onDismiss() {
-                warningDialog!!.dismiss()
-            }
-
         })
-        warningDialog!!.setBatteryOrStorageType(true)
+        warningDialog!!.isBattery=true
         warningDialog!!.show(requireActivity().supportFragmentManager, "DialogBatteryLow")
+    }
+
+    override fun onLowStorage() {
     }
 
     override fun onPositiveClick() {

@@ -10,13 +10,17 @@ import android.content.IntentFilter
 import android.os.*
 import android.util.Log
 import android.view.OrientationEventListener
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.service.notification.RecordNotificationManager
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.SoundRecorder
+import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
+import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import com.hola360.backgroundvideorecoder.utils.*
 import java.util.*
 
@@ -34,7 +38,6 @@ class RecordService : Service() {
         object : OrientationEventListener(this){
             override fun onOrientationChanged(orientation: Int) {
                 orientationAngle= orientation
-                Log.d("abcVideo", "Orientation: $orientation ")
             }
         }
     }
@@ -53,6 +56,9 @@ class RecordService : Service() {
         listener?.onUpdateTime(if (!mp3Name.isNullOrEmpty()) mp3Name!! else "Audio Record", 0, time)
         nextLoop()
         stopAudioRecordByTime(time)
+    }
+    private val generalSetting: SettingGeneralModel by lazy {
+        VideoRecordUtils.getSettingGeneralModel(this)
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -136,15 +142,15 @@ class RecordService : Service() {
                     Intent.ACTION_BATTERY_CHANGED -> {
                         val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
                         val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-                        val mBattery = level * 100 / scale.toFloat()
-                        if (mBattery == BATTERY_LOW) {
-                            if (recordStateLiveData.value == RecordState.AudioRecording) {
-                                listener?.onBatteryLow(mBattery)
+                        val mBattery = level * 100 / scale
+                        if (generalSetting.checkBattery && mBattery <= BATTERY_PERCENT_ALERT) {
+                            val state= recordStateLiveData.value
+                            if (state == RecordState.AudioRecording || state == RecordState.VideoRecording) {
+                                listener?.onBatteryLow()
                             }
                         }
                     }
                 }
-
             }
         }
 
@@ -165,6 +171,7 @@ class RecordService : Service() {
                                 notificationTitle,
                                 notificationContent
                             )
+//                            checkStoragePercent()
                             mRecordNotificationManager.notifyNewStatus(notification)
                         }
                     }
@@ -345,6 +352,16 @@ class RecordService : Service() {
         mServiceManager!!.stop()
     }
 
+    private fun checkStoragePercent(){
+        if(generalSetting.checkStorage){
+            val percent= SystemUtils.checkStoragePercent(this, generalSetting.storageId)
+            Log.d("abcVideo", "Percent storage: $percent")
+            if(percent>=STORAGE_PERCENT_ALERT){
+                listener?.onLowStorage()
+            }
+        }
+    }
+
     inner class LocalBinder : Binder() {
         fun getServiceInstance(): RecordService = this@RecordService
     }
@@ -360,12 +377,15 @@ class RecordService : Service() {
 
         fun onByteBuffer(buf: ShortArray?, minBufferSize: Int)
 
-        fun onBatteryLow(batteryPer: Float)
+        fun onBatteryLow()
+
+        fun onLowStorage()
     }
 
     companion object {
         const val TIME_LOOP = 500L
-        const val BATTERY_LOW = 20F
+        const val BATTERY_PERCENT_ALERT= 63
+        const val STORAGE_PERCENT_ALERT= 0.604
     }
 
     override fun onDestroy() {

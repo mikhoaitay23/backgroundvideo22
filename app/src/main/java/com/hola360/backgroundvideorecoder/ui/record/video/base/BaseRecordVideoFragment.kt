@@ -11,15 +11,14 @@ import androidx.databinding.ViewDataBinding
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
+import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDialog
-import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
-import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
-import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
-import com.hola360.backgroundvideorecoder.ui.dialog.VideoIntervalDurationDialog
+import com.hola360.backgroundvideorecoder.ui.dialog.*
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
+import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
@@ -75,6 +74,19 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
     protected var switchThumb: Int = 0
     protected var showDialog = false
     protected var isRecording = false
+    protected var showBatteryAlertDialog=false
+    protected var showStorageAlertDialog=false
+    protected val alertDialog: RecordAlertDialog by lazy {
+        RecordAlertDialog(object : ConfirmDialog.OnConfirmOke{
+            override fun onConfirm() {
+                if((requireActivity() as MainActivity).recordService!!.getRecordState().value == RecordService.RecordState.VideoRecording){
+                    (requireActivity() as MainActivity).recordService!!.stopRecordVideo()
+                }else{
+                    (requireActivity() as MainActivity).recordService!!.stopRecording()
+                }
+            }
+        })
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -221,6 +233,31 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
     }
 
     abstract fun startAction()
+
+    protected fun onLowBatteryAction(){
+        if(!showBatteryAlertDialog){
+            showBatteryAlertDialog=true
+            alertDialog.isBattery= true
+            alertDialog.show((requireActivity() as MainActivity).supportFragmentManager,
+                RecordVideo.ALERT_TAG
+            )
+        }
+    }
+
+    protected fun onLowStorageAction(){
+        if(!showStorageAlertDialog){
+            showStorageAlertDialog=true
+            alertDialog.isBattery= false
+            alertDialog.show((requireActivity() as MainActivity).supportFragmentManager,
+                RecordVideo.ALERT_TAG
+            )
+        }
+    }
+
+    protected fun onStopRecord(){
+        showBatteryAlertDialog=false
+        showStorageAlertDialog=false
+    }
 
     companion object {
         const val CAMERA_FACING_FRONT = 0
