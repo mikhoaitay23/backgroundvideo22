@@ -92,19 +92,20 @@ class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
 
         binding!!.myButtonCancel.setOnClickListener { dismiss() }
         binding!!.myButtonSelect.setOnClickListener {
-            val isFromSdCard =
-                getCurDocumentFile()!!
-                    .inSdCardStorage(mainActivity)
-            if (isFromSdCard && !FilePickerUtils.isGrantAccessSdCard(mainActivity)) {
-                showDialogInform(false)
-            } else {
-                dismiss()
-                mOnPickPathResultListener?.onPickPathResult(
-                    getCurDocumentFile()!!.getAbsolutePath(mainActivity),
-                    mViewModel.storageBrowserModel!!.curStorageModel().storageId
-                )
+            if(getCurDocumentFile() != null){
+                val isFromSdCard =
+                    getCurDocumentFile()!!
+                        .inSdCardStorage(mainActivity)
+                if (isFromSdCard && !FilePickerUtils.isGrantAccessSdCard(mainActivity)) {
+                    showDialogInform(false)
+                } else {
+                    dismiss()
+                    mOnPickPathResultListener?.onPickPathResult(
+                        getCurDocumentFile()!!.getAbsolutePath(mainActivity),
+                        mViewModel.storageBrowserModel!!.curStorageModel().storageId
+                    )
+                }
             }
-
         }
 
         mDialog!!.setCancelable(false)

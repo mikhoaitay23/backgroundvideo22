@@ -56,7 +56,6 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
     override fun initView() {
         binding!!.setting= generalSetting
         binding!!.path= parentPath
-        binding!!.txtFreeStorage.text= SystemUtils.getInternalStorageInformation(requireContext().externalCacheDir!!)
         binding!!.freeStorage.setOnClickListener(this)
         binding!!.batteryLevel.setOnClickListener(this)
         binding!!.appLock.setOnClickListener(this)

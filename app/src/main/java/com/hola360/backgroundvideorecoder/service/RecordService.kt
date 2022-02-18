@@ -9,10 +9,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.*
 import android.util.Log
+import android.view.OrientationEventListener
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
-import com.hola360.backgroundvideorecoder.broadcastreciever.BatteryLevelReceiver
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.service.notification.RecordNotificationManager
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
@@ -22,9 +22,6 @@ import java.util.*
 
 class RecordService : Service() {
 
-    private val batteryLevelReceiver: BatteryLevelReceiver by lazy {
-        BatteryLevelReceiver()
-    }
     private val mRecordNotificationManager by lazy {
         RecordNotificationManager(this)
     }
@@ -32,6 +29,15 @@ class RecordService : Service() {
     private var notificationContent: String = ""
     var mBinder = LocalBinder()
     private var videoPreviewVideoWindow: PreviewVideoWindow? = null
+    private var orientationAngle= 0
+    private val orientationListener: OrientationEventListener by lazy {
+        object : OrientationEventListener(this){
+            override fun onOrientationChanged(orientation: Int) {
+                orientationAngle= orientation
+                Log.d("abcVideo", "Orientation: $orientation ")
+            }
+        }
+    }
     private var listener: Listener? = null
     var time = 0L
     private var recordStateLiveData = MutableLiveData<RecordState>()
@@ -93,10 +99,6 @@ class RecordService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val batteryFilter = IntentFilter().apply {
-            addAction(Intent.ACTION_BATTERY_LOW)
-        }
-        registerReceiver(batteryLevelReceiver, batteryFilter)
         mServiceManager = ServiceManager()
         recordStateLiveData.value = RecordState.None
         initReceiver()
@@ -127,7 +129,7 @@ class RecordService : Service() {
                             startRecordAudio()
                             isRecordScheduleStart = true
                         } else {
-                            startRecordVideo()
+                            startRecordVideo(VideoRecordUtils.getVideoRotation(this@RecordService, orientationAngle))
                             time = System.currentTimeMillis()
                         }
                     }
@@ -148,13 +150,12 @@ class RecordService : Service() {
 
     }
 
-    fun startRecordVideo() {
+    fun startRecordVideo(videoOrientation:Int) {
         if (recordStateLiveData.value == RecordState.None || recordStateLiveData.value == RecordState.VideoSchedule) {
             mServiceManager!!.startRecord()
-            notificationTitle =
-                this.resources.getString(R.string.video_record_notification_title)
+            notificationTitle = this.resources.getString(R.string.video_record_notification_title)
             videoPreviewVideoWindow =
-                PreviewVideoWindow(this, object : PreviewVideoWindow.RecordAction {
+                PreviewVideoWindow(this, videoOrientation, object : PreviewVideoWindow.RecordAction {
                     override fun onRecording(recordTime: Long) {
                         if (recordStateLiveData.value == RecordState.VideoRecording) {
                             listener?.onUpdateTime("", 0L, recordTime)
@@ -176,6 +177,7 @@ class RecordService : Service() {
                             notificationTitle,
                             notificationContent
                         )
+                        listener?.onStopped()
                         mRecordNotificationManager.notifyNewStatus(notification)
                         mServiceManager!!.stop()
                     }
@@ -194,6 +196,7 @@ class RecordService : Service() {
             VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
             listener?.onStopped()
             time = 0L
+            orientationListener.disable()
             mServiceManager!!.stop()
         }
     }
@@ -329,6 +332,7 @@ class RecordService : Service() {
         recordStateLiveData.value = if (isVideo) {
             RecordState.VideoSchedule
         } else {
+            orientationListener.enable()
             RecordState.AudioSchedule
         }
         mServiceManager!!.startSchedule(time)
@@ -367,8 +371,6 @@ class RecordService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(globalReceiver)
-        unregisterReceiver(batteryLevelReceiver)
-        Log.d("abcVideo", "Service killed")
     }
 
     enum class RecordState {

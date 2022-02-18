@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.MediaStore
 import android.util.Log
+import android.view.Surface
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -261,5 +262,31 @@ object VideoRecordUtils {
             val dataPref = SharedPreferenceUtils.getInstance(context)
             dataPref!!.putSchedule("")
         }
+    }
+
+    fun getVideoRotation(context: Context, orientationAngle: Int):Int{
+        return when(getVideoConfiguration(context).videoOrientation){
+            0->{
+                Surface.ROTATION_0
+            }
+            1->{
+                if(isPortrait(orientationAngle)){
+                    Surface.ROTATION_0
+                }else{
+                    Surface.ROTATION_90
+                }
+            }
+            else->{
+                if(isPortrait(orientationAngle)){
+                    Surface.ROTATION_270
+                }else{
+                    Surface.ROTATION_0
+                }
+            }
+        }
+    }
+
+    private fun isPortrait(orientationAngle:Int):Boolean{
+        return !((orientationAngle in 46..134) || (orientationAngle in 226..314))
     }
 }

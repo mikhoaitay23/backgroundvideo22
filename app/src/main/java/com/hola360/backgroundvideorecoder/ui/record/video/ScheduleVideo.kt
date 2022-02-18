@@ -30,7 +30,7 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         (requireActivity() as MainActivity).recordService!!.getRecordState().observe(this) {
             val scheduleTime=  (requireActivity() as MainActivity).recordService!!.time
             when(it){
-                RecordService.RecordState.VideoSchedule->{
+                RecordService.RecordState.VideoSchedule, RecordService.RecordState.AudioSchedule->{
                     binding!!.schedule=true
                 }
                 RecordService.RecordState.VideoRecording->{

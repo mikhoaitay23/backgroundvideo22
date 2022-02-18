@@ -19,6 +19,7 @@ import android.os.Parcelable
 import android.os.StatFs
 import android.provider.Settings
 import android.util.DisplayMetrics
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
@@ -27,6 +28,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.exifinterface.media.ExifInterface
 import com.google.android.material.snackbar.Snackbar
 import com.hola360.backgroundvideorecoder.R
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.StorageUtils
 import java.io.*
 import java.text.SimpleDateFormat
 
@@ -432,7 +434,7 @@ object SystemUtils {
     }
 
     fun getBatteryPercent(context: Context):Int{
-        val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+        val batteryStatus: Intent? =IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
             context.registerReceiver(null, ifilter)
         }
         val batteryPct = batteryStatus?.let { intent ->
@@ -441,6 +443,12 @@ object SystemUtils {
             level * 100 / scale.toFloat()
         }
         return batteryPct?.toInt() ?: 100
+    }
+
+    fun checkStoragePercent(context: Context, storageId:String):Float{
+        val free= StorageUtils.getFree(context, storageId)
+        val total= StorageUtils.getTotal(context, storageId)
+        return free.toFloat()/total
     }
 
     interface OnStorageRequestResult{

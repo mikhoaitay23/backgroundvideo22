@@ -5,10 +5,9 @@ import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutBatteryWarningBinding
 import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseDialog
 
-class WarningDialog(val callback:ConfirmDialog.OnConfirmOke,
-    private val dismissCallback:OnDialogDismiss): BaseDialog<LayoutBatteryWarningBinding>() {
+class RecordAlertDialog(val callback:ConfirmDialog.OnConfirmOke): BaseDialog<LayoutBatteryWarningBinding>() {
 
-    private var isBattery= false
+    var isBattery= false
 
     override val layoutId: Int
         get() = R.layout.layout_battery_warning
@@ -22,17 +21,8 @@ class WarningDialog(val callback:ConfirmDialog.OnConfirmOke,
         }
     }
 
-    fun setBatteryOrStorageType(isBattery: Boolean){
-        this.isBattery= isBattery
-    }
-
     override fun onStart() {
         super.onStart()
         dialog?.window?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        dismissCallback.onDismiss()
     }
 }
