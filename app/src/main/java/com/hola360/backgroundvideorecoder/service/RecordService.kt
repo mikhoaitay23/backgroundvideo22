@@ -8,13 +8,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.*
-import android.provider.MediaStore
 import android.util.Log
 import android.view.OrientationEventListener
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
-import com.hola360.backgroundvideorecoder.broadcastreciever.BatteryLevelReceiver
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.service.notification.RecordNotificationManager
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
@@ -24,9 +22,6 @@ import java.util.*
 
 class RecordService : Service() {
 
-    private val batteryLevelReceiver: BatteryLevelReceiver by lazy {
-        BatteryLevelReceiver()
-    }
     private val mRecordNotificationManager by lazy {
         RecordNotificationManager(this)
     }
@@ -104,10 +99,6 @@ class RecordService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val batteryFilter = IntentFilter().apply {
-            addAction(Intent.ACTION_BATTERY_LOW)
-        }
-        registerReceiver(batteryLevelReceiver, batteryFilter)
         mServiceManager = ServiceManager()
         recordStateLiveData.value = RecordState.None
         initReceiver()
@@ -151,8 +142,7 @@ class RecordService : Service() {
     fun startRecordVideo(videoOrientation:Int) {
         if (recordStateLiveData.value == RecordState.None || recordStateLiveData.value == RecordState.VideoSchedule) {
             mServiceManager!!.startRecord()
-            notificationTitle =
-                this.resources.getString(R.string.video_record_notification_title)
+            notificationTitle = this.resources.getString(R.string.video_record_notification_title)
             videoPreviewVideoWindow =
                 PreviewVideoWindow(this, videoOrientation, object : PreviewVideoWindow.RecordAction {
                     override fun onRecording(recordTime: Long) {
@@ -176,6 +166,7 @@ class RecordService : Service() {
                             notificationTitle,
                             notificationContent
                         )
+                        listener?.onStopped()
                         mRecordNotificationManager.notifyNewStatus(notification)
                         mServiceManager!!.stop()
                     }
@@ -366,8 +357,6 @@ class RecordService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(globalReceiver)
-        unregisterReceiver(batteryLevelReceiver)
-        Log.d("abcVideo", "Service killed")
     }
 
     enum class RecordState {
