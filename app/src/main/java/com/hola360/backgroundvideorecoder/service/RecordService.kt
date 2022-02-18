@@ -33,11 +33,11 @@ class RecordService : Service() {
     private var notificationContent: String = ""
     var mBinder = LocalBinder()
     private var videoPreviewVideoWindow: PreviewVideoWindow? = null
-    private var orientationAngle= 0
+    private var orientationAngle = 0
     private val orientationListener: OrientationEventListener by lazy {
-        object : OrientationEventListener(this){
+        object : OrientationEventListener(this) {
             override fun onOrientationChanged(orientation: Int) {
-                orientationAngle= orientation
+                orientationAngle = orientation
             }
         }
     }
@@ -50,12 +50,18 @@ class RecordService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private var mp3Name: String? = null
     var isRecordScheduleStart = false
+    var mTimeCheckStorage = 0L
     private val runnable = Runnable {
         time = time.plus(TIME_LOOP)
         mServiceManager!!.updateProgress(Utils.convertTime(time / 1000))
         listener?.onUpdateTime(if (!mp3Name.isNullOrEmpty()) mp3Name!! else "Audio Record", 0, time)
         nextLoop()
         stopAudioRecordByTime(time)
+        mTimeCheckStorage = mTimeCheckStorage.plus(TIME_LOOP)
+        if (mTimeCheckStorage == TIME_LOOP.times(120)) {
+            mTimeCheckStorage = 0L
+            checkStoragePercent()
+        }
     }
     private val generalSetting: SettingGeneralModel by lazy {
         VideoRecordUtils.getSettingGeneralModel(this)
@@ -135,7 +141,12 @@ class RecordService : Service() {
                             startRecordAudio()
                             isRecordScheduleStart = true
                         } else {
-                            startRecordVideo(VideoRecordUtils.getVideoRotation(this@RecordService, orientationAngle))
+                            startRecordVideo(
+                                VideoRecordUtils.getVideoRotation(
+                                    this@RecordService,
+                                    orientationAngle
+                                )
+                            )
                             time = System.currentTimeMillis()
                         }
                     }
@@ -144,51 +155,56 @@ class RecordService : Service() {
                         val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
                         val mBattery = level * 100 / scale
                         if (generalSetting.checkBattery && mBattery <= BATTERY_PERCENT_ALERT) {
-                            val state= recordStateLiveData.value
+                            val state = recordStateLiveData.value
                             if (state == RecordState.AudioRecording || state == RecordState.VideoRecording) {
                                 listener?.onBatteryLow()
                             }
                         }
                     }
                 }
+
             }
         }
-
     }
 
-    fun startRecordVideo(videoOrientation:Int) {
+    fun startRecordVideo(videoOrientation: Int) {
         if (recordStateLiveData.value == RecordState.None || recordStateLiveData.value == RecordState.VideoSchedule) {
             mServiceManager!!.startRecord()
-            notificationTitle = this.resources.getString(R.string.video_record_notification_title)
+            notificationTitle =
+                this.resources.getString(R.string.video_record_notification_title)
             videoPreviewVideoWindow =
-                PreviewVideoWindow(this, videoOrientation, object : PreviewVideoWindow.RecordAction {
-                    override fun onRecording(recordTime: Long) {
-                        if (recordStateLiveData.value == RecordState.VideoRecording) {
-                            listener?.onUpdateTime("", 0L, recordTime)
-                            notificationContent =
-                                VideoRecordUtils.generateRecordTime(recordTime)
+                PreviewVideoWindow(
+                    this,
+                    videoOrientation,
+                    object : PreviewVideoWindow.RecordAction {
+                        override fun onRecording(recordTime: Long) {
+                            if (recordStateLiveData.value == RecordState.VideoRecording) {
+                                listener?.onUpdateTime("", 0L, recordTime)
+                                notificationContent =
+                                    VideoRecordUtils.generateRecordTime(recordTime)
+                                val notification =
+                                    mRecordNotificationManager.getNotification(
+                                        notificationTitle,
+                                        notificationContent
+                                    )
+//                            checkStoragePercent()
+                                mRecordNotificationManager.notifyNewStatus(notification)
+                            }
+                        }
+
+                        override fun onFinishRecord() {
+                            notificationTitle =
+                                this@RecordService.resources.getString(R.string.video_record_complete_prefix)
+                            VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
                             val notification = mRecordNotificationManager.getNotification(
                                 notificationTitle,
                                 notificationContent
                             )
-//                            checkStoragePercent()
+                            listener?.onStopped()
                             mRecordNotificationManager.notifyNewStatus(notification)
+                            mServiceManager!!.stop()
                         }
-                    }
-
-                    override fun onFinishRecord() {
-                        notificationTitle =
-                            this@RecordService.resources.getString(R.string.video_record_complete_prefix)
-                        VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
-                        val notification = mRecordNotificationManager.getNotification(
-                            notificationTitle,
-                            notificationContent
-                        )
-                        listener?.onStopped()
-                        mRecordNotificationManager.notifyNewStatus(notification)
-                        mServiceManager!!.stop()
-                    }
-                })
+                    })
             videoPreviewVideoWindow!!.setupVideoConfiguration()
             videoPreviewVideoWindow!!.open()
             recordStateLiveData.value = RecordState.VideoRecording
@@ -352,11 +368,11 @@ class RecordService : Service() {
         mServiceManager!!.stop()
     }
 
-    private fun checkStoragePercent(){
-        if(generalSetting.checkStorage){
-            val percent= SystemUtils.checkStoragePercent(this, generalSetting.storageId)
+    private fun checkStoragePercent() {
+        if (generalSetting.checkStorage) {
+            val percent = SystemUtils.checkStoragePercent(this, generalSetting.storageId)
             Log.d("abcVideo", "Percent storage: $percent")
-            if(percent>=STORAGE_PERCENT_ALERT){
+            if (percent >= STORAGE_PERCENT_ALERT) {
                 listener?.onLowStorage()
             }
         }
@@ -384,8 +400,8 @@ class RecordService : Service() {
 
     companion object {
         const val TIME_LOOP = 500L
-        const val BATTERY_PERCENT_ALERT= 63
-        const val STORAGE_PERCENT_ALERT= 0.604
+        const val BATTERY_PERCENT_ALERT = 63
+        const val STORAGE_PERCENT_ALERT = 0.604
     }
 
     override fun onDestroy() {

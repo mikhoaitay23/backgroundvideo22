@@ -1,7 +1,6 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.bottomsheet
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import com.hola360.backgroundvideorecoder.MainActivity
@@ -15,9 +14,6 @@ import com.hola360.backgroundvideorecoder.ui.dialog.RecordAlertDialog
 import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.widget.AudioView
 import com.hola360.backgroundvideorecoder.widget.bottomsheet.confirm.ConfirmBottomSheetFragment
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.IntBuffer
 
 class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     BaseBottomSheetDialog<FragmentBottomSheetRecordAudioBinding>(), View.OnClickListener,
@@ -26,7 +22,7 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     private lateinit var viewModel: AudioRecordBottomSheetViewModel
     private lateinit var mainActivity: MainActivity
     private var confirmBottomSheetFragment: ConfirmBottomSheetFragment? = null
-    private var warningDialog: RecordAlertDialog? = null
+    private var mRecordAlertDialog: RecordAlertDialog? = null
 
     override fun getLayout() = R.layout.fragment_bottom_sheet_record_audio
 
@@ -101,13 +97,13 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     }
 
     override fun onBatteryLow() {
-        warningDialog = RecordAlertDialog(object : ConfirmDialog.OnConfirmOke {
+        mRecordAlertDialog = RecordAlertDialog(object : ConfirmDialog.OnConfirmOke {
             override fun onConfirm() {
                 mainActivity.recordService!!.stopRecording()
             }
         })
-        warningDialog!!.isBattery=true
-        warningDialog!!.show(requireActivity().supportFragmentManager, "DialogBatteryLow")
+        mRecordAlertDialog!!.isBattery=true
+        mRecordAlertDialog!!.show(requireActivity().supportFragmentManager, "DialogBatteryLow")
     }
 
     override fun onLowStorage() {
