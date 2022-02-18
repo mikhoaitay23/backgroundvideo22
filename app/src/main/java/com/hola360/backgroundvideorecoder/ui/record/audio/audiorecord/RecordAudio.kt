@@ -2,7 +2,6 @@ package com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord
 
 import android.Manifest
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
@@ -14,7 +13,6 @@ import com.hola360.backgroundvideorecoder.data.model.audio.AudioQuality
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordAudioBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
 import com.hola360.backgroundvideorecoder.ui.base.basefragment.BasePermissionRequestFragment
-import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.StorageUtils
