@@ -186,28 +186,29 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
             currentRecording!!.stop()
             currentRecording = null
         }
-        val mediaOutputs= VideoRecordUtils.generateMediaStoreOutput(context)
-        currentRecording = videoCapture.output
-            .prepareRecording(context, mediaOutputs)
-            .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
-            .start(mainThreadExecutor, captureListener)
-//        val file= generateOutputFilepath()!!.toRawFile(context)
-//        if(file != null){
-//            val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
-//
-//            currentRecording = videoCapture.output
-//                .prepareRecording(context, fileOutputOptions)
-//                .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
-//                .start(mainThreadExecutor, captureListener)
-//        }else{
-//            close()
-//            callback.onFinishRecord()
-//        }
+//        val mediaOutputs= VideoRecordUtils.generateMediaStoreOutput(context)
+//        currentRecording = videoCapture.output
+//            .prepareRecording(context, mediaOutputs)
+//            .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
+//            .start(mainThreadExecutor, captureListener)
+        val file= generateOutputFilepath()!!.toRawFile(context)
+        if(file != null){
+            val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
+
+            currentRecording = videoCapture.output
+                .prepareRecording(context, fileOutputOptions)
+                .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
+                .start(mainThreadExecutor, captureListener)
+        }else{
+            close()
+            callback.onFinishRecord()
+        }
     }
 
     private val captureListener = Consumer<VideoRecordEvent> { event ->
         when(event){
             is VideoRecordEvent.Start->{
+                callback.onStartNewInterval()
                 totalTimeRecord+= videoRecordConfiguration.timePerVideo
                 newInterval=true
             }
@@ -307,6 +308,8 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
     }
 
     interface RecordAction{
+        fun onStartNewInterval()
+
         fun onRecording(recordTime:Long)
 
         fun onFinishRecord()

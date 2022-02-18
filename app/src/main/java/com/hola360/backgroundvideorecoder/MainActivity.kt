@@ -15,6 +15,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import com.anggrayudi.storage.file.DocumentFileCompat
+import com.anggrayudi.storage.file.StorageId
+import com.anggrayudi.storage.file.getAbsolutePath
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
@@ -50,7 +53,11 @@ class MainActivity : AppCompatActivity() {
     private fun setParentPath() {
         val path = dataSharedPreferenceUtils!!.getParentPath()
         if (path == null || path == "") {
-            dataSharedPreferenceUtils!!.setParentPath(this.externalCacheDir!!.absolutePath)
+            val primaryStorage= DocumentFileCompat.fromSimplePath(this, StorageId.PRIMARY, "")
+            primaryStorage?.let {
+                val parentPath= it.getAbsolutePath(this)
+                dataSharedPreferenceUtils!!.setParentPath(parentPath)
+            }
         }
     }
 

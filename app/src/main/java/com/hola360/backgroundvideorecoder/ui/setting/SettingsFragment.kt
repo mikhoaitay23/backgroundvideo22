@@ -14,18 +14,14 @@ class SettingsFragment : BaseFragment<FragmentSettingBinding>() {
         resources.getString(R.string.setting_title)
     }
     override val menuCode: Int = 0
-    private val adapter: RecordViewPagerAdapter by lazy {
-        RecordViewPagerAdapter(childFragmentManager, lifecycle).apply {
-            updateFragment(RecordViewPagerAdapter.SETTING_PAGER)
-        }
-    }
 
     override fun initViewModel() {
-
     }
 
     override fun initView() {
-        binding!!.viewPager.adapter = adapter
+        binding!!.viewPager.adapter = RecordViewPagerAdapter(childFragmentManager, lifecycle).apply {
+            updateFragment(RecordViewPagerAdapter.SETTING_PAGER)
+        }
         binding!!.viewPager.registerOnPageChangeCallback(object :
             ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {

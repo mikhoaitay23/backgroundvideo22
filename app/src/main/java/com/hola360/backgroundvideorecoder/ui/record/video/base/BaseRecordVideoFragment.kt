@@ -235,22 +235,26 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
     abstract fun startAction()
 
     protected fun onLowBatteryAction(){
-        if(!showBatteryAlertDialog){
-            showBatteryAlertDialog=true
-            alertDialog.isBattery= true
-            alertDialog.show((requireActivity() as MainActivity).supportFragmentManager,
-                RecordVideo.ALERT_TAG
-            )
+        if((requireActivity() as MainActivity).supportFragmentManager.findFragmentByTag(RecordVideo.ALERT_TAG) == null){
+            if(!showBatteryAlertDialog){
+                showBatteryAlertDialog=true
+                alertDialog.isBattery= true
+                alertDialog.show((requireActivity() as MainActivity).supportFragmentManager,
+                    RecordVideo.ALERT_TAG
+                )
+            }
         }
     }
 
     protected fun onLowStorageAction(){
-        if(!showStorageAlertDialog){
-            showStorageAlertDialog=true
-            alertDialog.isBattery= false
-            alertDialog.show((requireActivity() as MainActivity).supportFragmentManager,
-                RecordVideo.ALERT_TAG
-            )
+        if((requireActivity() as MainActivity).supportFragmentManager.findFragmentByTag(RecordVideo.ALERT_TAG) == null){
+            if(!showStorageAlertDialog){
+                showStorageAlertDialog=true
+                alertDialog.isBattery= false
+                alertDialog.show((requireActivity() as MainActivity).supportFragmentManager,
+                    RecordVideo.ALERT_TAG
+                )
+            }
         }
     }
 

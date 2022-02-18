@@ -211,51 +211,6 @@ object VideoRecordUtils {
         }
     }
 
-    fun generateScheduleTime(context: Context):String{
-        val dataPref = SharedPreferenceUtils.getInstance(context)
-        val videoSchedule= Gson().fromJson(dataPref!!.getSchedule(), RecordSchedule::class.java)
-        val dateFormat= SimpleDateFormat(BindingUtils.DATE_FORMAT, Locale.getDefault())
-        val timeFormat= SimpleDateFormat(BindingUtils.TIME_FORMAT, Locale.getDefault())
-        val time= timeFormat.format(videoSchedule.scheduleTime)
-        val date= dateFormat.format(videoSchedule.scheduleTime)
-        return time.plus("  $date")
-    }
-
-    fun startRecordIntent(context: Context, status:Int) {
-        val intent=  Intent(context, RecordService::class.java).apply {
-            putExtra(Constants.RECORD_VIDEO_TYPE, true)
-            putExtra(Constants.VIDEO_STATUS, status)
-        }
-        context.startService(intent)
-    }
-
-    private fun getBroadcastPendingIntent(context: Context):PendingIntent{
-        val intent=  Intent(RecordNotificationManager.ACTION_RECORD_FROM_SCHEDULE).apply {
-            putExtra(Constants.SCHEDULE_TYPE, true)
-        }
-        return PendingIntent.getBroadcast(
-            context, ScheduleVideo.BROADCAST_INTENT_REQUEST_CODE,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-    }
-
-    fun setAlarmSchedule(context: Context, time: Long){
-        val alarmManager =
-            context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        if(SystemUtils.isAndroidO()){
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, getBroadcastPendingIntent(context))
-        }else{
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, getBroadcastPendingIntent(context))
-        }
-    }
-
-    fun cancelAlarmSchedule(context: Context){
-        val alarmManager =
-            context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.cancel(getBroadcastPendingIntent(context))
-    }
-
     fun checkScheduleWhenRecordStop(context: Context){
         val schedule= getVideoSchedule(context)
         if(schedule.scheduleTime != 0L && schedule.scheduleTime<  System.currentTimeMillis()){
