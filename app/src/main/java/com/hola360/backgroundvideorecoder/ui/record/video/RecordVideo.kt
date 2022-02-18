@@ -2,6 +2,7 @@ package com.hola360.backgroundvideorecoder.ui.record.video
 
 import android.os.Bundle
 import android.util.Log
+import android.view.OrientationEventListener
 import android.view.View
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
@@ -14,6 +15,14 @@ import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener, RecordService.Listener {
 
     override val layoutId: Int = R.layout.layout_record_video
+    private var orientationAngle= 0
+    private val orientationListener: OrientationEventListener by lazy {
+        object : OrientationEventListener(requireContext()){
+            override fun onOrientationChanged(orientation: Int) {
+                orientationAngle= orientation
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +38,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
                 }
             }
         }
+        orientationListener.enable()
     }
 
     override fun initView() {
@@ -108,7 +118,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
             if (recordSchedule!!.scheduleTime > 0L && System.currentTimeMillis() + videoConfiguration!!.totalTime > recordSchedule!!.scheduleTime) {
                 showCancelDialog()
             } else {
-                (requireActivity() as MainActivity).recordService!!.startRecordVideo()
+                (requireActivity() as MainActivity).recordService!!.startRecordVideo(VideoRecordUtils.getVideoRotation(requireContext(), orientationAngle))
             }
         } else {
             (requireActivity() as MainActivity).recordService!!.stopRecordVideo()
@@ -122,5 +132,10 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 
     override fun onCancelSchedule() {
         cancelSchedule()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        orientationListener.disable()
     }
 }

@@ -31,7 +31,7 @@ import com.hola360.backgroundvideorecoder.utils.*
 import java.util.*
 
 @SuppressLint("InflateParams", "ClickableViewAccessibility")
-class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
+class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val callback:RecordAction) {
 
     private var view: View?= null
     private var windowManager: WindowManager?= null
@@ -160,7 +160,7 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
             .setQualitySelector(qualitySelector)
             .build()
         videoCapture = VideoCapture.withOutput(recorder)
-//        videoCapture.targetRotation= getVideoRotation()
+        videoCapture.targetRotation= videoOrientation
 
         try {
             cameraProvider.unbindAll()
@@ -176,38 +176,6 @@ class PreviewVideoWindow(val context: Context, val callback:RecordAction) {
         } catch (exc: Exception) {
             // we are on main thread, let's reset the controls on the UI.
             Log.e("CameraTest", "Use case binding failed", exc)
-        }
-    }
-
-    private fun getVideoRotation():Int{
-        return when(videoRecordConfiguration.videoOrientation){
-            0->{
-                if(MainActivity.SCREEN_ORIENTATION== Configuration.ORIENTATION_PORTRAIT){
-                    Surface.ROTATION_0
-                    Log.d("abcVideo", "Rotate auto 0 ")
-                }else{
-                    Surface.ROTATION_180
-                    Log.d("abcVideo", "Rorate auto 90 ")
-                }
-            }
-            1->{
-                if(MainActivity.SCREEN_ORIENTATION== Configuration.ORIENTATION_PORTRAIT){
-                    Surface.ROTATION_0
-                    Log.d("abcVideo", "Rotate portrait 0 ")
-                }else{
-                    Surface.ROTATION_180
-                    Log.d("abcVideo", "Rotate portrait 180 ")
-                }
-            }
-            else->{
-                if(MainActivity.SCREEN_ORIENTATION== Configuration.ORIENTATION_LANDSCAPE){
-                    Surface.ROTATION_0
-                    Log.d("abcVideo", "Rotate landscape 90 ")
-                }else{
-                    Surface.ROTATION_90
-                    Log.d("abcVideo", "Rotate landscape 0 ")
-                }
-            }
         }
     }
 

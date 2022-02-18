@@ -7,6 +7,8 @@ import android.content.ServiceConnection
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
+import android.view.OrientationEventListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
@@ -133,15 +135,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        SCREEN_ORIENTATION = newConfig.orientation
-    }
-
     companion object {
         var SCREEN_WIDTH: Int = 0
         var SCREEN_HEIGHT: Int = 0
-        var SCREEN_ORIENTATION:Int= Configuration.ORIENTATION_PORTRAIT
         const val PRIVACY = "privacy"
         const val RECORD_VIDEO_LOW_BATTERY = 5
     }

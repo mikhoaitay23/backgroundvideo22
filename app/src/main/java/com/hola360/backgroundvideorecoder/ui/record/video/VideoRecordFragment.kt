@@ -36,7 +36,7 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
     }
 
     override fun initView() {
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+//        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
         binding!!.viewPager.adapter= adapter
         binding!!.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
@@ -60,7 +60,7 @@ class VideoRecordFragment: BaseFragment<FragmentVideoRecordBinding>() {
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onDestroy() {
         super.onDestroy()
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+//        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         (requireActivity() as MainActivity).recordService!!.updatePreviewVideoParams(false)
     }
 }
