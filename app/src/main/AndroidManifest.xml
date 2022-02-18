@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-feature android:name="android.hardware.camera2.full" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission
@@ -29,7 +30,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Background_Video_Record">
 
-        <receiver android:name=".broadcastreciever.ListenRecordScheduleBroadcast"/>
         <receiver android:name=".broadcastreciever.BatteryLevelReceiver"
             android:exported="false">
             <intent-filter>

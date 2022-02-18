@@ -100,6 +100,10 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
 
     }
 
+    override fun onBatteryLow(batteryPer: Float) {
+
+    }
+
     override fun onStopped() {
     }
 

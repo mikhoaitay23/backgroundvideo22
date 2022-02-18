@@ -78,7 +78,8 @@ class SoundRecorder(
                         AudioQuality.obtainQuality(audioModel.quality).toInt(),
                         if (audioModel.mode == AudioMode.MONO)
                             AudioFormat.CHANNEL_IN_MONO
-                        else AudioFormat.CHANNEL_IN_STEREO,
+                        else
+                            AudioFormat.CHANNEL_IN_STEREO,
                         AudioFormat.ENCODING_PCM_16BIT
                     )
                     if (minBufferSize < 0) {
@@ -94,7 +95,7 @@ class SoundRecorder(
                         AudioFormat.ENCODING_PCM_16BIT,
                         minBufferSize * 2
                     )
-//                    Utils.adjustAudio(context, audioModel.isMuted)
+                    Utils.adjustAudio(context, audioModel.isMuted)
 
                     // PCM buffer size (5sec)
                     val buffer =

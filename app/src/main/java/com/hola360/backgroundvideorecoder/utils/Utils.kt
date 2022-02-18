@@ -190,30 +190,34 @@ object Utils {
     }
 
     fun adjustAudio(context: Context, setMute: Boolean) {
-        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
         if (setMute) {
-            audioManager?.ringerMode = AudioManager.RINGER_MODE_SILENT
-        } else {
-            audioManager?.ringerMode = AudioManager.RINGER_MODE_NORMAL
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+            val currentMode = audioManager?.ringerMode
+            if (currentMode != AudioManager.RINGER_MODE_SILENT) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    val adJustMute: Int = if (setMute) {
+                        AudioManager.ADJUST_MUTE
+                    } else {
+                        AudioManager.ADJUST_UNMUTE
+                    }
+                    audioManager!!.adjustStreamVolume(
+                        AudioManager.STREAM_NOTIFICATION,
+                        adJustMute,
+                        0
+                    )
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, adJustMute, 0)
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, adJustMute, 0)
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_RING, adJustMute, 0)
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, adJustMute, 0)
+                } else {
+                    audioManager!!.setStreamMute(AudioManager.STREAM_NOTIFICATION, setMute)
+                    audioManager.setStreamMute(AudioManager.STREAM_ALARM, setMute)
+                    audioManager.setStreamMute(AudioManager.STREAM_MUSIC, setMute)
+                    audioManager.setStreamMute(AudioManager.STREAM_RING, setMute)
+                    audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, setMute)
+                }
+            }
         }
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            val adJustMute: Int = if (setMute) {
-//                AudioManager.ADJUST_MUTE
-//            } else {
-//                AudioManager.ADJUST_UNMUTE
-//            }
-//            audioManager!!.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, adJustMute, 0)
-//            audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, adJustMute, 0)
-//            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, adJustMute, 0)
-//            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, adJustMute, 0)
-//            audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, adJustMute, 0)
-//        } else {
-//            audioManager!!.setStreamMute(AudioManager.STREAM_NOTIFICATION, setMute)
-//            audioManager.setStreamMute(AudioManager.STREAM_ALARM, setMute)
-//            audioManager.setStreamMute(AudioManager.STREAM_MUSIC, setMute)
-//            audioManager.setStreamMute(AudioManager.STREAM_RING, setMute)
-//            audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, setMute)
-//        }
     }
 
 }

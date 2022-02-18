@@ -7,7 +7,6 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import com.anggrayudi.storage.file.getAbsolutePath
-import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
@@ -18,11 +17,10 @@ import com.hola360.backgroundvideorecoder.ui.base.basefragment.BasePermissionReq
 import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.ui.dialog.RecordVideoDurationDialog
+import com.hola360.backgroundvideorecoder.ui.dialog.WarningDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.StorageUtils
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
-import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
-import com.hola360.backgroundvideorecoder.ui.record.audio.audioschedule.ScheduleAudio
 import com.hola360.backgroundvideorecoder.ui.record.audio.bottomsheet.AudioRecordBottomSheetFragment
 import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
@@ -37,19 +35,6 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
     private lateinit var viewModel: RecordAudioViewModel
     private var showBottomSheet = false
     private var isShow = false
-
-    private val confirmCancelSchedule: ConfirmDialog by lazy {
-        ConfirmDialog(object : ConfirmDialog.OnConfirmOke {
-            override fun onConfirm() {
-                mainActivity.recordService!!.cancelAlarmSchedule(requireContext(), false)
-            }
-        }, object : OnDialogDismiss {
-            override fun onDismiss() {
-
-            }
-
-        })
-    }
 
     override val layoutId: Int = R.layout.layout_record_audio
     override val showToolbar: Boolean = true
@@ -274,6 +259,10 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
     }
 
     override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {
+
+    }
+
+    override fun onBatteryLow(batteryPer: Float) {
 
     }
 

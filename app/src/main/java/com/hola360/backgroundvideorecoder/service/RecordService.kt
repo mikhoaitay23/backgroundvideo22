@@ -110,6 +110,7 @@ class RecordService : Service() {
         val intentFilter = IntentFilter()
         intentFilter.addAction(RecordNotificationManager.ACTION_STOP)
         intentFilter.addAction(RecordNotificationManager.ACTION_RECORD_FROM_SCHEDULE)
+        intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED)
         registerReceiver(globalReceiver, intentFilter)
     }
 
@@ -128,6 +129,16 @@ class RecordService : Service() {
                         } else {
                             startRecordVideo()
                             time = System.currentTimeMillis()
+                        }
+                    }
+                    Intent.ACTION_BATTERY_CHANGED -> {
+                        val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+                        val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+                        val mBattery = level * 100 / scale.toFloat()
+                        if (mBattery == BATTERY_LOW) {
+                            if (recordStateLiveData.value == RecordState.AudioRecording) {
+                                listener?.onBatteryLow(mBattery)
+                            }
                         }
                     }
                 }
@@ -344,10 +355,13 @@ class RecordService : Service() {
         fun onStopped()
 
         fun onByteBuffer(buf: ShortArray?, minBufferSize: Int)
+
+        fun onBatteryLow(batteryPer: Float)
     }
 
     companion object {
         const val TIME_LOOP = 500L
+        const val BATTERY_LOW = 20F
     }
 
     override fun onDestroy() {

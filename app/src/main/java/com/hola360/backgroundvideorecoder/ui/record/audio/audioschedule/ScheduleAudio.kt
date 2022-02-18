@@ -283,4 +283,8 @@ class ScheduleAudio : BaseRecordPageFragment<LayoutScheduleAudioBinding>(), View
     override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {
 
     }
+
+    override fun onBatteryLow(batteryPer: Float) {
+
+    }
 }
