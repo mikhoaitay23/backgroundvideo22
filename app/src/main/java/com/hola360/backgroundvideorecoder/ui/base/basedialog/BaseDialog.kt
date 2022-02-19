@@ -1,5 +1,6 @@
 package com.hola360.backgroundvideorecoder.ui.base.basedialog
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
+import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 
 
@@ -14,10 +16,12 @@ abstract class BaseDialog<V: ViewDataBinding?>: DialogFragment() {
 
     protected var binding: V?= null
     protected abstract val layoutId: Int
+    protected lateinit var mainActivity:Activity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.CustomBottomSheetDialogTheme)
+        mainActivity= (requireActivity() as MainActivity)
     }
 
     override fun onCreateView(

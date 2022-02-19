@@ -7,6 +7,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
 import com.hola360.backgroundvideorecoder.MainActivity
+import com.hola360.backgroundvideorecoder.R
 
 
 abstract class BaseDialogFragment<V : ViewDataBinding> : DialogFragment() {
@@ -17,6 +18,7 @@ abstract class BaseDialogFragment<V : ViewDataBinding> : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.CustomBottomSheetDialogTheme)
         mainActivity = (requireActivity() as MainActivity)
         initViewModel()
     }

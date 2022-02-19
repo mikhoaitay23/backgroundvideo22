@@ -13,6 +13,7 @@ import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.popup.ActionAdapt
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.popup.ListActionPopup
 
 import android.view.KeyEvent
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +21,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.documentfile.provider.DocumentFile
 import com.anggrayudi.storage.file.getAbsolutePath
 import com.anggrayudi.storage.file.inSdCardStorage
+import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.data.response.DataResponse
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.base.BaseDialogFragment
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.pickfolder.adapter.BrowserPathAdapter
@@ -27,18 +29,20 @@ import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.pickfolder.adapte
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.app.App
 import com.hola360.backgroundvideorecoder.databinding.LayoutPickFolderDialogBinding
+import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.StorageUtils
 import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.FilePickerUtils
 import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import java.io.File
 
 
-class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
+class PickFolderDialog : BaseDialog<LayoutPickFolderDialogBinding>(),
     BrowserPathAdapter.OnPathClickListener, ActionAdapter.OnActionClickListener {
     private lateinit var mViewModel: PickFolderViewModel
     private var mAdapter: FileAdapter? = null
     private val browserPathAdapter = BrowserPathAdapter()
-    private val listActionPopup by lazy { ListActionPopup(mainActivity) }
+    private val listActionPopup by lazy {
+        ListActionPopup((requireActivity() as MainActivity)) }
     private var smoothScroller: RecyclerView.SmoothScroller? = null
     var mOnPickPathResultListener: OnPickPathResultListener? = null
 
@@ -52,7 +56,7 @@ class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
         })
 
         browserPathAdapter.onPathClickListener = this
-
+        initViewModel()
     }
 
     private fun itemClick(position: Int, cFile: File) {
@@ -64,9 +68,8 @@ class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
         }
     }
 
-    override fun getLayout(): Int {
-        return R.layout.layout_pick_folder_dialog
-    }
+    override val layoutId: Int
+        get() = R.layout.layout_pick_folder_dialog
 
     override fun initView() {
         binding!!.recycleView.apply {
@@ -77,7 +80,7 @@ class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
             setHasFixedSize(true)
             adapter = browserPathAdapter
         }
-        mDialog!!.setOnKeyListener { dialog, keyCode, event ->
+        dialog?.setOnKeyListener { dialog, keyCode, event ->
             if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
                 if (listActionPopup.isShowing()) {
                     listActionPopup.dismiss()
@@ -108,7 +111,7 @@ class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
             }
         }
 
-        mDialog!!.setCancelable(false)
+        dialog?.setCancelable(false)
         isCancelable = false
         binding!!.viewModel = mViewModel
         mViewModel.initStorage()
@@ -119,7 +122,7 @@ class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
         return mViewModel.storageBrowserModel!!.getCurDocumentationFile(mainActivity)
     }
 
-    override fun initViewModel() {
+    private fun initViewModel() {
 
         val factory = PickFolderViewModel.Factory(
             mainActivity.application as App
@@ -184,6 +187,13 @@ class PickFolderDialog : BaseDialogFragment<LayoutPickFolderDialogBinding>(),
         binding!!.recycleViewPath.layoutManager!!.startSmoothScroll(smoothScroller);
     }
 
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        )
+    }
 
     companion object {
         fun create(): PickFolderDialog {

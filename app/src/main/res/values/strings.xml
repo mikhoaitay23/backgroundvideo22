@@ -152,6 +152,7 @@
     <string name="internal_storage">internal storage</string>
     <string name="sd_card">SD Card</string>
     <string name="save_to">Save to</string>
+    <string name="use_this_folder">Use this folder</string>
     <string name="title_dialog_permission_sdcard">Permission to operate SD Card</string>
     <string name="msg_giant_sd_card">You must perform the certain steps to grant SD Card access rights</string>
 
