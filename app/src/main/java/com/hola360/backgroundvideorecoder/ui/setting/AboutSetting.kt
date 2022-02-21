@@ -1,7 +1,10 @@
 package com.hola360.backgroundvideorecoder.ui.setting
 
+import android.content.Intent
+import android.net.Uri
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.NavMainGraphDirections
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutSettingAboutBinding
@@ -33,14 +36,23 @@ class AboutSetting : BaseRecordPageFragment<LayoutSettingAboutBinding>(), View.O
                 findNavController().navigate(NavMainGraphDirections.actionToNavPrivacy(false))
             }
             binding!!.btnContactUs -> {
-
+                contactUs()
             }
             binding!!.btnRateUs -> {
-
+                (requireActivity() as MainActivity).showToast(getString(R.string.coming_soon))
             }
             binding!!.btnShareApp -> {
-
+                (requireActivity() as MainActivity).showToast(getString(R.string.coming_soon))
             }
         }
+    }
+
+    private fun contactUs() {
+        val intent = Intent(Intent.ACTION_SENDTO)
+        intent.data = Uri.parse("mailto:")
+        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.extra_email)))
+        intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.extra_subject))
+        intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.extra_text))
+        startActivity(Intent.createChooser(intent, "Send Email using: "))
     }
 }

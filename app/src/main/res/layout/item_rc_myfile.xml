@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/dp_8">
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/imgRecord"
+            android:layout_width="@dimen/dp_48"
+            android:layout_height="@dimen/dp_48"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/img_default_photo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:riv_corner_radius_bottom_left="@dimen/dp_8"
+            app:riv_corner_radius_bottom_right="@dimen/dp_8"
+            app:riv_corner_radius_top_left="@dimen/dp_8"
+            app:riv_corner_radius_top_right="@dimen/dp_8" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/mLayoutInfoRecord"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/dp_8"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnOption"
+            app:layout_constraintStart_toEndOf="@id/imgRecord"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceBody1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/tvName"
+                android:textColor="@color/md_grey_500" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/tvName"
+                android:textColor="@color/md_grey_500" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnOption"
+            android:layout_width="@dimen/dp_32"
+            android:layout_height="@dimen/dp_32"
+            android:layout_gravity="center_vertical"
+            android:tint="@color/md_grey_800"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/mLayoutInfoRecord"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_option" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/dp_8"
+            android:background="@color/md_grey_400"
+            app:layout_constraintEnd_toEndOf="@id/btnOption"
+            app:layout_constraintStart_toStartOf="@id/mLayoutInfoRecord"
+            app:layout_constraintTop_toBottomOf="@id/mLayoutInfoRecord" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
