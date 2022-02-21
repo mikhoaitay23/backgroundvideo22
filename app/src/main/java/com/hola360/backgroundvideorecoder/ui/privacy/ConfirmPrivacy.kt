@@ -28,6 +28,10 @@ class ConfirmPrivacy: BaseFragment<FragmentConfirmPrivacyBinding>() {
         binding!!.agree.setOnClickListener {
             dataPref!!.putBooleanValue(MainActivity.PRIVACY, true)
             findNavController().popBackStack()
+//            val passcode= dataPref!!.getPasscode() ?: ""
+//            if(passcode != ""){
+//                findNavController().navigate(NavMainGraphDirections.actionToNavAppLock(true))
+//            }
         }
         binding!!.close.setOnClickListener {
             requireActivity().finish()

@@ -109,7 +109,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     }
 
     override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {
-
     }
 
     override fun onBatteryLow() {

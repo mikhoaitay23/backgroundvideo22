@@ -48,9 +48,7 @@
                         android:id="@+id/storageSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/record_switch_height"
-                        android:checked="@{setting.checkStorage}"
-                        android:thumb="@drawable/bg_switch_thumb"
-                        app:track="@drawable/bg_switch" />
+                        android:checked="@{setting.checkStorage}" />
 
                 </LinearLayout>
 
@@ -84,9 +82,7 @@
                         android:id="@+id/batterySwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/record_switch_height"
-                        android:checked="@{setting.checkBattery}"
-                        android:thumb="@drawable/bg_switch_thumb"
-                        app:track="@drawable/bg_switch" />
+                        android:checked="@{setting.checkBattery}"/>
 
                 </LinearLayout>
 
@@ -119,10 +115,7 @@
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/appLockSwitch"
                         android:layout_width="wrap_content"
-                        android:layout_height="@dimen/record_switch_height"
-                        android:checked="@{setting.appLock}"
-                        android:thumb="@drawable/bg_switch_thumb"
-                        app:track="@drawable/bg_switch" />
+                        android:layout_height="@dimen/record_switch_height"/>
 
                 </LinearLayout>
 

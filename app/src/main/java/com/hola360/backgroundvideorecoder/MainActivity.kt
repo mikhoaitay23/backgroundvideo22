@@ -4,13 +4,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
-import android.util.Log
-import android.view.OrientationEventListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -18,14 +15,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import com.anggrayudi.storage.file.DocumentFileCompat
-import com.anggrayudi.storage.file.StorageId
-import com.anggrayudi.storage.file.getAbsolutePath
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
+import com.hola360.backgroundvideorecoder.ui.setting.applock.AppLockFragment
 import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.ToastUtils
@@ -43,7 +38,6 @@ class MainActivity : AppCompatActivity() {
     private var dataSharedPreferenceUtils: SharedPreferenceUtils? = null
     var audioModel: AudioModel? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -51,20 +45,8 @@ class MainActivity : AppCompatActivity() {
         dataSharedPreferenceUtils = SharedPreferenceUtils.getInstance(this)
         setupNavigation()
         setupToolbar()
-        setupPrivacy()
         bindService()
-        setParentPath()
-    }
-
-    private fun setParentPath() {
-        val path = dataSharedPreferenceUtils!!.getParentPath()
-        if (path == null || path == "") {
-            val primaryStorage= DocumentFileCompat.fromSimplePath(this, StorageId.PRIMARY, "")
-            primaryStorage?.let {
-                val parentPath= it.getAbsolutePath(this)
-                dataSharedPreferenceUtils!!.setParentPath(parentPath)
-            }
-        }
+        setupPrivacyAndAppLock()
     }
 
     override fun onResume() {
@@ -92,10 +74,14 @@ class MainActivity : AppCompatActivity() {
         SCREEN_HEIGHT = SystemUtils.getScreenHeight(this)
     }
 
-    private fun setupPrivacy() {
-        val dataPref = SharedPreferenceUtils.getInstance(this)
-        if (!dataPref!!.getBooleanValue(PRIVACY)) {
+    private fun setupPrivacyAndAppLock() {
+        if (!dataSharedPreferenceUtils!!.getBooleanValue(PRIVACY)) {
             navController!!.navigate(R.id.nav_confirm_privacy)
+        }else{
+            val passcode= dataSharedPreferenceUtils!!.getPasscode() ?: ""
+            if(passcode != ""){
+                navController!!.navigate(NavMainGraphDirections.actionToNavAppLock(AppLockFragment.LOGIN_MODE))
+            }
         }
     }
 
@@ -155,7 +141,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindService() {
         val intent = Intent(this, RecordService::class.java)
-        startService(intent)
+//        startService(intent)
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
     }
 
@@ -171,10 +157,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        val fragment= navHostFragment!!.childFragmentManager.fragments[0]
+        if(fragment!= null){
+            if(fragment is AppLockFragment){
+                if(fragment.type == AppLockFragment.LOGIN_MODE){
+                    finish()
+                }
+            }else{
+                super.onBackPressed()
+            }
+        }else{
+            super.onBackPressed()
+        }
+    }
+
     companion object {
         var SCREEN_WIDTH: Int = 0
         var SCREEN_HEIGHT: Int = 0
         const val PRIVACY = "privacy"
-        const val RECORD_VIDEO_LOW_BATTERY = 5
     }
 }

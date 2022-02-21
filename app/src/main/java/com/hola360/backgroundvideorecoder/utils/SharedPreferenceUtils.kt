@@ -96,6 +96,14 @@ class SharedPreferenceUtils private constructor(context: Context) {
         return getStringValue("key_sdcard")
     }
 
+    fun putPasscode(value: String){
+        putStringValue("Login_passcode", value)
+    }
+
+    fun getPasscode():String?{
+        return getStringValue("Login_passcode")
+    }
+
     companion object {
         const val PREFERENCE_NAME = "FakeLive_pref"
         private var instance: SharedPreferenceUtils? = null

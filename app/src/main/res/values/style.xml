@@ -222,6 +222,32 @@
         <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
 
+    <style name="AppLockLayout1">
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <style name="AppLockLayout2">
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:paddingTop">@dimen/app_lock_btn_padding</item>
+        <item name="android:paddingBottom">@dimen/app_lock_btn_padding</item>
+        <item name="android:paddingStart">@dimen/app_lock_btn_padding</item>
+        <item name="android:paddingEnd">@dimen/app_lock_btn_padding</item>
+    </style>
+
+    <style name="AppLockBtnText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@drawable/bg_applock_btn</item>
+        <item name="android:textSize">48dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
     <style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/AppModalStyle</item>
     </style>

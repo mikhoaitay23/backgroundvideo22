@@ -30,13 +30,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Background_Video_Record">
 
-        <receiver android:name=".broadcastreciever.BatteryLevelReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BATTERY_LOW"/>
-            </intent-filter>
-        </receiver>
-
         <service
             android:name=".service.RecordService"
             android:enabled="true"
