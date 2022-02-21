@@ -28,6 +28,8 @@ import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleO
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import com.hola360.backgroundvideorecoder.utils.*
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.util.*
 
 @SuppressLint("InflateParams", "ClickableViewAccessibility")
@@ -182,15 +184,11 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
     @SuppressLint("MissingPermission")
     private fun startRecording() {
         // configure Recorder and Start recording to the mediaStoreOutput.
-        if(currentRecording!= null){
+        if(currentRecording!= null) {
             currentRecording!!.stop()
             currentRecording = null
         }
-//        val mediaOutputs= VideoRecordUtils.generateMediaStoreOutput(context)
-//        currentRecording = videoCapture.output
-//            .prepareRecording(context, mediaOutputs)
-//            .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
-//            .start(mainThreadExecutor, captureListener)
+
         val file= generateOutputFilepath()!!.toRawFile(context)
         if(file != null){
             val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
@@ -226,6 +224,10 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
                         newInterval=false
                     }
                 }
+            }
+            is VideoRecordEvent.Finalize->{
+                Log.d("abcVideo", "Error: ${event.error}")
+                Log.d("abcVideo", "Error: ${event.cause}")
             }
         }
     }

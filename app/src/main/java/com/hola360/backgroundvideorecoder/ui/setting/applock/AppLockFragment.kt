@@ -15,7 +15,7 @@ class AppLockFragment: BaseFragment<FragmentAppLockBinding>(), View.OnClickListe
     override val showToolbar: Boolean= false
     override val toolbarTitle: String= ""
     override val menuCode: Int= 0
-    private val type: Int by lazy {
+    val type: Int by lazy {
         AppLockFragmentArgs.fromBundle(requireArguments()).type
     }
     private val passCode:String by lazy {

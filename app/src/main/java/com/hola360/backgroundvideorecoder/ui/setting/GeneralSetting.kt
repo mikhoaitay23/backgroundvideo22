@@ -98,9 +98,6 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
                 }else{
                     findNavController().navigate(NavMainGraphDirections.actionToNavAppLock(AppLockFragment.CREATE_MODE))
                 }
-//                binding!!.appLockSwitch.isChecked= !binding!!.appLockSwitch.isChecked
-//                generalSetting.appLock= !generalSetting.appLock
-//                updateDataAndUI()
             }
             R.id.storagePath->{
                 if (FilePickerUtils.storagePermissionGrant(requireContext())) {

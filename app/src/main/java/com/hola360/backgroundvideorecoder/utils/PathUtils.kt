@@ -14,6 +14,9 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
+import com.anggrayudi.storage.file.DocumentFileCompat
+import com.anggrayudi.storage.file.StorageId
+import com.anggrayudi.storage.file.getAbsolutePath
 
 
 object PathUtils {
@@ -126,5 +129,17 @@ object PathUtils {
      */
     private fun isMediaDocument(uri: Uri): Boolean {
         return "com.android.providers.media.documents" == uri.getAuthority()
+    }
+
+    fun setParentPath(context: Context){
+        val dataPref= SharedPreferenceUtils.getInstance(context)
+        val path = dataPref!!.getParentPath()
+        if (path == null || path == "") {
+            val primaryStorage= DocumentFileCompat.fromSimplePath(context, StorageId.PRIMARY, "")
+            primaryStorage?.let {
+                val parentPath= it.getAbsolutePath(context)
+                dataPref.setParentPath(parentPath)
+            }
+        }
     }
 }

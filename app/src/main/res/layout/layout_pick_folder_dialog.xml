@@ -47,10 +47,11 @@
                 android:id="@+id/myButtonCancel"
                 android:layout_width="@dimen/item_file_icon_in_pick"
                 android:layout_height="@dimen/item_file_icon_in_pick"
+                android:padding="@dimen/home_v_padding"
                 android:src="@drawable/ic_close"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_margin="@dimen/home_v_padding"/>
+                android:layout_marginEnd="@dimen/home_v_padding"/>
 
             <LinearLayout
                 android:id="@+id/pathLayout"

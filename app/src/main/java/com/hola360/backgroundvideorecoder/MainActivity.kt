@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
     private var dataSharedPreferenceUtils: SharedPreferenceUtils? = null
     var audioModel: AudioModel? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -44,19 +43,7 @@ class MainActivity : AppCompatActivity() {
         setupNavigation()
         setupToolbar()
         bindService()
-        setParentPath()
         setupPrivacyAndAppLock()
-    }
-
-    private fun setParentPath() {
-        val path = dataSharedPreferenceUtils!!.getParentPath()
-        if (path == null || path == "") {
-            val primaryStorage= DocumentFileCompat.fromSimplePath(this, StorageId.PRIMARY, "")
-            primaryStorage?.let {
-                val parentPath= it.getAbsolutePath(this)
-                dataSharedPreferenceUtils!!.setParentPath(parentPath)
-            }
-        }
     }
 
     override fun onResume() {
@@ -144,10 +131,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        val fragment= navHostFragment!!.childFragmentManager.fragments[0]
+        if(fragment!= null){
+            if(fragment is AppLockFragment){
+                if(fragment.type == AppLockFragment.LOGIN_MODE){
+                    finish()
+                }
+            }else{
+                super.onBackPressed()
+            }
+        }else{
+            super.onBackPressed()
+        }
+    }
+
     companion object {
         var SCREEN_WIDTH: Int = 0
         var SCREEN_HEIGHT: Int = 0
         const val PRIVACY = "privacy"
-        const val RECORD_VIDEO_LOW_BATTERY = 5
     }
 }

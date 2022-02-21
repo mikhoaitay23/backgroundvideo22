@@ -8,6 +8,9 @@ import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.databinding.ViewDataBinding
+import com.anggrayudi.storage.file.DocumentFileCompat
+import com.anggrayudi.storage.file.StorageId
+import com.anggrayudi.storage.file.getAbsolutePath
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
@@ -21,6 +24,7 @@ import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.utils.Constants
+import com.hola360.backgroundvideorecoder.utils.PathUtils
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
@@ -74,9 +78,9 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
     protected var switchThumb: Int = 0
     protected var showDialog = false
     protected var isRecording = false
-    protected var showBatteryAlertDialog=false
-    protected var showStorageAlertDialog=false
-    protected val alertDialog: RecordAlertDialog by lazy {
+    private var showBatteryAlertDialog=false
+    private var showStorageAlertDialog=false
+    private val alertDialog: RecordAlertDialog by lazy {
         RecordAlertDialog(object : ConfirmDialog.OnConfirmOke{
             override fun onConfirm() {
                 if((requireActivity() as MainActivity).recordService!!.getRecordState().value == RecordService.RecordState.VideoRecording){
@@ -161,14 +165,14 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         videoConfiguration!!.previewMode = !videoConfiguration!!.previewMode
         applyNewVideoConfiguration()
         saveNewVideoConfiguration()
-        if (SystemUtils.isAndroidO() && videoConfiguration!!.previewMode) {
+        if (SystemUtils.isAndroidM() && videoConfiguration!!.previewMode) {
             requestOverlayPermission()
         }
     }
 
     protected fun checkPreviewMode(){
         if (videoConfiguration!!.previewMode) {
-            if (SystemUtils.isAndroidO() && !Settings.canDrawOverlays(requireContext())) {
+            if (SystemUtils.isAndroidM() && !Settings.canDrawOverlays(requireContext())) {
                 videoConfiguration!!.previewMode = false
                 applyNewVideoConfiguration()
                 saveNewVideoConfiguration()
@@ -196,11 +200,12 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         }
     }
 
-    protected val requestCameraPermission = registerForActivityResult(
+    private val requestCameraPermission = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result: Map<String?, Boolean?>? ->
         if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
-            if (SystemUtils.isAndroidO() &&!Settings.canDrawOverlays(requireContext())) {
+            PathUtils.setParentPath(requireContext())
+            if (SystemUtils.isAndroidM() &&!Settings.canDrawOverlays(requireContext())) {
                 requestOverlayPermission()
             } else {
                 startAction()
