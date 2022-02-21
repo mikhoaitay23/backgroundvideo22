@@ -4,11 +4,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
-import android.view.OrientationEventListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
@@ -22,6 +19,7 @@ import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
+import com.hola360.backgroundvideorecoder.ui.setting.applock.AppLockFragment
 import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.ToastUtils
@@ -45,9 +43,9 @@ class MainActivity : AppCompatActivity() {
         dataSharedPreferenceUtils = SharedPreferenceUtils.getInstance(this)
         setupNavigation()
         setupToolbar()
-        setupPrivacy()
         bindService()
         setParentPath()
+        setupPrivacyAndAppLock()
     }
 
     private fun setParentPath() {
@@ -86,10 +84,14 @@ class MainActivity : AppCompatActivity() {
         SCREEN_HEIGHT = SystemUtils.getScreenHeight(this)
     }
 
-    private fun setupPrivacy() {
-        val dataPref = SharedPreferenceUtils.getInstance(this)
-        if (!dataPref!!.getBooleanValue(PRIVACY)) {
+    private fun setupPrivacyAndAppLock() {
+        if (!dataSharedPreferenceUtils!!.getBooleanValue(PRIVACY)) {
             navController!!.navigate(R.id.nav_confirm_privacy)
+        }else{
+            val passcode= dataSharedPreferenceUtils!!.getPasscode() ?: ""
+            if(passcode != ""){
+                navController!!.navigate(NavMainGraphDirections.actionToNavAppLock(AppLockFragment.LOGIN_MODE))
+            }
         }
     }
 
@@ -126,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindService() {
         val intent = Intent(this, RecordService::class.java)
-        startService(intent)
+//        startService(intent)
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
     }
 

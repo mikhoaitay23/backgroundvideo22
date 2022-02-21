@@ -11,8 +11,10 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
+import com.hola360.backgroundvideorecoder.NavMainGraphDirections
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutSettingGeneralBinding
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
@@ -21,6 +23,7 @@ import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.FilePickerU
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
+import com.hola360.backgroundvideorecoder.ui.setting.applock.AppLockFragment
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
@@ -52,6 +55,7 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
             showDialog= false
         }
     }
+    private var passcode:String= ""
 
     override fun initView() {
         binding!!.setting= generalSetting
@@ -61,12 +65,19 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
         binding!!.appLock.setOnClickListener(this)
         binding!!.storagePath.setOnClickListener(this)
         binding!!.notificationLevel.setOnClickListener(this)
-        binding!!.storageSwitch.isEnabled=false
-        binding!!.batterySwitch.isEnabled=false
-        binding!!.appLockSwitch.isEnabled= false
     }
 
     override fun initViewModel() {
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding!!.appLockSwitch.isChecked= hasPasscode()
+    }
+
+    private fun hasPasscode():Boolean{
+        passcode= dataPref!!.getPasscode() ?: ""
+        return passcode != ""
     }
 
     override fun onClick(v: View?) {
@@ -82,9 +93,14 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
                 updateDataAndUI()
             }
             R.id.appLock->{
-                binding!!.appLockSwitch.isChecked= !binding!!.appLockSwitch.isChecked
-                generalSetting.appLock= !generalSetting.appLock
-                updateDataAndUI()
+                if(binding!!.appLockSwitch.isChecked){
+                    findNavController().navigate(NavMainGraphDirections.actionToNavAppLock(AppLockFragment.DELETE_MODE))
+                }else{
+                    findNavController().navigate(NavMainGraphDirections.actionToNavAppLock(AppLockFragment.CREATE_MODE))
+                }
+//                binding!!.appLockSwitch.isChecked= !binding!!.appLockSwitch.isChecked
+//                generalSetting.appLock= !generalSetting.appLock
+//                updateDataAndUI()
             }
             R.id.storagePath->{
                 if (FilePickerUtils.storagePermissionGrant(requireContext())) {

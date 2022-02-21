@@ -211,4 +211,48 @@ object BindingUtils {
         }
     }
 
+    @BindingAdapter("android:appLockIndicatorOne")
+    @JvmStatic
+    fun appLockIndicatorOne(imageView: ImageView, indicatorNumber:Int) {
+        val srcId= if((indicatorNumber in 1..4) || (indicatorNumber in 6..9)){
+            R.drawable.app_lock_item_select
+        }else{
+            R.drawable.app_lock_item_unselect
+        }
+        imageView.setImageResource(srcId)
+    }
+
+    @BindingAdapter("android:appLockIndicatorTwo")
+    @JvmStatic
+    fun appLockIndicatorTwo(imageView: ImageView, indicatorNumber:Int) {
+        val srcId= if((indicatorNumber in 2..4) || (indicatorNumber in 7..9)){
+            R.drawable.app_lock_item_select
+        }else{
+            R.drawable.app_lock_item_unselect
+        }
+        imageView.setImageResource(srcId)
+    }
+
+    @BindingAdapter("android:appLockIndicatorThree")
+    @JvmStatic
+    fun appLockIndicatorThree(imageView: ImageView, indicatorNumber:Int) {
+        val srcId= if((indicatorNumber in 3..4) || (indicatorNumber in 8..9)){
+            R.drawable.app_lock_item_select
+        }else{
+            R.drawable.app_lock_item_unselect
+        }
+        imageView.setImageResource(srcId)
+    }
+
+    @BindingAdapter("android:appLockIndicatorFour")
+    @JvmStatic
+    fun appLockIndicatorFour(imageView: ImageView, indicatorNumber:Int) {
+        val srcId= if((indicatorNumber ==4) || (indicatorNumber == 9)){
+            R.drawable.app_lock_item_select
+        }else{
+            R.drawable.app_lock_item_unselect
+        }
+        imageView.setImageResource(srcId)
+    }
+
 }

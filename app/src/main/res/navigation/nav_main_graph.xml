@@ -49,6 +49,22 @@
         android:id="@+id/nav_my_file"
         android:name="com.hola360.backgroundvideorecoder.ui.myfile.MyFileFragment"
         tools:layout="@layout/fragment_my_file" />
+    <fragment
+        android:id="@+id/nav_app_lock"
+        android:name="com.hola360.backgroundvideorecoder.ui.setting.applock.AppLockFragment"
+        tools:layout="@layout/fragment_app_lock" >
+        <argument
+            android:name="type"
+            app:argType="integer" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_to_nav_app_lock"
+        app:destination="@id/nav_app_lock"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"/>
 
 
 </navigation>
