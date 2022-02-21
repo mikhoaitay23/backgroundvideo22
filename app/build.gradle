@@ -102,6 +102,9 @@ dependencies {
 
     //storage
     implementation "com.anggrayudi:storage:0.13.0"
+
+    //Sectioned recyclerview adapter
+    implementation 'com.github.luizgrp:SectionedRecyclerViewAdapter:v3.2.0'
 }
 repositories {
     mavenCentral()

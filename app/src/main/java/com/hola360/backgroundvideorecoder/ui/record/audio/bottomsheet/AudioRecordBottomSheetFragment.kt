@@ -1,6 +1,7 @@
 package com.hola360.backgroundvideorecoder.ui.record.audio.bottomsheet
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import com.hola360.backgroundvideorecoder.MainActivity
@@ -102,11 +103,18 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
                 mainActivity.recordService!!.stopRecording()
             }
         })
-        mRecordAlertDialog!!.isBattery=true
+        mRecordAlertDialog!!.isBattery = true
         mRecordAlertDialog!!.show(requireActivity().supportFragmentManager, "DialogBatteryLow")
     }
 
     override fun onLowStorage() {
+        mRecordAlertDialog = RecordAlertDialog(object : ConfirmDialog.OnConfirmOke {
+            override fun onConfirm() {
+                mainActivity.recordService!!.stopRecording()
+            }
+        })
+        mRecordAlertDialog!!.isBattery = false
+        mRecordAlertDialog!!.show(requireActivity().supportFragmentManager, "DialogBatteryLow")
     }
 
     override fun onPositiveClick() {

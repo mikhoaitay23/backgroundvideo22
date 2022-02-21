@@ -3,11 +3,78 @@
 
     <data>
 
+        <variable
+            name="position"
+            type="Integer" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/record_bottom_pager_height"
+            android:background="@color/colorAccent"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/mLayoutVideo"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imgRecord"
+                    android:layout_width="@dimen/dp_30"
+                    android:layout_height="@dimen/dp_30"
+                    android:pagerIconTint="@{position==0}"
+                    android:src="@drawable/ic_video_record" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvRecord"
+                    style="@style/TextPager"
+                    android:text="@string/video"
+                    android:textAllCaps="true"
+                    android:textColor="@{position==1?@color/bg_page_un_select:@color/md_white_1000}" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/mLayoutAudio"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imgSchedule"
+                    android:layout_width="@dimen/dp_30"
+                    android:layout_height="@dimen/dp_30"
+                    android:pagerIconTint="@{position==1}"
+                    android:src="@drawable/ic_micro" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvSchedule"
+                    style="@style/TextPager"
+                    android:text="@string/audio"
+                    android:textAllCaps="true"
+                    android:textColor="@{position==0?@color/bg_page_un_select:@color/md_white_1000}" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </LinearLayout>
 </layout>

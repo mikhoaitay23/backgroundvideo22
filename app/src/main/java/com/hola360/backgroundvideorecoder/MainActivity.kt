@@ -4,17 +4,18 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
+import android.provider.Settings
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import com.anggrayudi.storage.file.DocumentFileCompat
-import com.anggrayudi.storage.file.StorageId
-import com.anggrayudi.storage.file.getAbsolutePath
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
@@ -23,7 +24,9 @@ import com.hola360.backgroundvideorecoder.ui.setting.applock.AppLockFragment
 import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.ToastUtils
+import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.widget.Toolbar
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -96,6 +99,29 @@ class MainActivity : AppCompatActivity() {
 
     fun showToolbarMenu(menuCode: Int) {
         binding?.toolbar?.showToolbarMenu(menuCode)
+    }
+
+    fun showAlertPermissionNotGrant(){
+        if (!SystemUtils.hasShowRequestPermissionRationale(this, *Utils.getStoragePermissions())
+        ) {
+            val snackBar = Snackbar.make(
+                mLayoutRoot,
+                resources.getString(R.string.goto_settings),
+                Snackbar.LENGTH_LONG
+            )
+            snackBar.setAction(
+                resources.getString(R.string.settings)
+            ) {
+                val intent = Intent()
+                intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                val uri: Uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+            snackBar.show()
+        } else {
+            Toast.makeText(this, getString(R.string.grant_permission), Toast.LENGTH_SHORT).show()
+        }
     }
 
     private val mConnection: ServiceConnection = object : ServiceConnection {

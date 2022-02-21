@@ -102,7 +102,7 @@
     <string name="date">Date</string>
     <string name="time">Time</string>
     <string name="set_schedule">Set Schedule</string>
-    
+
     <array name="record_quality">
         <item>@string/high</item>
         <item>@string/medium</item>
@@ -175,5 +175,14 @@
     <string name="rate_us_describe">You are worth for the application</string>
     <string name="share_app">Share app</string>
     <string name="share_app_with_friend">Share app with friend</string>
+    <string name="coming_soon">Coming soon!</string>
+    <string name="extra_email">trieuvn91@gmail.com</string>
+    <string name="extra_subject">Feedback on using the application</string>
+    <string name="extra_text">Hi! Developer. In the process of using the application, I have comments about the application:</string>
+
+    //My file
+    <string name="video">Video</string>
+    <string name="audio">Audio</string>
+    <string name="empty_file">There\'s nothing here.</string>
 
 </resources>

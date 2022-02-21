@@ -220,4 +220,12 @@ object Utils {
         }
     }
 
+    fun getStoragePermissions(): Array<String> {
+        return if (isAndroidQ()) {
+            Constants.STORAGE_PERMISSION_STORAGE_SCOPE
+        } else {
+            Constants.STORAGE_PERMISSION_UNDER_STORAGE_SCOPE
+        }
+    }
+
 }
