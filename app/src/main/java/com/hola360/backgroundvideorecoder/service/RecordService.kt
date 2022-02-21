@@ -204,6 +204,7 @@ class RecordService : Service() {
                             listener?.onStopped()
                             mRecordNotificationManager.notifyNewStatus(notification)
                             mServiceManager!!.stop()
+                            videoPreviewVideoWindow = null
                         }
                     })
                 videoPreviewVideoWindow!!.setupVideoConfiguration()

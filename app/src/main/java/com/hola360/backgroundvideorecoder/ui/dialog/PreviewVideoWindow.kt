@@ -192,7 +192,6 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
         val file= generateOutputFilepath()!!.toRawFile(context)
         if(file != null){
             val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
-
             currentRecording = videoCapture.output
                 .prepareRecording(context, fileOutputOptions)
                 .apply { if (videoRecordConfiguration.sound) withAudioEnabled() }
@@ -220,7 +219,12 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
                 if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.timePerVideo-INTERVAL_TIME_ADJUST){
                     if(newInterval){
                         stopRecording()
-                        startRecording()
+                        if(videoRecordConfiguration.totalTime- (totalTimeRecord+ videoRecordConfiguration.timePerVideo)>1000){
+                            startRecording()
+                        }else{
+                            close()
+                            callback.onFinishRecord()
+                        }
                         newInterval=false
                     }
                 }

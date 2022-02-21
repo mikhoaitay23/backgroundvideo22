@@ -49,7 +49,7 @@
 
     //app lock
     <dimen name="app_lock_cancel_icon_height">40dp</dimen>
-    <dimen name="app_lock_indicator_height">25dp</dimen>
+    <dimen name="app_lock_indicator_height">20dp</dimen>
     <dimen name="app_lock_btn_padding">10dp</dimen>
 
 </resources>
