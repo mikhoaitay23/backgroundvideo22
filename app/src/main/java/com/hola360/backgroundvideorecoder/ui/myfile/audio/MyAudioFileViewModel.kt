@@ -1,52 +1,55 @@
 package com.hola360.backgroundvideorecoder.ui.myfile.audio
 
 import android.app.Application
-import android.net.Uri
-import android.util.Log
-import androidx.core.net.toUri
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.anggrayudi.storage.file.toRawFile
 import com.hola360.backgroundvideorecoder.data.model.LoadDataStatus
-import com.hola360.backgroundvideorecoder.data.model.media.AudioFile
 import com.hola360.backgroundvideorecoder.data.repository.BackgroundRecordRepository
 import com.hola360.backgroundvideorecoder.data.response.DataResponse
+import com.hola360.backgroundvideorecoder.utils.Configurations
 import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
+import com.hola360.backgroundvideorecoder.utils.Utils
 import kotlinx.coroutines.launch
 import java.io.File
 
 class MyAudioFileViewModel(val application: Application) : ViewModel() {
 
     private val repository = BackgroundRecordRepository(application)
-    private val audioFiles = mutableListOf<AudioFile>()
-    val mediaFileLiveData = MutableLiveData<DataResponse<MutableList<AudioFile>>>()
+    val allFileLiveData = MutableLiveData<DataResponse<MutableList<File>>>()
 
     init {
-        mediaFileLiveData.value = DataResponse.DataEmptyResponse()
+        allFileLiveData.value = DataResponse.DataEmptyResponse()
     }
 
-    fun loadAudios() {
-        if (mediaFileLiveData.value!!.loadDataStatus != LoadDataStatus.LOADING) {
-            mediaFileLiveData.value = DataResponse.DataLoadingResponse()
+    val isEmpty: LiveData<Boolean> = Transformations.map(allFileLiveData) {
+        allFileLiveData.value!!.loadDataStatus == LoadDataStatus.ERROR
+    }
+
+    fun fetch() {
+        if (allFileLiveData.value!!.loadDataStatus != LoadDataStatus.LOADING) {
+            allFileLiveData.value = DataResponse.DataLoadingResponse()
             viewModelScope.launch {
-                val file = File(
-                    SharedPreferenceUtils.getInstance(
-                        application
-                    )?.getParentPath()!!
-                )
-                val uri = Uri.fromFile(file)
-                audioFiles.clear()
-                audioFiles.add(AudioFile(null, null, null, 0, 0))
-                audioFiles.addAll(repository.getAllAudio())
-                if (audioFiles.isNotEmpty()) {
-                    mediaFileLiveData.value = DataResponse.DataSuccessResponse(audioFiles)
-                } else {
-                    mediaFileLiveData.value = DataResponse.DataErrorResponse()
+                val curPath =
+                    SharedPreferenceUtils.getInstance(application)?.getParentPath().plus("/")
+                        .plus(Configurations.RECORD_PATH).plus("/")
+                        .plus(Configurations.RECORD_AUDIO_PATH)
+                if (curPath != null) {
+                    val documentFile = Utils.getDocumentFile(application, curPath)
+                    if (documentFile != null) {
+                        val file = documentFile.toRawFile(application)
+                        val list = repository.getAllFileOnly(file!!)
+                        if (!list.isNullOrEmpty()) {
+                            allFileLiveData.value =
+                                DataResponse.DataSuccessResponse(list.toMutableList())
+                        } else {
+                            allFileLiveData.value = DataResponse.DataErrorResponse()
+                        }
+                    } else {
+                        allFileLiveData.value = DataResponse.DataErrorResponse()
+                    }
                 }
             }
         }
-
     }
 
     class Factory(private val application: Application) :

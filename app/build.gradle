@@ -105,6 +105,9 @@ dependencies {
 
     //Sectioned recyclerview adapter
     implementation 'com.github.luizgrp:SectionedRecyclerViewAdapter:v3.2.0'
+
+    //Rounded image
+    implementation 'com.joooonho:selectableroundedimageview:1.0.1'
 }
 repositories {
     mavenCentral()

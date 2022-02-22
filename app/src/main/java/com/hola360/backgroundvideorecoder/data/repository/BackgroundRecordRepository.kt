@@ -1,11 +1,10 @@
 package com.hola360.backgroundvideorecoder.data.repository
 
 import android.app.Application
-import android.net.Uri
-import com.hola360.backgroundvideorecoder.data.model.media.AudioFile
-import com.hola360.backgroundvideorecoder.utils.Loader
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.MyFileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class BackgroundRecordRepository(val application: Application) {
 
@@ -13,7 +12,7 @@ class BackgroundRecordRepository(val application: Application) {
 
     }
 
-    suspend fun getAllAudio(): MutableList<AudioFile> = withContext(Dispatchers.IO) {
-        Loader.getAudios(application)
+    suspend fun getAllFileOnly(file: File): MutableList<File> = withContext(Dispatchers.IO) {
+        MyFileUtil.getAllFileOnly(file)
     }
 }

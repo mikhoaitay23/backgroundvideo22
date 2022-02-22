@@ -184,5 +184,13 @@
     <string name="video">Video</string>
     <string name="audio">Audio</string>
     <string name="empty_file">There\'s nothing here.</string>
+    <string name="duration_size_my_file">%s - %s</string>
+    <string name="today">Today</string>
+    <string name="audio_mime_type">audio/mpeg</string>
+    <string name="select">Select</string>
+    <string name="open_with">Open with</string>
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
 
 </resources>

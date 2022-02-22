@@ -12,19 +12,19 @@
         android:orientation="horizontal"
         android:padding="@dimen/dp_8">
 
-        <com.makeramen.roundedimageview.RoundedImageView
+        <com.joooonho.SelectableRoundedImageView
             android:id="@+id/imgRecord"
             android:layout_width="@dimen/dp_48"
             android:layout_height="@dimen/dp_48"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/img_default_photo"
+            android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:riv_corner_radius_bottom_left="@dimen/dp_8"
-            app:riv_corner_radius_bottom_right="@dimen/dp_8"
-            app:riv_corner_radius_top_left="@dimen/dp_8"
-            app:riv_corner_radius_top_right="@dimen/dp_8" />
+            app:sriv_left_bottom_corner_radius="@dimen/dp_8"
+            app:sriv_left_top_corner_radius="@dimen/dp_8"
+            app:sriv_right_bottom_corner_radius="@dimen/dp_8"
+            app:sriv_right_top_corner_radius="@dimen/dp_8" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/mLayoutInfoRecord"
@@ -39,17 +39,22 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:lines="1"
+                android:singleLine="true"
                 android:textAppearance="?textAppearanceBody1" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@id/tvName"
                 android:textColor="@color/md_grey_500" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDateTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@id/tvName"
@@ -67,6 +72,15 @@
             app:layout_constraintStart_toEndOf="@id/mLayoutInfoRecord"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_option" />
+
+        <RadioButton
+            android:id="@+id/btnSelect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@id/btnOption"
+            app:layout_constraintStart_toStartOf="@id/btnOption"
+            app:layout_constraintTop_toTopOf="@id/btnOption" />
 
         <View
             android:layout_width="0dp"

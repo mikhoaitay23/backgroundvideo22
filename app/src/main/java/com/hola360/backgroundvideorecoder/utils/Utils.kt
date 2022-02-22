@@ -6,13 +6,13 @@ import android.content.Context
 import android.content.UriPermission
 import android.content.pm.PackageManager
 import android.media.AudioManager
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.documentfile.provider.DocumentFile
 import com.anggrayudi.storage.file.inSdCardStorage
 import com.google.android.material.snackbar.Snackbar
@@ -20,6 +20,8 @@ import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import java.io.File
+import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.util.*
 import kotlin.math.ln
 import kotlin.math.pow
@@ -228,4 +230,84 @@ object Utils {
         }
     }
 
+    fun groupDataIntoHashMap(
+        context: Context,
+        files: List<File>
+    ): LinkedHashMap<String, MutableSet<File>?>? {
+        val groupedHashMap: LinkedHashMap<String, MutableSet<File>?> = LinkedHashMap()
+        var list: MutableSet<File>?
+        for (file in files) {
+            val mDate =
+                if (DateTimeUtils.getDateMyFileFlag(Calendar.getInstance().timeInMillis) == DateTimeUtils.getDateMyFileFlag(
+                        file.lastModified()
+                    )
+                ) {
+                    context.getString(R.string.today)
+                } else {
+                    DateTimeUtils.getDateMyFileFlag(file.lastModified())
+                }
+            if (groupedHashMap.containsKey(mDate)) {
+                groupedHashMap[mDate]!!.add(file)
+            } else {
+                // The key is not there in the HashMap; create a new key-value pair
+                list = LinkedHashSet()
+                list.add(file)
+                groupedHashMap[mDate.toString()] = list
+            }
+        }
+        //Generate list from map
+        return groupedHashMap
+    }
+
+    fun getDuration(file: File): String? {
+        val mediaMetadataRetriever = MediaMetadataRetriever()
+        mediaMetadataRetriever.setDataSource(file.absolutePath)
+        val durationStr =
+            mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        return formatMilliSecond(durationStr!!.toLong())
+    }
+
+    private fun formatMilliSecond(milliseconds: Long): String? {
+        var finalTimerString = ""
+        var secondsString = ""
+
+        val hours = (milliseconds / (1000 * 60 * 60)).toInt()
+        val minutes = (milliseconds % (1000 * 60 * 60)).toInt() / (1000 * 60)
+        val seconds = (milliseconds % (1000 * 60 * 60) % (1000 * 60) / 1000).toInt()
+
+        if (hours > 0) {
+            finalTimerString = "$hours:"
+        }
+
+        secondsString = if (seconds < 10) {
+            "0$seconds"
+        } else {
+            "" + seconds
+        }
+        finalTimerString = "$finalTimerString$minutes:$secondsString"
+
+        return finalTimerString
+    }
+
+    fun getFileSize(file: File): String {
+        val df = NumberFormat.getNumberInstance(Locale.US) as DecimalFormat
+        df.applyPattern("0.00")
+
+        val sizeKb = 1024.0f
+        val sizeMb = sizeKb * sizeKb
+        val sizeGb = sizeMb * sizeKb
+        val sizeTerra = sizeGb * sizeKb
+
+
+        return when {
+            file.length() < sizeMb -> df.format(file.length() / sizeKb)
+                .toString() + " Kb"
+            file.length() < sizeGb -> df.format(file.length() / sizeMb)
+                .toString() + " Mb"
+            file.length() < sizeTerra -> df.format(file.length() / sizeGb)
+                .toString() + " Gb"
+            else -> ""
+        }
+
+    }
 }
