@@ -167,6 +167,7 @@
     <string name="use_this_folder">Use this folder</string>
     <string name="title_dialog_permission_sdcard">Permission to operate SD Card</string>
     <string name="msg_giant_sd_card">You must perform the certain steps to grant SD Card access rights</string>
+    <string name="unable_create_viewmodel">Unable create ViewModel</string>
 
     //Setting
     <string name="privacy_policy_describe">A privacy policy is a statement or legal document</string>

@@ -13,7 +13,10 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
 import androidx.core.content.res.ResourcesCompat
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LifecycleOwner
+import com.anggrayudi.storage.file.findFolder
+import com.anggrayudi.storage.file.getAbsolutePath
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
@@ -241,5 +244,33 @@ object VideoRecordUtils {
 
     private fun isPortrait(orientationAngle:Int):Boolean{
         return !((orientationAngle in 46..134) || (orientationAngle in 226..314))
+    }
+
+    fun generateOutputFilepath(context: Context, videoFileName:String): DocumentFile?{
+        val parentPath = SharedPreferenceUtils.getInstance(context)?.getParentPath()
+        val rootParentDocFile = Utils.getDocumentFile(context, parentPath!!)
+        return if (rootParentDocFile != null && rootParentDocFile.exists()) {
+            try {
+                var parentRecordDocFile = rootParentDocFile.findFile(Configurations.RECORD_PATH)
+                if (parentRecordDocFile == null || !parentRecordDocFile.exists()) {
+                    parentRecordDocFile =
+                        rootParentDocFile.createDirectory(Configurations.RECORD_PATH)
+                }
+                var videoFolderDoc =
+                    parentRecordDocFile!!.findFolder(Configurations.RECORD_VIDEO_PATH)
+                if (videoFolderDoc == null || !videoFolderDoc.exists()) {
+                    videoFolderDoc =
+                        parentRecordDocFile.createDirectory(Configurations.RECORD_VIDEO_PATH)
+                }
+                val mimeType = "video/mp4"
+                videoFolderDoc =
+                    Utils.getDocumentFile(context, videoFolderDoc!!.getAbsolutePath(context))
+                videoFolderDoc!!.createFile(mimeType, videoFileName)
+            } catch (ex: Exception) {
+                null
+            }
+        } else {
+            null
+        }
     }
 }

@@ -13,6 +13,9 @@ import android.text.SpannableString
 import android.util.Log
 import android.view.OrientationEventListener
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelProvider
+import com.anggrayudi.storage.extension.launchOnUiThread
+import com.anggrayudi.storage.file.StorageId
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
@@ -21,6 +24,8 @@ import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.SoundRecorder
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import com.hola360.backgroundvideorecoder.utils.*
+import kotlinx.coroutines.*
+import java.lang.Runnable
 import java.util.*
 
 class RecordService : Service() {
@@ -177,7 +182,7 @@ class RecordService : Service() {
                 videoPreviewVideoWindow =
                     PreviewVideoWindow(
                         this,
-                        videoOrientation,
+                        videoOrientation, generalSetting.storageId== StorageId.PRIMARY,
                         object : PreviewVideoWindow.RecordAction {
                             override fun onStartNewInterval() {
                                 checkStoragePercent()
@@ -191,6 +196,14 @@ class RecordService : Service() {
                                         notificationTitle, notificationContent, true, generalSetting.notificationImportance
                                     )
                                     mRecordNotificationManager.notifyNewStatus(notification)
+                                }
+                            }
+
+                            override fun onFinishInterval(filePath: String, videoFileName:String) {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    launch {
+
+                                    }
                                 }
                             }
 

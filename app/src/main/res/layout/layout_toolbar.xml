@@ -37,5 +37,11 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"/>
 
+        <ImageView
+            android:visibility="@{menuCode==1? View.VISIBLE: View.GONE}"
+            android:layout_gravity="center"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+
     </LinearLayout>
 </layout>

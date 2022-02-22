@@ -14,9 +14,6 @@ import androidx.camera.video.*
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
-import androidx.documentfile.provider.DocumentFile
-import com.anggrayudi.storage.file.findFolder
-import com.anggrayudi.storage.file.getAbsolutePath
 import com.anggrayudi.storage.file.toRawFile
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
@@ -24,10 +21,11 @@ import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.utils.*
+import java.io.File
 import java.util.*
 
 @SuppressLint("InflateParams", "ClickableViewAccessibility")
-class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val callback:RecordAction) {
+class PreviewVideoWindow(val context: Context, private val videoOrientation:Int, val isInternalStorage:Boolean, val callback:RecordAction) {
 
     private var view: View?= null
     private var windowManager: WindowManager?= null
@@ -49,6 +47,8 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
     private lateinit var videoRecordConfiguration: VideoRecordConfiguration
     private var totalTimeRecord:Long= 0
     private var newInterval=false
+    private var videoFileName:String=""
+    private var tempFilePath:String?= null
 
     init {
         windowManager= context.getSystemService(WINDOW_SERVICE) as WindowManager
@@ -78,38 +78,6 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         } else {
             WindowManager.LayoutParams.TYPE_PHONE
-        }
-    }
-
-    private fun generateOutputFilepath():DocumentFile?{
-        val parentPath = SharedPreferenceUtils.getInstance(context)?.getParentPath()
-        val rootParentDocFile = Utils.getDocumentFile(context, parentPath!!)
-        return if (rootParentDocFile != null && rootParentDocFile.exists()) {
-            try {
-                var parentRecordDocFile = rootParentDocFile.findFile(Configurations.RECORD_PATH)
-                if (parentRecordDocFile == null || !parentRecordDocFile.exists()) {
-                    parentRecordDocFile =
-                        rootParentDocFile.createDirectory(Configurations.RECORD_PATH)
-                }
-                var videoFolderDoc =
-                    parentRecordDocFile!!.findFolder(Configurations.RECORD_VIDEO_PATH)
-                if (videoFolderDoc == null || !videoFolderDoc.exists()) {
-                    videoFolderDoc =
-                        parentRecordDocFile.createDirectory(Configurations.RECORD_VIDEO_PATH)
-                }
-                val mimeType = "video/mp4"
-                videoFolderDoc =
-                    Utils.getDocumentFile(context, videoFolderDoc!!.getAbsolutePath(context))
-                val videoFileName = String.format(
-                    Configurations.TEMPLATE_VIDEO_FILE_NAME,
-                    DateTimeUtils.getFullDate(Date().time)
-                )
-                videoFolderDoc!!.createFile(mimeType, videoFileName)
-            } catch (ex: Exception) {
-                 null
-            }
-        } else {
-             null
         }
     }
 
@@ -182,8 +150,18 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
             currentRecording!!.stop()
             currentRecording = null
         }
-
-        val file= generateOutputFilepath()!!.toRawFile(context)
+        videoFileName = String.format(
+            Configurations.TEMPLATE_VIDEO_FILE_NAME,
+            DateTimeUtils.getFullDate(Date().time)
+        )
+        val file=if(isInternalStorage){
+            VideoRecordUtils.generateOutputFilepath(context, videoFileName)!!.toRawFile(context)
+        }else{
+            File(context.cacheDir, videoFileName)
+        }
+        if(!isInternalStorage){
+            tempFilePath= file?.absolutePath
+        }
         if(file != null){
             val fileOutputOptions= VideoRecordUtils.generateFileOutput(file)
             currentRecording = videoCapture.output
@@ -207,6 +185,7 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
                 callback.onRecording(totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000)
                 if(videoRecordConfiguration.totalTime!= 0L &&
                     totalTimeRecord+ event.recordingStats.recordedDurationNanos/1000000> videoRecordConfiguration.totalTime){
+                    stopRecording()
                     close()
                     callback.onFinishRecord()
                 }
@@ -234,12 +213,14 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
         if (currentRecording == null || recordingState is VideoRecordEvent.Finalize) {
             return
         }
-        val recording = currentRecording
-        if (recording != null) {
-            recording.stop()
-            currentRecording = null
-            recordingState= null
+        currentRecording!!.stop()
+        currentRecording = null
+        recordingState= null
+        tempFilePath?.let {
+
         }
+        callback.onFinishInterval(tempFilePath?:"", videoFileName)
+        tempFilePath=null
     }
 
     fun updateLayoutParams(visibility:Boolean){
@@ -311,6 +292,8 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
         fun onStartNewInterval()
 
         fun onRecording(recordTime:Long)
+
+        fun onFinishInterval(filePath:String, videoFileName:String)
 
         fun onFinishRecord()
     }
