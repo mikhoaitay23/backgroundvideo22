@@ -5,8 +5,8 @@
     <data>
 
         <variable
-            name="isLoading"
-            type="boolean" />
+            name="viewModel"
+            type="com.hola360.backgroundvideorecoder.ui.myfile.video.MyVideoFileViewModel" />
 
         <import type="android.view.View" />
     </data>
@@ -19,20 +19,23 @@
             android:id="@+id/rcMyVideoFile"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerInParent="true" />
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         <ProgressBar
+            android:id="@+id/mProgressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="@{isLoading?View.VISIBLE:View.GONE}" />
+            android:layout_centerInParent="true" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="@{viewModel.isEmpty()?View.VISIBLE:View.GONE}">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"

@@ -20,6 +20,17 @@ object MyFileUtil {
         return filesList
     }
 
+    fun getAllFileOnly(file: File): MutableList<File> {
+        val fileList = mutableListOf<File>()
+
+        if (!file.listFiles().isNullOrEmpty()) {
+            fileList.addAll(file.listFiles()!!.filter {
+                !it.isHidden && it.isFile
+            })
+        }
+        return fileList
+    }
+
     private fun getMimeType(cFile: File): String =
         MimeTypeMap.getSingleton().getMimeTypeFromExtension(cFile.extension)
             ?.lowercase()

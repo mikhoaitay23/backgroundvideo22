@@ -257,4 +257,8 @@
         <item name="android:background">@drawable/bg_bottom_sheet</item>
     </style>
 
+    <style name="PopupMenuTheme" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textSize">18dp</item>
+    </style>
+
 </resources>
