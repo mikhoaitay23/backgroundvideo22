@@ -21,6 +21,7 @@
             android:layout_height="30dp"/>
 
         <TextView
+            android:id="@+id/titlePrefix"
             android:textSize="16dp"
             android:text="@string/video_record_notification_prefix"
             android:fontFamily="@font/roboto_medium"

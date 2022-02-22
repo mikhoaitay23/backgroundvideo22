@@ -82,8 +82,14 @@ class RecordNotificationManager(private val mService: RecordService) {
         }else{
             ContextCompat.getDrawable(mService, R.drawable.ic_micro)
         }
+        val titlePrefix= if(isVideo){
+            mService.getString(R.string.video_record_notification_prefix)
+        }else{
+            mService.getString(R.string.audio_record_notification_prefix)
+        }
         val bitmap= drawable?.toBitmap( drawable.intrinsicWidth.coerceAtLeast(1),  drawable.intrinsicHeight.coerceAtLeast(1), null)
         return RemoteViews(mService.packageName, R.layout.layout_custom_notification).apply {
+            setTextViewText(R.id.titlePrefix, titlePrefix)
             setTextViewText(R.id.des, des)
             setTextViewText(R.id.title, title)
             setImageViewBitmap(R.id.icon, bitmap)

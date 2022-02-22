@@ -296,6 +296,7 @@ class RecordService : Service() {
             })
             time = 0
             recordStateLiveData.value = RecordState.AudioRecording
+            notificationTitle = this.resources.getString(R.string.audio_record_notification_title)
             mSoundRecorder!!.start()
             showStorageAlertDialog=false
             showBatteryAlertDialog=false
