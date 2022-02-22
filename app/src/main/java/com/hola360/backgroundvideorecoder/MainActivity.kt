@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -27,6 +28,7 @@ import com.hola360.backgroundvideorecoder.utils.ToastUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
 import com.hola360.backgroundvideorecoder.widget.Toolbar
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.layout_toolbar.view.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,7 +38,6 @@ class MainActivity : AppCompatActivity() {
     var recordService: RecordService? = null
     var isBound = false
     private var dataSharedPreferenceUtils: SharedPreferenceUtils? = null
-    var audioModel: AudioModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,15 +48,6 @@ class MainActivity : AppCompatActivity() {
         setupToolbar()
         bindService()
         setupPrivacyAndAppLock()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        audioModel = if (!dataSharedPreferenceUtils!!.getAudioConfig().isNullOrEmpty()) {
-            Gson().fromJson(dataSharedPreferenceUtils!!.getAudioConfig(), AudioModel::class.java)
-        } else {
-            AudioModel()
-        }
     }
 
     private fun setupNavigation() {
@@ -70,6 +62,12 @@ class MainActivity : AppCompatActivity() {
                 navController?.popBackStack()
             }
         })
+        binding!!.toolbar.btnOption.setOnClickListener {
+
+        }
+        binding!!.toolbar.btnSearch.setOnClickListener {
+
+        }
         SCREEN_WIDTH = SystemUtils.getScreenWidth(this)
         SCREEN_HEIGHT = SystemUtils.getScreenHeight(this)
     }
