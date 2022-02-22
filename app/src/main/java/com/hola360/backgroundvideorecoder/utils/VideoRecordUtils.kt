@@ -23,10 +23,11 @@ import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import com.hola360.backgroundvideorecoder.R
+import com.hola360.backgroundvideorecoder.ui.record.audio.utils.io.FileWritableInSdCardAccessIO
+import java.io.*
 
 object VideoRecordUtils {
 
@@ -246,7 +247,7 @@ object VideoRecordUtils {
         return !((orientationAngle in 46..134) || (orientationAngle in 226..314))
     }
 
-    fun generateOutputFilepath(context: Context, videoFileName:String): DocumentFile?{
+    fun generateOutputFile(context: Context, videoFileName:String): DocumentFile?{
         val parentPath = SharedPreferenceUtils.getInstance(context)?.getParentPath()
         val rootParentDocFile = Utils.getDocumentFile(context, parentPath!!)
         return if (rootParentDocFile != null && rootParentDocFile.exists()) {
@@ -273,4 +274,27 @@ object VideoRecordUtils {
             null
         }
     }
+
+    fun transferFile(context: Context, filePath:String, videoFileName:String){
+        try {
+            val file=File(filePath)
+            val bytes = ByteArray(file.length().toInt())
+            val fos= FileInputStream(file)
+            val buffer= BufferedInputStream(fos)
+            buffer.read(bytes)
+            buffer.close()
+            val videoOutputFile= generateOutputFile(context, videoFileName)
+            videoOutputFile?.let {
+                val sdCardFileWriter= FileWritableInSdCardAccessIO(context, it.uri)
+                sdCardFileWriter.write(bytes, 0, bytes.size)
+            }
+        }catch (ex:FileNotFoundException){
+            Log.d("abcVideo", "file not found")
+            ex.printStackTrace()
+        }catch (ex:IOException){
+            Log.d("abcVideo", "io exception")
+            ex.printStackTrace()
+        }
+    }
+
 }

@@ -202,7 +202,7 @@ class RecordService : Service() {
                             override fun onFinishInterval(filePath: String, videoFileName:String) {
                                 CoroutineScope(Dispatchers.IO).launch {
                                     launch {
-
+                                        VideoRecordUtils.transferFile(this@RecordService, filePath, videoFileName)
                                     }
                                 }
                             }

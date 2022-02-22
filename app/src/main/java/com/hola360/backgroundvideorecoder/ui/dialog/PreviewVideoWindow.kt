@@ -155,7 +155,7 @@ class PreviewVideoWindow(val context: Context, private val videoOrientation:Int,
             DateTimeUtils.getFullDate(Date().time)
         )
         val file=if(isInternalStorage){
-            VideoRecordUtils.generateOutputFilepath(context, videoFileName)!!.toRawFile(context)
+            VideoRecordUtils.generateOutputFile(context, videoFileName)!!.toRawFile(context)
         }else{
             File(context.cacheDir, videoFileName)
         }
@@ -217,9 +217,8 @@ class PreviewVideoWindow(val context: Context, private val videoOrientation:Int,
         currentRecording = null
         recordingState= null
         tempFilePath?.let {
-
+            callback.onFinishInterval(tempFilePath?:"", videoFileName)
         }
-        callback.onFinishInterval(tempFilePath?:"", videoFileName)
         tempFilePath=null
     }
 
