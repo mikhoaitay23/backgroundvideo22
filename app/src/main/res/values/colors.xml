@@ -23,6 +23,7 @@
     <color name="un_clickable">#C4C4C4</color>
     <color name="dark_white">#eaeaea</color>
     <color name="white_smoke">#f2f5f6</color>
+    <color name="notification_text_color">#2f2f2f</color>
 
     <!-- Common -->
     <color name="transparent">#00000000</color>

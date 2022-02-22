@@ -1,31 +1,29 @@
 package com.hola360.backgroundvideorecoder.utils
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
-import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Surface
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
-import com.hola360.backgroundvideorecoder.service.RecordService
-import com.hola360.backgroundvideorecoder.service.notification.RecordNotificationManager
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
-import com.hola360.backgroundvideorecoder.ui.record.video.ScheduleVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import com.hola360.backgroundvideorecoder.R
 
 object VideoRecordUtils {
 
@@ -164,14 +162,13 @@ object VideoRecordUtils {
         return FileOutputOptions.Builder(file).build()
     }
 
-    fun generateRecordTime(time:Long):String{
+    fun generateRecordTime(time: Long):String{
         val timeInSecond= time/1000
         val hour= timeInSecond/3600
         val minute= (timeInSecond%3600)/60
         val second= (timeInSecond%3600)%60
-        return  String.format("%02d:%02d:%02d", hour, minute, second)
+        return String.format(" %02d:%02d:%02d", hour, minute, second)
     }
-
 
     fun getVideoConfiguration(context: Context):VideoRecordConfiguration{
         val dataPref = SharedPreferenceUtils.getInstance(context)

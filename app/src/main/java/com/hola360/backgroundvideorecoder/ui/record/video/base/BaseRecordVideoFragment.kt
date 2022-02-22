@@ -1,27 +1,27 @@
 package com.hola360.backgroundvideorecoder.ui.record.video.base
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.databinding.ViewDataBinding
-import com.anggrayudi.storage.file.DocumentFileCompat
-import com.anggrayudi.storage.file.StorageId
-import com.anggrayudi.storage.file.getAbsolutePath
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.service.RecordService
-import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.*
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.FilePickerUtils
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
-import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.PathUtils
@@ -78,16 +78,17 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
     protected var switchThumb: Int = 0
     protected var showDialog = false
     protected var isRecording = false
-    private var showBatteryAlertDialog=false
-    private var showStorageAlertDialog=false
-    private val alertDialog: RecordAlertDialog by lazy {
-        RecordAlertDialog(object : ConfirmDialog.OnConfirmOke{
+    private val batteryDialog: RecordAlertDialog by lazy {
+        RecordAlertDialog(true, object : ConfirmDialog.OnConfirmOke{
             override fun onConfirm() {
-                if((requireActivity() as MainActivity).recordService!!.getRecordState().value == RecordService.RecordState.VideoRecording){
-                    (requireActivity() as MainActivity).recordService!!.stopRecordVideo()
-                }else{
-                    (requireActivity() as MainActivity).recordService!!.stopRecording()
-                }
+                onAlertAction()
+            }
+        })
+    }
+    private val storageDialog: RecordAlertDialog by lazy {
+        RecordAlertDialog(false, object : ConfirmDialog.OnConfirmOke{
+            override fun onConfirm() {
+                onAlertAction()
             }
         })
     }
@@ -200,18 +201,29 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         }
     }
 
+    protected fun startRecordOrSetSchedule() {
+        if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
+            setupWhenCameraPermissionGranted()
+        } else {
+            requestCameraPermission.launch(Constants.CAMERA_RECORD_PERMISSION)
+        }
+    }
+
     private val requestCameraPermission = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result: Map<String?, Boolean?>? ->
         if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
-            PathUtils.setParentPath(requireContext())
-            if (SystemUtils.isAndroidM() &&!Settings.canDrawOverlays(requireContext())) {
-                requestOverlayPermission()
-            } else {
-                startAction()
-            }
+            setupWhenCameraPermissionGranted()
         } else {
             SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+        }
+    }
+
+    private fun setupWhenCameraPermissionGranted(){
+        if (FilePickerUtils.storagePermissionGrant(requireContext())) {
+            setupWhenStoragePermissionGranted()
+        } else {
+            requestPermission()
         }
     }
 
@@ -225,52 +237,96 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         }
     }
 
-    protected fun startRecordOrSetSchedule() {
-        if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
-            if (SystemUtils.isAndroidM() &&!Settings.canDrawOverlays(requireContext())) {
-                requestOverlayPermission()
-            } else {
-                startAction()
-            }
-        } else {
-            requestCameraPermission.launch(Constants.CAMERA_RECORD_PERMISSION)
-        }
-    }
-
     abstract fun startAction()
 
     protected fun onLowBatteryAction(){
-        if((requireActivity() as MainActivity).supportFragmentManager.findFragmentByTag(RecordVideo.ALERT_TAG) == null){
-            if(!showBatteryAlertDialog){
-                showBatteryAlertDialog=true
-                alertDialog.isBattery= true
-                alertDialog.show((requireActivity() as MainActivity).supportFragmentManager,
-                    RecordVideo.ALERT_TAG
-                )
-            }
+        if((requireActivity() as MainActivity).supportFragmentManager.findFragmentByTag(BATTERY_TAG) == null){
+            batteryDialog.show((requireActivity() as MainActivity).supportFragmentManager, BATTERY_TAG)
         }
     }
 
     protected fun onLowStorageAction(){
-        if((requireActivity() as MainActivity).supportFragmentManager.findFragmentByTag(RecordVideo.ALERT_TAG) == null){
-            if(!showStorageAlertDialog){
-                showStorageAlertDialog=true
-                alertDialog.isBattery= false
-                alertDialog.show((requireActivity() as MainActivity).supportFragmentManager,
-                    RecordVideo.ALERT_TAG
-                )
-            }
+        if((requireActivity() as MainActivity).supportFragmentManager.findFragmentByTag(STORAGE_TAG) == null){
+            storageDialog.show((requireActivity() as MainActivity).supportFragmentManager, STORAGE_TAG)
         }
     }
 
-    protected fun onStopRecord(){
-        showBatteryAlertDialog=false
-        showStorageAlertDialog=false
+    private fun onAlertAction(){
+        if((requireActivity() as MainActivity).recordService!!.getRecordState().value == RecordService.RecordState.VideoRecording){
+            (requireActivity() as MainActivity).recordService!!.stopRecordVideo()
+        }else{
+            (requireActivity() as MainActivity).recordService!!.stopRecording()
+        }
     }
+
+    private fun requestPermission() {
+        if (SystemUtils.isAndroidR()) {
+            activityResultLauncher.launch(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+        } else resultLauncher.launch(
+            arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        )
+    }
+
+    private fun setupWhenStoragePermissionGranted(){
+        PathUtils.setParentPath(requireContext())
+        if (SystemUtils.isAndroidM() &&!Settings.canDrawOverlays(requireContext())) {
+            requestOverlayPermission()
+        } else {
+            startAction()
+        }
+    }
+
+    private val customContract = object : ActivityResultContract<String, Boolean>() {
+        override fun createIntent(context: Context, input: String): Intent {
+            val intent = Intent(input)
+            intent.addCategory("android.intent.category.DEFAULT")
+            intent.data = Uri.parse(
+                String.format(
+                    "package:%s",
+                    requireActivity().applicationContext.packageName
+                )
+            )
+            return intent
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Boolean =
+            if (SystemUtils.isAndroidR()) {
+                Environment.isExternalStorageManager()
+            } else {
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+
+    }
+
+    private val activityResultLauncher = registerForActivityResult(customContract) {
+        if (it) {
+            setupWhenStoragePermissionGranted()
+        } else {
+            SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+        }
+    }
+
+    private val resultLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (FilePickerUtils.storagePermissionGrant(requireContext())
+            ) {
+                setupWhenStoragePermissionGranted()
+            } else {
+                SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+            }
+        }
 
     companion object {
         const val CAMERA_FACING_FRONT = 0
         const val CAMERA_FACING_BACK = 1
+        const val BATTERY_TAG= "Alert_battery"
+        const val STORAGE_TAG= "Alert_storage"
     }
 
 }

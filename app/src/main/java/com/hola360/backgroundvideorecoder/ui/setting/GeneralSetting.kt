@@ -190,5 +190,4 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
         )
     }
 
-
 }

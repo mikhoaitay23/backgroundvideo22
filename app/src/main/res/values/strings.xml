@@ -54,8 +54,8 @@
         <item>Landscape</item>
     </array>
     <string name="video_record_time_zero">00:00:00</string>
-    <string name="video_record_notification_title">Video recording</string>
-    <string name="video_record_notification_prefix">Record time:</string>
+    <string name="video_record_notification_title">Video record is running</string>
+    <string name="video_record_notification_prefix">Video Record •</string>
     <string name="video_record_complete_prefix">Record video complete</string>
 
     <string name="video_record_schedule_title">Schedule automatically video recording</string>
@@ -192,5 +192,8 @@
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
     <string name="share">Share</string>
+
+    //notification
+    <string name="tap_to_open">Tap to open now</string>
 
 </resources>

@@ -38,7 +38,7 @@ object SystemUtils {
 
     @JvmStatic
     fun getResUrl(resId: Int): String {
-        return "android.resource://com.hola360.qrcodescan/$resId"
+        return "android.resource://com.hola360.backgroundvideorecoder/$resId"
     }
 
     @JvmStatic

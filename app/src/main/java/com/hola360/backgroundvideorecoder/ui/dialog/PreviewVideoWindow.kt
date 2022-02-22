@@ -2,14 +2,10 @@ package com.hola360.backgroundvideorecoder.ui.dialog
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Context.WINDOW_SERVICE
 import android.graphics.PixelFormat
 import android.os.Build
 import android.util.Log
-import com.hola360.backgroundvideorecoder.R
-import java.lang.Exception
-
-import android.content.Context.WINDOW_SERVICE
-import android.content.res.Configuration
 import android.view.*
 import androidx.camera.core.CameraControl
 import androidx.camera.core.Preview
@@ -23,13 +19,11 @@ import com.anggrayudi.storage.file.findFolder
 import com.anggrayudi.storage.file.getAbsolutePath
 import com.anggrayudi.storage.file.toRawFile
 import com.hola360.backgroundvideorecoder.MainActivity
+import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
-import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import com.hola360.backgroundvideorecoder.utils.*
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
 import java.util.*
 
 @SuppressLint("InflateParams", "ClickableViewAccessibility")
@@ -133,13 +127,13 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
         }else{
             1
         }
-        qualityIndex= if(videoRecordConfiguration.isBack){
-            videoRecordConfiguration.backCameraQuality
-        }else{
-            videoRecordConfiguration.frontCameraQuality
-        }
         customLifeCycleOwner= CustomLifeCycleOwner().apply {
             doOnResume()
+        }
+        qualityIndex= if(videoRecordConfiguration.isBack){
+            videoRecordConfiguration.backCameraQuality.coerceAtLeast(cameraCapabilities[0].qualities.size-3)
+        }else{
+            videoRecordConfiguration.frontCameraQuality.coerceAtLeast(cameraCapabilities[1].qualities.size-3)
         }
         totalTimeRecord = -videoRecordConfiguration.timePerVideo
         bindCaptureUserCase()
@@ -219,7 +213,7 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
                 if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.timePerVideo-INTERVAL_TIME_ADJUST){
                     if(newInterval){
                         stopRecording()
-                        if(videoRecordConfiguration.totalTime- (totalTimeRecord+ videoRecordConfiguration.timePerVideo)>1000){
+                        if(videoRecordConfiguration.totalTime==0L || (videoRecordConfiguration.totalTime- (totalTimeRecord+ videoRecordConfiguration.timePerVideo))>1000){
                             startRecording()
                         }else{
                             close()

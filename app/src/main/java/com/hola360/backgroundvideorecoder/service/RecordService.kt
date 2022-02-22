@@ -9,18 +9,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.*
 import android.provider.Settings
+import android.text.SpannableString
 import android.util.Log
 import android.view.OrientationEventListener
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.service.notification.RecordNotificationManager
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.SoundRecorder
-import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import com.hola360.backgroundvideorecoder.utils.*
 import java.util.*
@@ -31,7 +29,7 @@ class RecordService : Service() {
         RecordNotificationManager(this)
     }
     private var notificationTitle: String = ""
-    private var notificationContent: String = ""
+    private var notificationContent: String= ""
     var mBinder = LocalBinder()
     private var videoPreviewVideoWindow: PreviewVideoWindow? = null
     private var orientationAngle = 0
@@ -67,6 +65,8 @@ class RecordService : Service() {
     private val generalSetting: SettingGeneralModel by lazy {
         VideoRecordUtils.getSettingGeneralModel(this)
     }
+    private var showBatteryAlertDialog=false
+    private var showStorageAlertDialog=false
 
     override fun onBind(intent: Intent): IBinder {
         return mBinder
@@ -75,24 +75,24 @@ class RecordService : Service() {
     private inner class ServiceManager {
         fun startRecord() {
             val notification = mRecordNotificationManager.getNotification(
-                notificationTitle,
-                notificationContent
+                notificationTitle, notificationContent,
+                recordStateLiveData.value == RecordState.VideoRecording, generalSetting.notificationImportance
             )
             startForeground(RecordNotificationManager.NOTIFICATION_ID, notification)
         }
 
         fun startSchedule(time: Long) {
             val notification = mRecordNotificationManager.getNotification(
-                notificationTitle,
-                notificationContent
+                notificationTitle, notificationContent,
+                recordStateLiveData.value == RecordState.VideoSchedule, generalSetting.notificationImportance
             )
             startForeground(RecordNotificationManager.NOTIFICATION_ID, notification)
         }
 
         fun updateProgress(time: String) {
             val notification = mRecordNotificationManager.getNotification(
-                notificationTitle,
-                time
+                notificationTitle, time,
+                recordStateLiveData.value == RecordState.VideoRecording, generalSetting.notificationImportance
             )
             mRecordNotificationManager.notificationManager.notify(
                 RecordNotificationManager.NOTIFICATION_ID,
@@ -144,21 +144,22 @@ class RecordService : Service() {
                         } else {
                             startRecordVideo(
                                 VideoRecordUtils.getVideoRotation(
-                                    this@RecordService,
-                                    orientationAngle
-                                )
+                                    this@RecordService, orientationAngle)
                             )
                             time = System.currentTimeMillis()
                         }
                     }
                     Intent.ACTION_BATTERY_CHANGED -> {
-                        val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-                        val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-                        val mBattery = level * 100 / scale
-                        if (generalSetting.checkBattery && mBattery <= BATTERY_PERCENT_ALERT) {
-                            val state = recordStateLiveData.value
-                            if (state == RecordState.AudioRecording || state == RecordState.VideoRecording) {
-                                listener?.onBatteryLow()
+                        listener?.let {
+                            val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+                            val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+                            val mBattery = level * 100 / scale
+                            if (!showBatteryAlertDialog && generalSetting.checkBattery && mBattery <= BATTERY_PERCENT_ALERT) {
+                                showBatteryAlertDialog=true
+                                val state = recordStateLiveData.value
+                                if (state == RecordState.AudioRecording || state == RecordState.VideoRecording) {
+                                    it.onBatteryLow()
+                                }
                             }
                         }
                     }
@@ -172,8 +173,7 @@ class RecordService : Service() {
         if (SystemUtils.isAndroidM() && Settings.canDrawOverlays(this)) {
             if (recordStateLiveData.value == RecordState.None || recordStateLiveData.value == RecordState.VideoSchedule) {
                 mServiceManager!!.startRecord()
-                notificationTitle =
-                    this.resources.getString(R.string.video_record_notification_title)
+                notificationTitle = this.resources.getString(R.string.video_record_notification_title)
                 videoPreviewVideoWindow =
                     PreviewVideoWindow(
                         this,
@@ -186,13 +186,10 @@ class RecordService : Service() {
                             override fun onRecording(recordTime: Long) {
                                 if (recordStateLiveData.value == RecordState.VideoRecording) {
                                     listener?.onUpdateTime("", 0L, recordTime)
-                                    notificationContent =
-                                        VideoRecordUtils.generateRecordTime(recordTime)
+                                    notificationContent = VideoRecordUtils.generateRecordTime(recordTime)
                                     val notification = mRecordNotificationManager.getNotification(
-                                        notificationTitle,
-                                        notificationContent
+                                        notificationTitle, notificationContent, true, generalSetting.notificationImportance
                                     )
-
                                     mRecordNotificationManager.notifyNewStatus(notification)
                                 }
                             }
@@ -202,18 +199,20 @@ class RecordService : Service() {
                                     this@RecordService.resources.getString(R.string.video_record_complete_prefix)
                                 VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
                                 val notification = mRecordNotificationManager.getNotification(
-                                    notificationTitle,
-                                    notificationContent
+                                    notificationTitle, notificationContent,
+                                    true, generalSetting.notificationImportance
                                 )
                                 listener?.onStopped()
-                                mRecordNotificationManager.notifyNewStatus(notification)
                                 mServiceManager!!.stop()
+                                mRecordNotificationManager.notifyNewStatus(notification)
                                 videoPreviewVideoWindow = null
                             }
                         })
                 videoPreviewVideoWindow!!.setupVideoConfiguration()
                 videoPreviewVideoWindow!!.open()
                 recordStateLiveData.value = RecordState.VideoRecording
+                showBatteryAlertDialog=false
+                showStorageAlertDialog=false
             }
         } else {
             val scheduleVideo = VideoRecordUtils.getVideoSchedule(this)
@@ -298,6 +297,8 @@ class RecordService : Service() {
             time = 0
             recordStateLiveData.value = RecordState.AudioRecording
             mSoundRecorder!!.start()
+            showStorageAlertDialog=false
+            showBatteryAlertDialog=false
             nextLoop()
         }
 
@@ -385,11 +386,14 @@ class RecordService : Service() {
     }
 
     private fun checkStoragePercent() {
-        if (generalSetting.checkStorage) {
-            val percent = SystemUtils.checkStoragePercent(this, generalSetting.storageId)
-            Log.d("abcVideo", "Percent storage: $percent")
-            if (percent <= STORAGE_PERCENT_ALERT) {
-                listener?.onLowStorage()
+        listener?.let {
+            if (!showStorageAlertDialog && generalSetting.checkStorage) {
+                val percent = SystemUtils.checkStoragePercent(this, generalSetting.storageId)
+                Log.d("abcVideo", "Percent storage: $percent")
+                if (percent <= STORAGE_PERCENT_ALERT) {
+                    showStorageAlertDialog=true
+                    it.onLowStorage()
+                }
             }
         }
     }
@@ -398,7 +402,7 @@ class RecordService : Service() {
         fun getServiceInstance(): RecordService = this@RecordService
     }
 
-    fun registerListener(listener: Listener) {
+    fun registerListener(listener: Listener?) {
         this.listener = listener
     }
 
@@ -416,12 +420,13 @@ class RecordService : Service() {
 
     companion object {
         const val TIME_LOOP = 500L
-        const val BATTERY_PERCENT_ALERT = 96
-        const val STORAGE_PERCENT_ALERT = 0.603
+        const val BATTERY_PERCENT_ALERT = 63
+        const val STORAGE_PERCENT_ALERT =0.565
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d("abcVideo", "Service killed")
         unregisterReceiver(globalReceiver)
     }
 

@@ -109,6 +109,7 @@
         <item name="android:paddingBottom">@dimen/home_v_margin</item>
         <item name="android:paddingStart">30dp</item>
         <item name="android:paddingEnd">30dp</item>
+        <item name="android:foreground">?selectableItemBackground</item>
         <item name="android:background">@drawable/bg_button_start</item>
         <item name="android:elevation">@dimen/home_v_padding</item>
     </style>
