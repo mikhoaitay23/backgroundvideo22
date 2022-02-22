@@ -6,12 +6,15 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.os.Build
+import android.text.SpannableString
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.service.RecordService
@@ -42,8 +45,7 @@ class RecordNotificationManager(private val mService: RecordService) {
         val builder = NotificationCompat.Builder(mService, CHANNEL_ID)
         builder.apply {
             setContentIntent(createContentIntent())
-            setSmallIcon(R.drawable.ic_abort)
-            setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            setSmallIcon(R.drawable.ic_video_record)
             setCustomContentView(getRemoteViews(title, des, isVideo))
             setOnlyAlertOnce(true)
         }
@@ -52,13 +54,13 @@ class RecordNotificationManager(private val mService: RecordService) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createChannel(importance: Int) {
-        val importanceLevel= if(importance==0){
-            NotificationManager.IMPORTANCE_DEFAULT
-        }else{
-            NotificationManager.IMPORTANCE_LOW
-        }
+//        val importanceLevel= if(importance==0){
+//            NotificationManager.IMPORTANCE_DEFAULT
+//        }else{
+//            NotificationManager.IMPORTANCE_LOW
+//        }
         val mChannel =
-            NotificationChannel(CHANNEL_ID, CHANNEL_ID, importanceLevel)
+            NotificationChannel(CHANNEL_ID, CHANNEL_ID, NotificationManager.IMPORTANCE_LOW)
         mService.getString(R.string.app_name)
         mChannel.enableLights(false)
         mChannel.enableVibration(false)
@@ -75,11 +77,12 @@ class RecordNotificationManager(private val mService: RecordService) {
     }
 
     private fun getRemoteViews(title: String, des: String, isVideo: Boolean):RemoteViews{
-        val bitmap= if(isVideo){
-            BitmapFactory.decodeResource(mService.resources, R.drawable.ic_video_record)
+        val drawable: Drawable? = if(isVideo){
+            ContextCompat.getDrawable(mService, R.drawable.ic_video_record)
         }else{
-            BitmapFactory.decodeResource(mService.resources, R.drawable.ic_micro)
+            ContextCompat.getDrawable(mService, R.drawable.ic_micro)
         }
+        val bitmap= drawable?.toBitmap( drawable.intrinsicWidth.coerceAtLeast(1),  drawable.intrinsicHeight.coerceAtLeast(1), null)
         return RemoteViews(mService.packageName, R.layout.layout_custom_notification).apply {
             setTextViewText(R.id.des, des)
             setTextViewText(R.id.title, title)

@@ -9,18 +9,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.*
 import android.provider.Settings
+import android.text.SpannableString
 import android.util.Log
 import android.view.OrientationEventListener
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.service.notification.RecordNotificationManager
 import com.hola360.backgroundvideorecoder.ui.dialog.PreviewVideoWindow
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.SoundRecorder
-import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import com.hola360.backgroundvideorecoder.utils.*
 import java.util.*
@@ -31,7 +29,7 @@ class RecordService : Service() {
         RecordNotificationManager(this)
     }
     private var notificationTitle: String = ""
-    private var notificationContent: String = ""
+    private var notificationContent: String= ""
     var mBinder = LocalBinder()
     private var videoPreviewVideoWindow: PreviewVideoWindow? = null
     private var orientationAngle = 0
@@ -170,8 +168,7 @@ class RecordService : Service() {
         if (SystemUtils.isAndroidM() && Settings.canDrawOverlays(this)) {
             if (recordStateLiveData.value == RecordState.None || recordStateLiveData.value == RecordState.VideoSchedule) {
                 mServiceManager!!.startRecord()
-                notificationTitle =
-                    this.resources.getString(R.string.video_record_notification_title)
+                notificationTitle = this.resources.getString(R.string.video_record_notification_title)
                 videoPreviewVideoWindow =
                     PreviewVideoWindow(
                         this,
@@ -184,12 +181,10 @@ class RecordService : Service() {
                             override fun onRecording(recordTime: Long) {
                                 if (recordStateLiveData.value == RecordState.VideoRecording) {
                                     listener?.onUpdateTime("", 0L, recordTime)
-                                    notificationContent =
-                                        VideoRecordUtils.generateRecordTime(recordTime)
+                                    notificationContent = VideoRecordUtils.generateRecordTime(recordTime)
                                     val notification = mRecordNotificationManager.getNotification(
                                         notificationTitle, notificationContent, true, generalSetting.notificationImportance
                                     )
-
                                     mRecordNotificationManager.notifyNewStatus(notification)
                                 }
                             }
@@ -203,8 +198,8 @@ class RecordService : Service() {
                                     true, generalSetting.notificationImportance
                                 )
                                 listener?.onStopped()
-                                mRecordNotificationManager.notifyNewStatus(notification)
                                 mServiceManager!!.stop()
+                                mRecordNotificationManager.notifyNewStatus(notification)
                                 videoPreviewVideoWindow = null
                             }
                         })
@@ -413,8 +408,8 @@ class RecordService : Service() {
 
     companion object {
         const val TIME_LOOP = 500L
-        const val BATTERY_PERCENT_ALERT = 96
-        const val STORAGE_PERCENT_ALERT = 0.603
+        const val BATTERY_PERCENT_ALERT = 62
+        const val STORAGE_PERCENT_ALERT = 0.6
     }
 
     override fun onDestroy() {

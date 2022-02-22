@@ -7,11 +7,7 @@ import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.LayoutRecordVideoBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
-import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
-import com.hola360.backgroundvideorecoder.ui.dialog.RecordAlertDialog
 import com.hola360.backgroundvideorecoder.ui.record.video.base.BaseRecordVideoFragment
-import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
-import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.VideoRecordUtils
 
 class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.OnClickListener, RecordService.Listener {

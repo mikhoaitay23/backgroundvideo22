@@ -2,14 +2,10 @@ package com.hola360.backgroundvideorecoder.ui.dialog
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Context.WINDOW_SERVICE
 import android.graphics.PixelFormat
 import android.os.Build
 import android.util.Log
-import com.hola360.backgroundvideorecoder.R
-import java.lang.Exception
-
-import android.content.Context.WINDOW_SERVICE
-import android.content.res.Configuration
 import android.view.*
 import androidx.camera.core.CameraControl
 import androidx.camera.core.Preview
@@ -23,13 +19,11 @@ import com.anggrayudi.storage.file.findFolder
 import com.anggrayudi.storage.file.getAbsolutePath
 import com.anggrayudi.storage.file.toRawFile
 import com.hola360.backgroundvideorecoder.MainActivity
+import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CameraCapability
 import com.hola360.backgroundvideorecoder.ui.record.video.model.CustomLifeCycleOwner
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
-import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import com.hola360.backgroundvideorecoder.utils.*
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
 import java.util.*
 
 @SuppressLint("InflateParams", "ClickableViewAccessibility")
