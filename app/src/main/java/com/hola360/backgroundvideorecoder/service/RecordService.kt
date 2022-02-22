@@ -75,24 +75,24 @@ class RecordService : Service() {
     private inner class ServiceManager {
         fun startRecord() {
             val notification = mRecordNotificationManager.getNotification(
-                notificationTitle,
-                notificationContent
+                notificationTitle, notificationContent,
+                recordStateLiveData.value == RecordState.VideoRecording, generalSetting.notificationImportance
             )
             startForeground(RecordNotificationManager.NOTIFICATION_ID, notification)
         }
 
         fun startSchedule(time: Long) {
             val notification = mRecordNotificationManager.getNotification(
-                notificationTitle,
-                notificationContent
+                notificationTitle, notificationContent,
+                recordStateLiveData.value == RecordState.VideoSchedule, generalSetting.notificationImportance
             )
             startForeground(RecordNotificationManager.NOTIFICATION_ID, notification)
         }
 
         fun updateProgress(time: String) {
             val notification = mRecordNotificationManager.getNotification(
-                notificationTitle,
-                time
+                notificationTitle, time,
+                recordStateLiveData.value == RecordState.VideoRecording, generalSetting.notificationImportance
             )
             mRecordNotificationManager.notificationManager.notify(
                 RecordNotificationManager.NOTIFICATION_ID,
@@ -144,9 +144,7 @@ class RecordService : Service() {
                         } else {
                             startRecordVideo(
                                 VideoRecordUtils.getVideoRotation(
-                                    this@RecordService,
-                                    orientationAngle
-                                )
+                                    this@RecordService, orientationAngle)
                             )
                             time = System.currentTimeMillis()
                         }
@@ -189,8 +187,7 @@ class RecordService : Service() {
                                     notificationContent =
                                         VideoRecordUtils.generateRecordTime(recordTime)
                                     val notification = mRecordNotificationManager.getNotification(
-                                        notificationTitle,
-                                        notificationContent
+                                        notificationTitle, notificationContent, true, generalSetting.notificationImportance
                                     )
 
                                     mRecordNotificationManager.notifyNewStatus(notification)
@@ -202,8 +199,8 @@ class RecordService : Service() {
                                     this@RecordService.resources.getString(R.string.video_record_complete_prefix)
                                 VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
                                 val notification = mRecordNotificationManager.getNotification(
-                                    notificationTitle,
-                                    notificationContent
+                                    notificationTitle, notificationContent,
+                                    true, generalSetting.notificationImportance
                                 )
                                 listener?.onStopped()
                                 mRecordNotificationManager.notifyNewStatus(notification)

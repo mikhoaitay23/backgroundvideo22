@@ -1,22 +1,23 @@
 package com.hola360.backgroundvideorecoder.ui.record.video.base
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.databinding.ViewDataBinding
-import com.anggrayudi.storage.file.DocumentFileCompat
-import com.anggrayudi.storage.file.StorageId
-import com.anggrayudi.storage.file.getAbsolutePath
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.service.RecordService
-import com.hola360.backgroundvideorecoder.ui.base.basedialog.BaseBottomSheetDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.*
+import com.hola360.backgroundvideorecoder.ui.dialog.filepicker.utils.FilePickerUtils
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
@@ -200,18 +201,29 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         }
     }
 
+    protected fun startRecordOrSetSchedule() {
+        if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
+            setupWhenCameraPermissionGranted()
+        } else {
+            requestCameraPermission.launch(Constants.CAMERA_RECORD_PERMISSION)
+        }
+    }
+
     private val requestCameraPermission = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result: Map<String?, Boolean?>? ->
         if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
-            PathUtils.setParentPath(requireContext())
-            if (SystemUtils.isAndroidM() &&!Settings.canDrawOverlays(requireContext())) {
-                requestOverlayPermission()
-            } else {
-                startAction()
-            }
+            setupWhenCameraPermissionGranted()
         } else {
             SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+        }
+    }
+
+    private fun setupWhenCameraPermissionGranted(){
+        if (FilePickerUtils.storagePermissionGrant(requireContext())) {
+            setupWhenStoragePermissionGranted()
+        } else {
+            requestPermission()
         }
     }
 
@@ -222,18 +234,6 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
                 Uri.parse("package:" + requireContext().packageName)
             )
             startActivityForResult(intent, 0)
-        }
-    }
-
-    protected fun startRecordOrSetSchedule() {
-        if (SystemUtils.hasPermissions(requireContext(), *Constants.CAMERA_RECORD_PERMISSION)) {
-            if (SystemUtils.isAndroidM() &&!Settings.canDrawOverlays(requireContext())) {
-                requestOverlayPermission()
-            } else {
-                startAction()
-            }
-        } else {
-            requestCameraPermission.launch(Constants.CAMERA_RECORD_PERMISSION)
         }
     }
 
@@ -267,6 +267,69 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         showBatteryAlertDialog=false
         showStorageAlertDialog=false
     }
+
+    private fun requestPermission() {
+        if (SystemUtils.isAndroidR()) {
+            activityResultLauncher.launch(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+        } else resultLauncher.launch(
+            arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        )
+    }
+
+    private fun setupWhenStoragePermissionGranted(){
+        PathUtils.setParentPath(requireContext())
+        if (SystemUtils.isAndroidM() &&!Settings.canDrawOverlays(requireContext())) {
+            requestOverlayPermission()
+        } else {
+            startAction()
+        }
+    }
+
+    private val customContract = object : ActivityResultContract<String, Boolean>() {
+        override fun createIntent(context: Context, input: String): Intent {
+            val intent = Intent(input)
+            intent.addCategory("android.intent.category.DEFAULT")
+            intent.data = Uri.parse(
+                String.format(
+                    "package:%s",
+                    requireActivity().applicationContext.packageName
+                )
+            )
+            return intent
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Boolean =
+            if (SystemUtils.isAndroidR()) {
+                Environment.isExternalStorageManager()
+            } else {
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+
+    }
+
+    private val activityResultLauncher = registerForActivityResult(customContract) {
+        if (it) {
+            setupWhenStoragePermissionGranted()
+        } else {
+            SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+        }
+    }
+
+    private val resultLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (FilePickerUtils.storagePermissionGrant(requireContext())
+            ) {
+                setupWhenStoragePermissionGranted()
+            } else {
+                SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+            }
+        }
 
     companion object {
         const val CAMERA_FACING_FRONT = 0

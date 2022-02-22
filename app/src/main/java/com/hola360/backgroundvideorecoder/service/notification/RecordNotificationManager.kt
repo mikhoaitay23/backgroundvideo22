@@ -5,7 +5,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
+import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -21,8 +23,8 @@ class RecordNotificationManager(private val mService: RecordService) {
         NotificationManagerCompat.from(mService)
     }
 
-    fun getNotification(title: String, des: String): Notification {
-        val builder = buildNotification(title, des)
+    fun getNotification(title: String, des: String, isVideo:Boolean, importance:Int): Notification {
+        val builder = buildNotification(title, des, isVideo, importance)
         return builder.build()
     }
 
@@ -31,33 +33,32 @@ class RecordNotificationManager(private val mService: RecordService) {
     }
 
     private fun buildNotification(
-        title: String,
-        des: String
+        title: String, des: String,
+        isVideo: Boolean, importance: Int
     ): NotificationCompat.Builder {
         if (Utils.isAndroidO()) {
-            createChannel()
+            createChannel(importance)
         }
         val builder = NotificationCompat.Builder(mService, CHANNEL_ID)
         builder.apply {
             setContentIntent(createContentIntent())
             setSmallIcon(R.drawable.ic_abort)
-            setContentTitle(title)
-            setContentText(des)
+            setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            setCustomContentView(getRemoteViews(title, des, isVideo))
             setOnlyAlertOnce(true)
-            setOngoing(true)
-            setChannelId(CHANNEL_ID).addAction(
-                R.drawable.ic_stop_24,
-                mService.getString(R.string.stop), createStopIntent()
-            )
-            color = ContextCompat.getColor(mService, R.color.colorAccent)
         }
         return builder
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createChannel() {
+    private fun createChannel(importance: Int) {
+        val importanceLevel= if(importance==0){
+            NotificationManager.IMPORTANCE_DEFAULT
+        }else{
+            NotificationManager.IMPORTANCE_LOW
+        }
         val mChannel =
-            NotificationChannel(CHANNEL_ID, CHANNEL_ID, NotificationManager.IMPORTANCE_LOW)
+            NotificationChannel(CHANNEL_ID, CHANNEL_ID, importanceLevel)
         mService.getString(R.string.app_name)
         mChannel.enableLights(false)
         mChannel.enableVibration(false)
@@ -73,10 +74,22 @@ class RecordNotificationManager(private val mService: RecordService) {
         )
     }
 
+    private fun getRemoteViews(title: String, des: String, isVideo: Boolean):RemoteViews{
+        val bitmap= if(isVideo){
+            BitmapFactory.decodeResource(mService.resources, R.drawable.ic_video_record)
+        }else{
+            BitmapFactory.decodeResource(mService.resources, R.drawable.ic_micro)
+        }
+        return RemoteViews(mService.packageName, R.layout.layout_custom_notification).apply {
+            setTextViewText(R.id.des, des)
+            setTextViewText(R.id.title, title)
+            setImageViewBitmap(R.id.icon, bitmap)
+        }
+    }
+
     companion object {
         const val ACTION_STOP = "stop_record"
         const val ACTION_RECORD_FROM_SCHEDULE = "Action_schedule"
-        const val ACTION_RECORD_VIDEO_SCHEDULE = "Video_schedule"
         const val NOTIFICATION_ID = 234
         private const val CHANNEL_ID = "RecordBg"
         private const val REQUEST_CODE = 1212

@@ -133,13 +133,13 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
         }else{
             1
         }
-        qualityIndex= if(videoRecordConfiguration.isBack){
-            videoRecordConfiguration.backCameraQuality
-        }else{
-            videoRecordConfiguration.frontCameraQuality
-        }
         customLifeCycleOwner= CustomLifeCycleOwner().apply {
             doOnResume()
+        }
+        qualityIndex= if(videoRecordConfiguration.isBack){
+            videoRecordConfiguration.backCameraQuality.coerceAtLeast(cameraCapabilities[0].qualities.size-3)
+        }else{
+            videoRecordConfiguration.frontCameraQuality.coerceAtLeast(cameraCapabilities[1].qualities.size-3)
         }
         totalTimeRecord = -videoRecordConfiguration.timePerVideo
         bindCaptureUserCase()
@@ -219,7 +219,7 @@ class PreviewVideoWindow(val context: Context, val videoOrientation:Int, val cal
                 if(event.recordingStats.recordedDurationNanos/1000000>= videoRecordConfiguration.timePerVideo-INTERVAL_TIME_ADJUST){
                     if(newInterval){
                         stopRecording()
-                        if(videoRecordConfiguration.totalTime- (totalTimeRecord+ videoRecordConfiguration.timePerVideo)>1000){
+                        if(videoRecordConfiguration.totalTime==0L || (videoRecordConfiguration.totalTime- (totalTimeRecord+ videoRecordConfiguration.timePerVideo))>1000){
                             startRecording()
                         }else{
                             close()
