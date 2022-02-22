@@ -2,6 +2,7 @@ package com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord
 
 import android.Manifest
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
@@ -70,7 +71,18 @@ class RecordAudio : BasePermissionRequestFragment<LayoutRecordAudioBinding>(), V
 
     override fun onDestroy() {
         super.onDestroy()
-        isShow = false
+        if (isShow){
+            mAudioRecordBottomSheetFragment!!.dismiss()
+            isShow = false
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (isShow){
+            mAudioRecordBottomSheetFragment!!.dismiss()
+            isShow = false
+        }
     }
 
     private val resultRecordPermissionLauncher =
