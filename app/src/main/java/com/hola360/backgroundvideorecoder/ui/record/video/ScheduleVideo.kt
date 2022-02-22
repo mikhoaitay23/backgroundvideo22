@@ -212,7 +212,6 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
     }
 
     override fun onStopped() {
-        onStopRecord()
     }
 
     override fun onByteBuffer(buf: ShortArray?, minBufferSize: Int) {

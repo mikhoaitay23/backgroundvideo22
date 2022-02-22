@@ -65,6 +65,8 @@ class RecordService : Service() {
     private val generalSetting: SettingGeneralModel by lazy {
         VideoRecordUtils.getSettingGeneralModel(this)
     }
+    private var showBatteryAlertDialog=false
+    private var showStorageAlertDialog=false
 
     override fun onBind(intent: Intent): IBinder {
         return mBinder
@@ -148,13 +150,16 @@ class RecordService : Service() {
                         }
                     }
                     Intent.ACTION_BATTERY_CHANGED -> {
-                        val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-                        val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-                        val mBattery = level * 100 / scale
-                        if (generalSetting.checkBattery && mBattery <= BATTERY_PERCENT_ALERT) {
-                            val state = recordStateLiveData.value
-                            if (state == RecordState.AudioRecording || state == RecordState.VideoRecording) {
-                                listener?.onBatteryLow()
+                        listener?.let {
+                            val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+                            val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+                            val mBattery = level * 100 / scale
+                            if (!showBatteryAlertDialog && generalSetting.checkBattery && mBattery <= BATTERY_PERCENT_ALERT) {
+                                showBatteryAlertDialog=true
+                                val state = recordStateLiveData.value
+                                if (state == RecordState.AudioRecording || state == RecordState.VideoRecording) {
+                                    it.onBatteryLow()
+                                }
                             }
                         }
                     }
@@ -206,6 +211,8 @@ class RecordService : Service() {
                 videoPreviewVideoWindow!!.setupVideoConfiguration()
                 videoPreviewVideoWindow!!.open()
                 recordStateLiveData.value = RecordState.VideoRecording
+                showBatteryAlertDialog=false
+                showStorageAlertDialog=false
             }
         } else {
             val scheduleVideo = VideoRecordUtils.getVideoSchedule(this)
@@ -290,6 +297,8 @@ class RecordService : Service() {
             time = 0
             recordStateLiveData.value = RecordState.AudioRecording
             mSoundRecorder!!.start()
+            showStorageAlertDialog=false
+            showBatteryAlertDialog=false
             nextLoop()
         }
 
@@ -377,11 +386,14 @@ class RecordService : Service() {
     }
 
     private fun checkStoragePercent() {
-        if (generalSetting.checkStorage) {
-            val percent = SystemUtils.checkStoragePercent(this, generalSetting.storageId)
-            Log.d("abcVideo", "Percent storage: $percent")
-            if (percent <= STORAGE_PERCENT_ALERT) {
-                listener?.onLowStorage()
+        listener?.let {
+            if (!showStorageAlertDialog && generalSetting.checkStorage) {
+                val percent = SystemUtils.checkStoragePercent(this, generalSetting.storageId)
+                Log.d("abcVideo", "Percent storage: $percent")
+                if (percent <= STORAGE_PERCENT_ALERT) {
+                    showStorageAlertDialog=true
+                    it.onLowStorage()
+                }
             }
         }
     }
@@ -390,7 +402,7 @@ class RecordService : Service() {
         fun getServiceInstance(): RecordService = this@RecordService
     }
 
-    fun registerListener(listener: Listener) {
+    fun registerListener(listener: Listener?) {
         this.listener = listener
     }
 
@@ -408,12 +420,13 @@ class RecordService : Service() {
 
     companion object {
         const val TIME_LOOP = 500L
-        const val BATTERY_PERCENT_ALERT = 62
-        const val STORAGE_PERCENT_ALERT = 0.6
+        const val BATTERY_PERCENT_ALERT = 63
+        const val STORAGE_PERCENT_ALERT =0.565
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d("abcVideo", "Service killed")
         unregisterReceiver(globalReceiver)
     }
 

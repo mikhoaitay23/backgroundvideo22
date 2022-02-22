@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindService() {
         val intent = Intent(this, RecordService::class.java)
-//        startService(intent)
+        startService(intent)
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
     }
 
@@ -153,6 +153,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         ToastUtils.getInstance(this)!!.release()
         if (isBound) {
+            recordService!!.registerListener(null)
             unbindService(mConnection)
         }
     }

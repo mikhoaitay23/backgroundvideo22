@@ -22,7 +22,6 @@ import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdap
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
 import com.hola360.backgroundvideorecoder.ui.record.RecordSchedule
-import com.hola360.backgroundvideorecoder.ui.record.video.RecordVideo
 import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfiguration
 import com.hola360.backgroundvideorecoder.utils.Constants
 import com.hola360.backgroundvideorecoder.utils.PathUtils
@@ -79,16 +78,17 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
     protected var switchThumb: Int = 0
     protected var showDialog = false
     protected var isRecording = false
-    private var showBatteryAlertDialog=false
-    private var showStorageAlertDialog=false
-    private val alertDialog: RecordAlertDialog by lazy {
-        RecordAlertDialog(object : ConfirmDialog.OnConfirmOke{
+    private val batteryDialog: RecordAlertDialog by lazy {
+        RecordAlertDialog(true, object : ConfirmDialog.OnConfirmOke{
             override fun onConfirm() {
-                if((requireActivity() as MainActivity).recordService!!.getRecordState().value == RecordService.RecordState.VideoRecording){
-                    (requireActivity() as MainActivity).recordService!!.stopRecordVideo()
-                }else{
-                    (requireActivity() as MainActivity).recordService!!.stopRecording()
-                }
+                onAlertAction()
+            }
+        })
+    }
+    private val storageDialog: RecordAlertDialog by lazy {
+        RecordAlertDialog(false, object : ConfirmDialog.OnConfirmOke{
+            override fun onConfirm() {
+                onAlertAction()
             }
         })
     }
@@ -240,32 +240,23 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
     abstract fun startAction()
 
     protected fun onLowBatteryAction(){
-        if((requireActivity() as MainActivity).supportFragmentManager.findFragmentByTag(RecordVideo.ALERT_TAG) == null){
-            if(!showBatteryAlertDialog){
-                showBatteryAlertDialog=true
-                alertDialog.isBattery= true
-                alertDialog.show((requireActivity() as MainActivity).supportFragmentManager,
-                    RecordVideo.ALERT_TAG
-                )
-            }
+        if((requireActivity() as MainActivity).supportFragmentManager.findFragmentByTag(BATTERY_TAG) == null){
+            batteryDialog.show((requireActivity() as MainActivity).supportFragmentManager, BATTERY_TAG)
         }
     }
 
     protected fun onLowStorageAction(){
-        if((requireActivity() as MainActivity).supportFragmentManager.findFragmentByTag(RecordVideo.ALERT_TAG) == null){
-            if(!showStorageAlertDialog){
-                showStorageAlertDialog=true
-                alertDialog.isBattery= false
-                alertDialog.show((requireActivity() as MainActivity).supportFragmentManager,
-                    RecordVideo.ALERT_TAG
-                )
-            }
+        if((requireActivity() as MainActivity).supportFragmentManager.findFragmentByTag(STORAGE_TAG) == null){
+            storageDialog.show((requireActivity() as MainActivity).supportFragmentManager, STORAGE_TAG)
         }
     }
 
-    protected fun onStopRecord(){
-        showBatteryAlertDialog=false
-        showStorageAlertDialog=false
+    private fun onAlertAction(){
+        if((requireActivity() as MainActivity).recordService!!.getRecordState().value == RecordService.RecordState.VideoRecording){
+            (requireActivity() as MainActivity).recordService!!.stopRecordVideo()
+        }else{
+            (requireActivity() as MainActivity).recordService!!.stopRecording()
+        }
     }
 
     private fun requestPermission() {
@@ -334,6 +325,8 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
     companion object {
         const val CAMERA_FACING_FRONT = 0
         const val CAMERA_FACING_BACK = 1
+        const val BATTERY_TAG= "Alert_battery"
+        const val STORAGE_TAG= "Alert_storage"
     }
 
 }

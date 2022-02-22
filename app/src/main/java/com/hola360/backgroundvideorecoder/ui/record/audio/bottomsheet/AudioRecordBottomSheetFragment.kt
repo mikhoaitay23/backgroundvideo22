@@ -98,22 +98,20 @@ class AudioRecordBottomSheetFragment(val dismissCallback: OnDialogDismiss) :
     }
 
     override fun onBatteryLow() {
-        mRecordAlertDialog = RecordAlertDialog(object : ConfirmDialog.OnConfirmOke {
+        mRecordAlertDialog = RecordAlertDialog(true,object : ConfirmDialog.OnConfirmOke {
             override fun onConfirm() {
                 mainActivity.recordService!!.stopRecording()
             }
         })
-        mRecordAlertDialog!!.isBattery = true
         mRecordAlertDialog!!.show(requireActivity().supportFragmentManager, "DialogBatteryLow")
     }
 
     override fun onLowStorage() {
-        mRecordAlertDialog = RecordAlertDialog(object : ConfirmDialog.OnConfirmOke {
+        mRecordAlertDialog = RecordAlertDialog(false, object : ConfirmDialog.OnConfirmOke {
             override fun onConfirm() {
                 mainActivity.recordService!!.stopRecording()
             }
         })
-        mRecordAlertDialog!!.isBattery = false
         mRecordAlertDialog!!.show(requireActivity().supportFragmentManager, "DialogBatteryLow")
     }
 

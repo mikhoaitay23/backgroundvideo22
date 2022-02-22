@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.text.SpannableString
 import android.widget.RemoteViews
@@ -18,6 +19,7 @@ import androidx.core.graphics.drawable.toBitmap
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.service.RecordService
+import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
 
 
@@ -40,7 +42,7 @@ class RecordNotificationManager(private val mService: RecordService) {
         isVideo: Boolean, importance: Int
     ): NotificationCompat.Builder {
         if (Utils.isAndroidO()) {
-            createChannel(importance)
+            createChannel()
         }
         val builder = NotificationCompat.Builder(mService, CHANNEL_ID)
         builder.apply {
@@ -49,16 +51,14 @@ class RecordNotificationManager(private val mService: RecordService) {
             setCustomContentView(getRemoteViews(title, des, isVideo))
             setOnlyAlertOnce(true)
         }
+        if(importance==0){
+            builder.setSound(Uri.parse(SystemUtils.getResUrl(R.raw.beep_sound)))
+        }
         return builder
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createChannel(importance: Int) {
-//        val importanceLevel= if(importance==0){
-//            NotificationManager.IMPORTANCE_DEFAULT
-//        }else{
-//            NotificationManager.IMPORTANCE_LOW
-//        }
+    private fun createChannel() {
         val mChannel =
             NotificationChannel(CHANNEL_ID, CHANNEL_ID, NotificationManager.IMPORTANCE_LOW)
         mService.getString(R.string.app_name)

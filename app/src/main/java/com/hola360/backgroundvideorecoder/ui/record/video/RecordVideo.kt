@@ -116,7 +116,6 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     }
 
     override fun onStopped() {
-        onStopRecord()
     }
 
     override fun startAction() {
@@ -143,9 +142,5 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
     override fun onDestroy() {
         super.onDestroy()
         orientationListener.disable()
-    }
-
-    companion object{
-        const val ALERT_TAG= "Alert_dialog"
     }
 }
