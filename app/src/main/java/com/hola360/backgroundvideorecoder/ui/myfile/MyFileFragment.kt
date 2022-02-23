@@ -4,16 +4,17 @@ import androidx.viewpager2.widget.ViewPager2
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.databinding.FragmentMyFileBinding
 import com.hola360.backgroundvideorecoder.ui.base.basefragment.BaseFragment
+import com.hola360.backgroundvideorecoder.ui.myfile.adapter.MyFileSectionAdapter
 import com.hola360.backgroundvideorecoder.ui.record.RecordViewPagerAdapter
 
 class MyFileFragment : BaseFragment<FragmentMyFileBinding>() {
 
     override val layoutId: Int = R.layout.fragment_my_file
-    override val showToolbar: Boolean = true
+    override val showToolbar: Boolean = false
     override val toolbarTitle: String? by lazy {
         resources.getString(R.string.my_file_title)
     }
-    override val menuCode: Int = 2
+    override val menuCode: Int = 0
     private val adapter: RecordViewPagerAdapter by lazy {
         RecordViewPagerAdapter(childFragmentManager, lifecycle).apply {
             updateFragment(RecordViewPagerAdapter.MY_FILE_PAGER)

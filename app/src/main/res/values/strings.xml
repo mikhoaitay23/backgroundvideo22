@@ -195,6 +195,15 @@
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
     <string name="share">Share</string>
+    <string name="invalid_filename">This name have special character, please try again!</string>
+    <string name="empty_file_name">Please enter file name!</string>
+    <string name="select_all">Select all</string>
+    <string name="sort_by">Sort by</string>
+    <string name="selected">Selected</string>
+    <plurals name="delete_file_msg">
+        <item quantity="one">Do you want delete this %s file</item>
+        <item quantity="other">Do you want delete this %s files</item>
+    </plurals>
 
     //notification
     <string name="tap_to_open">Tap to open now</string>

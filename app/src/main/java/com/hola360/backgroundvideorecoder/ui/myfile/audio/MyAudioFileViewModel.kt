@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.anggrayudi.storage.file.toRawFile
 import com.hola360.backgroundvideorecoder.data.model.LoadDataStatus
+import com.hola360.backgroundvideorecoder.data.model.mediafile.MediaFile
 import com.hola360.backgroundvideorecoder.data.repository.BackgroundRecordRepository
 import com.hola360.backgroundvideorecoder.data.response.DataResponse
 import com.hola360.backgroundvideorecoder.utils.Configurations
@@ -15,7 +16,8 @@ import java.io.File
 class MyAudioFileViewModel(val application: Application) : ViewModel() {
 
     private val repository = BackgroundRecordRepository(application)
-    val allFileLiveData = MutableLiveData<DataResponse<MutableList<File>>>()
+    val allFileLiveData = MutableLiveData<DataResponse<MutableList<MediaFile>>>()
+    val listMediaFile = mutableListOf<MediaFile>()
 
     init {
         allFileLiveData.value = DataResponse.DataEmptyResponse()
@@ -39,8 +41,11 @@ class MyAudioFileViewModel(val application: Application) : ViewModel() {
                         val file = documentFile.toRawFile(application)
                         val list = repository.getAllFileOnly(file!!)
                         if (!list.isNullOrEmpty()) {
+                            for (i in list) {
+                                listMediaFile.add(MediaFile(i))
+                            }
                             allFileLiveData.value =
-                                DataResponse.DataSuccessResponse(list.toMutableList())
+                                DataResponse.DataSuccessResponse(listMediaFile)
                         } else {
                             allFileLiveData.value = DataResponse.DataErrorResponse()
                         }

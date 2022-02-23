@@ -5,11 +5,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.UriPermission
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.media.AudioManager
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -18,6 +20,7 @@ import com.anggrayudi.storage.file.inSdCardStorage
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
+import com.hola360.backgroundvideorecoder.data.model.mediafile.MediaFile
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import java.io.File
 import java.text.DecimalFormat
@@ -232,19 +235,19 @@ object Utils {
 
     fun groupDataIntoHashMap(
         context: Context,
-        files: List<File>
-    ): LinkedHashMap<String, MutableSet<File>?>? {
-        val groupedHashMap: LinkedHashMap<String, MutableSet<File>?> = LinkedHashMap()
-        var list: MutableSet<File>?
+        files: List<MediaFile>
+    ): LinkedHashMap<String, MutableSet<MediaFile>?>? {
+        val groupedHashMap: LinkedHashMap<String, MutableSet<MediaFile>?> = LinkedHashMap()
+        var list: MutableSet<MediaFile>?
         for (file in files) {
             val mDate =
                 if (DateTimeUtils.getDateMyFileFlag(Calendar.getInstance().timeInMillis) == DateTimeUtils.getDateMyFileFlag(
-                        file.lastModified()
+                        file.file.lastModified()
                     )
                 ) {
                     context.getString(R.string.today)
                 } else {
-                    DateTimeUtils.getDateMyFileFlag(file.lastModified())
+                    DateTimeUtils.getDateMyFileFlag(file.file.lastModified())
                 }
             if (groupedHashMap.containsKey(mDate)) {
                 groupedHashMap[mDate]!!.add(file)
@@ -309,5 +312,34 @@ object Utils {
             else -> ""
         }
 
+    }
+
+    fun getRealPathFromURI(context: Context, contentURI: Uri): String? {
+        val result: String?
+
+        if (isAndroidQ()) {
+            result = PathUtils.getPath(context, contentURI)
+        } else {
+            val cursor: Cursor = context.contentResolver.query(contentURI, null, null, null, null)!!
+            cursor.moveToFirst()
+            val idx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)
+            result = cursor.getString(idx)
+            cursor.close()
+        }
+        return result
+    }
+
+    fun deletePdfFile(
+        context: Context,
+        uri: Uri
+    ): Boolean {
+        val path = getRealPathFromURI(context, uri)
+        val file = File(path!!)
+        val deleted = context.contentResolver.delete(
+            uri,
+            null,
+            null
+        ) > 0
+        return deleted || file.delete()
     }
 }

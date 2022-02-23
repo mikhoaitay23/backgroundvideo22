@@ -16,21 +16,17 @@ object Constants {
         Manifest.permission.RECORD_AUDIO
     )
 
-val RECORD_AUDIO_PERMISSION = Manifest.permission.RECORD_AUDIO
+    val RECORD_AUDIO_PERMISSION = Manifest.permission.RECORD_AUDIO
 
-const val FOLDER_NAME = "BackgroundRecorder"
+    const val FOLDER_NAME = "BackgroundRecorder"
 
-const val RECORD_VIDEO_TYPE = "Record_type"
-const val VIDEO_STATUS = "Video_status"
-const val SCHEDULE_TYPE = "Schedule_type"
-
-const val RECORD_AUDIO_TYPE = "RECORD_AUDIO_TYPE"
-const val RECORD_AUDIO_STATUS = "AUDIO_STATUS"
+    const val SCHEDULE_TYPE = "Schedule_type"
 
 
-val TIME_ZONE_OFFSET = TimeZone.getDefault().getOffset(Date().time)
-const val DELETE_DIALOG = "DeleteDialog"
-const val ASSETS_PATH: String = "file:///android_asset/"
-const val PHOTO_PATH: String = "ScanQrCode"
+    val TIME_ZONE_OFFSET = TimeZone.getDefault().getOffset(Date().time)
+    const val DELETE_DIALOG = "DeleteDialog"
+    const val ASSETS_PATH: String = "file:///android_asset/"
+    const val PHOTO_PATH: String = "ScanQrCode"
+    const val REGEX_FILENAME = "^$|(?!.*\\.\\.)(?!.*\\.\$)[^\\W][\\s\\w.]{0,29}\$"
 
 }

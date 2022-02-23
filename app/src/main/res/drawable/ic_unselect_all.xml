@@ -1,0 +1,21 @@
+<vector android:height="32dp" android:viewportHeight="192"
+    android:viewportWidth="192" android:width="32dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@color/md_white_1000" android:pathData="M-133.62,-60.52l78,78 78,-78Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M65.29,65.26h61.41v61.66h-61.41z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M71.43,34.93V46.77H59.36V34.93Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M132.58,46.82h-12V34.94h12Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M34.92,59.27H46.77V71.33H34.92Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M157.07,71.43H145.25V59.38h11.82Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M34.94,120.53H46.81V132.6H34.94Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M157.11,120.55v12H145.18v-12Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M59.34,157V145.15H71.41V157Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M132.65,145.21V157H120.59V145.21Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M90,46.76V34.9h11.86V46.76Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M46.8,101.94H34.93V90.07H46.8Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M157.05,101.92H145.2V90.07h11.85Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M90.05,145.12h11.87V157H90.05Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M34.89,45.83V34.92H45.82Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M45.76,157.11H34.94V145.9Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M157.1,34.89V46.06L146,34.89Z"/>
+    <path android:fillColor="@color/md_white_1000" android:pathData="M157.07,146.28V157H146.29Z"/>
+</vector>

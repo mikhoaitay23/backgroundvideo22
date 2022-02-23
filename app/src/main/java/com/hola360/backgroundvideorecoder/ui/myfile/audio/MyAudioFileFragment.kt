@@ -8,13 +8,13 @@ import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.LoadDataStatus
 import com.hola360.backgroundvideorecoder.data.response.DataResponse
 import com.hola360.backgroundvideorecoder.databinding.LayoutMyAudioFileBinding
-import com.hola360.backgroundvideorecoder.ui.myfile.adapter.MyFileSessionAdapter
+import com.hola360.backgroundvideorecoder.ui.myfile.adapter.MyFileSectionAdapter
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
 import com.hola360.backgroundvideorecoder.utils.Utils.groupDataIntoHashMap
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
 
 class MyAudioFileFragment : BaseRecordPageFragment<LayoutMyAudioFileBinding>(),
-    MyFileSessionAdapter.OnClickListener {
+    MyFileSectionAdapter.OnClickListener {
 
     private lateinit var viewModel: MyAudioFileViewModel
     private var mFileSectionAdapter = SectionedRecyclerViewAdapter()
@@ -47,7 +47,7 @@ class MyAudioFileFragment : BaseRecordPageFragment<LayoutMyAudioFileBinding>(),
                             if (value != null) {
                                 if (value.size > 0) {
                                     mFileSectionAdapter.addSection(
-                                        MyFileSessionAdapter(
+                                        MyFileSectionAdapter(
                                             key,
                                             value.toMutableList(),
                                             this
@@ -68,7 +68,7 @@ class MyAudioFileFragment : BaseRecordPageFragment<LayoutMyAudioFileBinding>(),
         }
     }
 
-    override fun onOptionClicked(position: Int, view: View) {
+    override fun onClicked(position: Int, view: View) {
         showActionItem(view)
     }
 
@@ -80,7 +80,7 @@ class MyAudioFileFragment : BaseRecordPageFragment<LayoutMyAudioFileBinding>(),
             ), view.findViewById(R.id.btnOption)
         )
         with(popupMenu) {
-            inflate(R.menu.menu_option_my_file)
+            inflate(R.menu.menu_option_item_my_file)
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.action_select -> {
