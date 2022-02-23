@@ -8,46 +8,163 @@
             name="viewModel"
             type="com.hola360.backgroundvideorecoder.ui.myfile.video.MyVideoFileViewModel" />
 
+        <variable
+            name="isSelectMode"
+            type="Boolean" />
+
         <import type="android.view.View" />
     </data>
 
-    <RelativeLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcMyVideoFile"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            android:layout_height="?actionBarSize"
+            android:background="@color/colorAccent"
+            android:orientation="horizontal">
 
-        <ProgressBar
-            android:id="@+id/mProgressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="@dimen/toolbar_back_icon_height"
+                android:layout_height="@dimen/toolbar_back_icon_height"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:setBackButton="@{isSelectMode}"
+                app:tint="@color/md_white_1000" />
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="@{viewModel.isEmpty()?View.VISIBLE:View.GONE}">
-
-            <androidx.appcompat.widget.AppCompatImageView
+            <TextView
+                android:id="@+id/title"
+                style="@style/TextAppearanceToolbar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_empty_file" />
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:text="@string/my_file_title"
+                android:textColor="@color/md_white_1000"
+                android:visibility="@{isSelectMode?View.GONE:View.VISIBLE}" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{isSelectMode?View.GONE:View.VISIBLE}">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btnOption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:padding="@dimen/dp_8"
+                        app:srcCompat="@drawable/ic_option" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btnSearch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/btnOption"
+                        android:padding="@dimen/dp_8"
+                        app:srcCompat="@drawable/ic_search" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{isSelectMode?View.VISIBLE:View.GONE}">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="@dimen/dp_20"
+                        android:layout_toStartOf="@id/btnDelete"
+                        android:textAppearance="?textAppearanceHeadline6"
+                        android:textColor="@color/md_white_1000" />
+
+                    <RadioButton
+                        android:id="@+id/btnSelectAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:button="@drawable/bg_btn_select_all"
+                        android:buttonTint="@color/md_white_1000"
+                        android:padding="@dimen/dp_8" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btnShare"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/btnSelectAll"
+                        android:padding="@dimen/dp_8"
+                        android:tint="@color/md_white_1000"
+                        app:srcCompat="@drawable/ic_share" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btnDelete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/btnShare"
+                        android:padding="@dimen/dp_8"
+                        android:tint="@color/md_white_1000"
+                        app:srcCompat="@drawable/ic_delete" />
+                </RelativeLayout>
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcMyVideoFile"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <ProgressBar
+                android:id="@+id/mProgressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/empty_file"
-                android:textAppearance="?textAppearanceBody1" />
+                android:layout_centerInParent="true" />
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
-    </RelativeLayout>
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="@{viewModel.isEmpty()?View.VISIBLE:View.GONE}">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_empty_file" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/empty_file"
+                    android:textAppearance="?textAppearanceBody1" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </RelativeLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 </layout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/dp_16">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rename"
+            android:textAppearance="?textAppearanceHeadline6"
+            android:textColor="@color/colorAccent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/myTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/dp_8"
+            app:endIconDrawable="@drawable/ic_cancel"
+            app:endIconMode="clear_text">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/myEditTextName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="?backgroundColor"
+                android:maxLength="80" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/myButtonCancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dp_16"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_cancel"
+                android:gravity="center"
+                android:paddingVertical="@dimen/dp_8"
+                android:text="@string/cancel"
+                android:textAllCaps="false"
+                android:textAppearance="?textAppearanceButton"
+                android:textColor="@color/colorAccent"
+                app:cornerRadius="@dimen/dp_8" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/myButtonOk"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dp_16"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_start"
+                android:gravity="center"
+                android:paddingVertical="@dimen/dp_8"
+                android:text="@string/ok"
+                android:textAppearance="?textAppearanceButton"
+                android:textColor="@color/white"
+                app:cornerRadius="@dimen/dp_8" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </LinearLayout>
+</layout>

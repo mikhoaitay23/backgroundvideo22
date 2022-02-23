@@ -9,9 +9,12 @@ import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
+import android.view.ContextThemeWrapper
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.PopupMenu
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
@@ -21,6 +24,8 @@ import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
+import com.hola360.backgroundvideorecoder.ui.myfile.MyFileFragment
+import com.hola360.backgroundvideorecoder.ui.myfile.video.MyVideoFileFragment
 import com.hola360.backgroundvideorecoder.ui.setting.applock.AppLockFragment
 import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
@@ -62,12 +67,6 @@ class MainActivity : AppCompatActivity() {
                 navController?.popBackStack()
             }
         })
-        binding!!.toolbar.btnOption.setOnClickListener {
-
-        }
-        binding!!.toolbar.btnSearch.setOnClickListener {
-
-        }
         SCREEN_WIDTH = SystemUtils.getScreenWidth(this)
         SCREEN_HEIGHT = SystemUtils.getScreenHeight(this)
     }
@@ -75,9 +74,9 @@ class MainActivity : AppCompatActivity() {
     private fun setupPrivacyAndAppLock() {
         if (!dataSharedPreferenceUtils!!.getBooleanValue(PRIVACY)) {
             navController!!.navigate(R.id.nav_confirm_privacy)
-        }else{
-            val passcode= dataSharedPreferenceUtils!!.getPasscode() ?: ""
-            if(passcode != ""){
+        } else {
+            val passcode = dataSharedPreferenceUtils!!.getPasscode() ?: ""
+            if (passcode != "") {
                 navController!!.navigate(NavMainGraphDirections.actionToNavAppLock(AppLockFragment.LOGIN_MODE))
             }
         }
@@ -99,7 +98,7 @@ class MainActivity : AppCompatActivity() {
         binding?.toolbar?.showToolbarMenu(menuCode)
     }
 
-    fun showAlertPermissionNotGrant(){
+    fun showAlertPermissionNotGrant() {
         if (!SystemUtils.hasShowRequestPermissionRationale(this, *Utils.getStoragePermissions())
         ) {
             val snackBar = Snackbar.make(
@@ -157,16 +156,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        val fragment= navHostFragment!!.childFragmentManager.fragments[0]
-        if(fragment!= null){
-            if(fragment is AppLockFragment){
-                if(fragment.type == AppLockFragment.LOGIN_MODE){
+        val fragment = navHostFragment!!.childFragmentManager.fragments[0]
+        if (fragment != null) {
+            if (fragment is AppLockFragment) {
+                if (fragment.type == AppLockFragment.LOGIN_MODE) {
                     finish()
                 }
-            }else{
+            } else {
                 super.onBackPressed()
             }
-        }else{
+        } else {
             super.onBackPressed()
         }
     }

@@ -7,17 +7,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.anggrayudi.storage.file.mimeType
 import com.bumptech.glide.Glide
 import com.hola360.backgroundvideorecoder.R
+import com.hola360.backgroundvideorecoder.data.model.mediafile.MediaFile
 import com.hola360.backgroundvideorecoder.databinding.ItemHeaderRcMyfileBinding
 import com.hola360.backgroundvideorecoder.databinding.ItemRcMyfileBinding
 import com.hola360.backgroundvideorecoder.utils.DateTimeUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
 import io.github.luizgrp.sectionedrecyclerviewadapter.Section
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters
-import java.io.File
 
-class MyFileSessionAdapter(
+class MyFileSectionAdapter(
     private val title: String,
-    private val files: MutableList<File>?,
+    private val files: MutableList<MediaFile>,
     var onClickListener: OnClickListener
 ) : Section(
     SectionParameters.builder()
@@ -25,7 +25,30 @@ class MyFileSessionAdapter(
         .headerResourceId(R.layout.item_header_rc_myfile)
         .build()
 ) {
-    override fun getContentItemsTotal() = files?.size ?: 0
+
+    var isSelectMode = false
+
+    fun updateSelected(position: Int) {
+        files[position].isSelect = !files[position].isSelect
+    }
+
+    fun countItemSelected(): Int {
+        return files.count { it.isSelect }
+    }
+
+    fun updateSelect(isAll: Boolean) {
+        if (isAll) {
+            files.forEachIndexed { index, mediaFile ->
+                mediaFile.isSelect = true
+            }
+        } else {
+            files.forEachIndexed { index, mediaFile ->
+                mediaFile.isSelect = false
+            }
+        }
+    }
+
+    override fun getContentItemsTotal() = files.size
 
     override fun getItemViewHolder(view: View?): RecyclerView.ViewHolder {
         val itemRcMyFileBinding =
@@ -57,22 +80,34 @@ class MyFileSessionAdapter(
     inner class MediaViewHolder(val binding: ItemRcMyfileBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
-            if (files?.get(position)?.mimeType == binding.root.context.getString(R.string.audio_mime_type)) {
+            if (isSelectMode) {
+                binding.btnOption.visibility = View.INVISIBLE
+                binding.btnSelect.visibility = View.VISIBLE
+            } else {
+                binding.btnOption.visibility = View.VISIBLE
+                binding.btnSelect.visibility = View.INVISIBLE
+            }
+            if (files[position].file.mimeType == binding.root.context.getString(R.string.audio_mime_type)) {
                 binding.imgRecord.setImageResource(R.drawable.img_default_photo)
             } else {
-                Glide.with(binding.imgRecord.context).load(files?.get(position)?.absolutePath)
+                Glide.with(binding.imgRecord.context).load(files[position].file.absolutePath)
                     .into(binding.imgRecord)
             }
-            binding.tvName.text = files?.get(position)?.name
+            binding.tvName.text = files[position].file.name
             binding.tvDuration.text = String.format(
                 binding.root.context.getString(R.string.duration_size_my_file),
-                Utils.getDuration(files?.get(position)!!),
-                Utils.getFileSize(files[position])
+                Utils.getDuration(files[position].file),
+                Utils.getFileSize(files[position].file)
             )
             binding.tvDateTime.text =
-                DateTimeUtils.getTimeDateMyFile(files[position].lastModified())
+                DateTimeUtils.getTimeDateMyFile(files[position].file.lastModified())
+            binding.btnSelect.isChecked = files[position].isSelect
+
             binding.btnOption.setOnClickListener {
-                onClickListener.onOptionClicked(position, binding.btnOption)
+                onClickListener.onClicked(position, binding.btnOption)
+            }
+            binding.btnSelect.setOnClickListener {
+                onClickListener.onClicked(position, binding.btnSelect)
             }
         }
     }
@@ -85,6 +120,6 @@ class MyFileSessionAdapter(
     }
 
     interface OnClickListener {
-        fun onOptionClicked(position: Int, view: View)
+        fun onClicked(position: Int, view: View)
     }
 }
