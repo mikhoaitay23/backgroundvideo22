@@ -3,16 +3,12 @@ package com.hola360.backgroundvideorecoder.utils
 import android.content.ContentValues
 import android.content.Context
 import android.provider.MediaStore
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Surface
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
-import androidx.core.content.res.ResourcesCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LifecycleOwner
 import com.anggrayudi.storage.file.findFolder
@@ -25,7 +21,6 @@ import com.hola360.backgroundvideorecoder.ui.record.video.model.VideoRecordConfi
 import com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel
 import java.text.SimpleDateFormat
 import java.util.*
-import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.ui.record.audio.utils.io.FileWritableInSdCardAccessIO
 import java.io.*
 
@@ -162,7 +157,7 @@ object VideoRecordUtils {
             .build()
     }
 
-    fun generateFileOutput(file:File):FileOutputOptions{
+    fun generateFileOutputOptions(file:File):FileOutputOptions{
         return FileOutputOptions.Builder(file).build()
     }
 
@@ -247,7 +242,7 @@ object VideoRecordUtils {
         return !((orientationAngle in 46..134) || (orientationAngle in 226..314))
     }
 
-    fun generateOutputFile(context: Context, videoFileName:String): DocumentFile?{
+    fun generateVideoOutputFile(context: Context, videoFileName:String): DocumentFile?{
         val parentPath = SharedPreferenceUtils.getInstance(context)?.getParentPath()
         val rootParentDocFile = Utils.getDocumentFile(context, parentPath!!)
         return if (rootParentDocFile != null && rootParentDocFile.exists()) {
@@ -280,13 +275,20 @@ object VideoRecordUtils {
             val file=File(filePath)
             val bytes = ByteArray(file.length().toInt())
             val fos= FileInputStream(file)
-            val buffer= BufferedInputStream(fos)
-            buffer.read(bytes)
-            buffer.close()
-            val videoOutputFile= generateOutputFile(context, videoFileName)
+            val videoOutputFile= generateVideoOutputFile(context, videoFileName)
             videoOutputFile?.let {
                 val sdCardFileWriter= FileWritableInSdCardAccessIO(context, it.uri)
-                sdCardFileWriter.write(bytes, 0, bytes.size)
+                val bufferSize= ByteArray(bytes.size)
+                var len=0
+                while(len != -1){
+                    len= fos.read(bufferSize)
+                    if(len!=-1){
+                        sdCardFileWriter.write(bufferSize,0, len)
+                    }
+                }
+                sdCardFileWriter.close()
+                fos.close()
+                file.delete()
             }
         }catch (ex:FileNotFoundException){
             Log.d("abcVideo", "file not found")

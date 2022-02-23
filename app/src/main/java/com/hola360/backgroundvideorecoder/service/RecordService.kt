@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.Uri
 import android.os.*
 import android.provider.Settings
 import android.text.SpannableString
@@ -199,7 +200,7 @@ class RecordService : Service() {
                                 }
                             }
 
-                            override fun onFinishInterval(filePath: String, videoFileName:String) {
+                            override fun onFinishInterval(filePath: String, videoFileName: String) {
                                 CoroutineScope(Dispatchers.IO).launch {
                                     launch {
                                         VideoRecordUtils.transferFile(this@RecordService, filePath, videoFileName)
@@ -242,6 +243,7 @@ class RecordService : Service() {
     fun stopRecordVideo() {
         if (recordStateLiveData.value == RecordState.VideoRecording) {
             recordStateLiveData.value = RecordState.None
+            videoPreviewVideoWindow!!.stopRecording()
             videoPreviewVideoWindow?.close()
             videoPreviewVideoWindow = null
             VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)

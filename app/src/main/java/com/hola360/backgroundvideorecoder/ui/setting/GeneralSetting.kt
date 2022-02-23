@@ -177,7 +177,9 @@ class GeneralSetting: BaseRecordPageFragment<LayoutSettingGeneralBinding>(), Vie
             }
         }
 
-    private fun setupWhenPermissionGranted(){}
+    private fun setupWhenPermissionGranted(){
+        startPickFolder()
+    }
 
     private fun requestPermission() {
         if (SystemUtils.isAndroidR()) {

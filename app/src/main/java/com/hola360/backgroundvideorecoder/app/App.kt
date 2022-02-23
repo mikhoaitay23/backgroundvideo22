@@ -16,7 +16,7 @@ class App: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        createNoneChannelNotification()
+//        createNoneChannelNotification()
     }
 
     private fun createNoneChannelNotification(){

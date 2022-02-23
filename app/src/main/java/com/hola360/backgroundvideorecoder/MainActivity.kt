@@ -21,6 +21,7 @@ import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.data.model.audio.AudioModel
 import com.hola360.backgroundvideorecoder.databinding.ActivityMainBinding
 import com.hola360.backgroundvideorecoder.service.RecordService
+import com.hola360.backgroundvideorecoder.ui.privacy.ConfirmPrivacy
 import com.hola360.backgroundvideorecoder.ui.setting.applock.AppLockFragment
 import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.SystemUtils
@@ -159,12 +160,18 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         val fragment= navHostFragment!!.childFragmentManager.fragments[0]
         if(fragment!= null){
-            if(fragment is AppLockFragment){
-                if(fragment.type == AppLockFragment.LOGIN_MODE){
+            when(fragment){
+                is AppLockFragment->{
+                    if(fragment.type == AppLockFragment.LOGIN_MODE){
+                        finish()
+                    }
+                }
+                is ConfirmPrivacy ->{
                     finish()
                 }
-            }else{
-                super.onBackPressed()
+                else->{
+                    super.onBackPressed()
+                }
             }
         }else{
             super.onBackPressed()
