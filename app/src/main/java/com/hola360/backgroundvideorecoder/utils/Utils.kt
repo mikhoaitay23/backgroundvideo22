@@ -2,7 +2,9 @@ package com.hola360.backgroundvideorecoder.utils
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.UriPermission
 import android.content.pm.PackageManager
 import android.database.Cursor
@@ -28,6 +30,8 @@ import java.text.NumberFormat
 import java.util.*
 import kotlin.math.ln
 import kotlin.math.pow
+import androidx.core.content.FileProvider
+import com.hola360.backgroundvideorecoder.BuildConfig
 
 
 object Utils {
@@ -341,5 +345,23 @@ object Utils {
             null
         ) > 0
         return deleted || file.delete()
+    }
+
+    fun openMp4File(context: Context, file: File) {
+        val mimeType = "video/mp4"
+        try {
+            val intent = Intent(Intent.ACTION_VIEW)
+            val data = FileProvider.getUriForFile(
+                context,
+                BuildConfig.APPLICATION_ID + ".provider",
+                file
+            )
+            intent.setDataAndType(data, mimeType)
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            ToastUtils.getInstance(context)
+                ?.showToast(context.getString(R.string.cannot_open_mp4))
+        }
     }
 }

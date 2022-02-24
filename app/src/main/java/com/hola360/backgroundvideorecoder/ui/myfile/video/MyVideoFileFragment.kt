@@ -3,21 +3,24 @@ package com.hola360.backgroundvideorecoder.ui.myfile.video
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
-import android.widget.CompoundButton
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.LoadDataStatus
+import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.mediafile.MediaFile
 import com.hola360.backgroundvideorecoder.data.response.DataResponse
 import com.hola360.backgroundvideorecoder.databinding.LayoutMyVideoFileBinding
 import com.hola360.backgroundvideorecoder.ui.dialog.ConfirmDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.ui.dialog.input.InputTextDialog
+import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
+import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.myfile.adapter.MyFileSectionAdapter
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
+import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
 
@@ -29,6 +32,8 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
     private var mFileSectionAdapter: MyFileSectionAdapter? = null
     private var fileList = mutableListOf<MediaFile>()
     private lateinit var mainActivity: MainActivity
+    private var mListSelectionBottomSheet: ListSelectionBotDialog? = null
+    private var showBottomSheet = false
     private val confirmCancelSchedule: ConfirmDialog by lazy {
         ConfirmDialog(object : ConfirmDialog.OnConfirmOke {
             override fun onConfirm() {
@@ -51,6 +56,7 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
         binding!!.btnOption.setOnClickListener(this)
         binding!!.btnSearch.setOnClickListener(this)
         binding!!.btnSelectAll.setOnClickListener(this)
+        binding!!.btnSelectAll.isChecked = false
 
         binding!!.lifecycleOwner = this
         binding!!.viewModel = viewModel
@@ -114,6 +120,14 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
             binding!!.btnSearch -> {
 
             }
+            binding!!.btnSelectAll -> {
+                binding!!.btnSelectAll.isChecked = !binding!!.btnSelectAll.isChecked
+                mFileSectionAdapter?.updateSelect(binding!!.btnSelectAll.isChecked)
+                binding!!.tvCount.text =
+                    mFileSectionAdapter?.countItemSelected().toString().plus(" ")
+                        .plus(getString(R.string.selected))
+                mSectionRecyclerViewAdapter.notifyDataSetChanged()
+            }
         }
     }
 
@@ -130,6 +144,9 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
                 binding!!.btnSelectAll.isChecked =
                     mFileSectionAdapter?.countItemSelected() == mSectionRecyclerViewAdapter.itemCount - 1
                 mSectionRecyclerViewAdapter.notifyDataSetChanged()
+            }
+            R.id.mLayoutRoot -> {
+                Utils.openMp4File(requireContext(), fileList[position].file)
             }
         }
     }
@@ -211,7 +228,8 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
                         onSelectAll()
                     }
                     R.id.action_sort_by -> {
-
+                        showBottomSheet = true
+                        onSortByBottomSheet()
                     }
                 }
                 false
@@ -221,7 +239,6 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
     }
 
     private fun onSelectAll() {
-        binding!!.btnSelectAll.isChecked = !binding!!.btnSelectAll.isChecked
         mFileSectionAdapter?.updateSelect(binding!!.btnSelectAll.isChecked)
         mFileSectionAdapter?.isSelectMode = true
         binding!!.isSelectMode = mFileSectionAdapter?.isSelectMode
@@ -229,6 +246,96 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
             mFileSectionAdapter?.countItemSelected().toString().plus(" ")
                 .plus(getString(R.string.selected))
         mSectionRecyclerViewAdapter.notifyDataSetChanged()
+    }
+
+    private fun onSortByBottomSheet() {
+        val listSelection = resources.getStringArray(R.array.sort_by).toMutableList()
+        mListSelectionBottomSheet = ListSelectionBotDialog(
+            getString(R.string.sort_by),
+            listSelection,
+            object : ListSelectionAdapter.OnItemListSelection {
+                override fun onSelection(position: Int) {
+                    when (position) {
+                        0 -> {
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortByDate(true)
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortByASC(false)
+                            startApplyNewSort()
+                        }
+                        1 -> {
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortByDate(true)
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortByASC(true)
+                            startApplyNewSort()
+                        }
+                        2 -> {
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortBySize(true)
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortByASC(false)
+                            startApplyNewSort()
+                        }
+                        3 -> {
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortBySize(true)
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortByASC(true)
+                            startApplyNewSort()
+                        }
+                        4 -> {
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortByName(true)
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortByASC(false)
+                            startApplyNewSort()
+                        }
+                        5 -> {
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortByName(true)
+                            SharedPreferenceUtils.getInstance(mainActivity)?.setSortByASC(true)
+                            startApplyNewSort()
+                        }
+                    }
+                    mListSelectionBottomSheet!!.dialog!!.dismiss()
+                }
+
+            }, object : OnDialogDismiss {
+                override fun onDismiss() {
+                    showBottomSheet = false
+                }
+
+            })
+        when {
+            SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortByDate()!! && !SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortByASC()!! -> {
+                mListSelectionBottomSheet!!.setSelectionPos(0)
+            }
+            SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortByDate()!! && SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortByASC()!! -> {
+                mListSelectionBottomSheet!!.setSelectionPos(1)
+            }
+            SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortBySize()!! && !SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortByASC()!! -> {
+                mListSelectionBottomSheet!!.setSelectionPos(2)
+            }
+            SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortBySize()!! && SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortByASC()!! -> {
+                mListSelectionBottomSheet!!.setSelectionPos(3)
+            }
+            SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortByName()!! && !SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortByASC()!! -> {
+                mListSelectionBottomSheet!!.setSelectionPos(4)
+            }
+            SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortByName()!! && SharedPreferenceUtils.getInstance(requireContext())
+                ?.getSortByASC()!! -> {
+                mListSelectionBottomSheet!!.setSelectionPos(5)
+            }
+        }
+        mListSelectionBottomSheet!!.show(
+            requireActivity().supportFragmentManager,
+            "bottomSheetAudioRecordMode"
+        )
+    }
+
+    private fun startApplyNewSort() {
+        viewModel.applyNewSort()
     }
 
 

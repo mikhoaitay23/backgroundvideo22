@@ -27,6 +27,9 @@ object MyFileUtil {
             fileList.addAll(file.listFiles()!!.filter {
                 !it.isHidden && it.isFile
             })
+            fileList.sortByDescending {
+                it.lastModified()
+            }
         }
         return fileList
     }

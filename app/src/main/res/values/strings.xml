@@ -200,10 +200,26 @@
     <string name="select_all">Select all</string>
     <string name="sort_by">Sort by</string>
     <string name="selected">Selected</string>
+    <string name="sort_by_newest_date_first">Newest date first</string>
+    <string name="sort_by_oldest_date_first">Oldest date first</string>
+    <string name="sort_by_largest_first">Largest first</string>
+    <string name="sort_by_smallest_first">Smallest first</string>
+    <string name="sort_by_name_az">Name A-Z</string>
+    <string name="sort_by_name_za">Name Z-A</string>
+
     <plurals name="delete_file_msg">
         <item quantity="one">Do you want delete this %s file</item>
         <item quantity="other">Do you want delete this %s files</item>
     </plurals>
+    <string name="cannot_open_mp4">Cannot open file mp4</string>
+    <array name="sort_by">
+        <item>@string/sort_by_newest_date_first</item>
+        <item>@string/sort_by_oldest_date_first</item>
+        <item>@string/sort_by_largest_first</item>
+        <item>@string/sort_by_smallest_first</item>
+        <item>@string/sort_by_name_az</item>
+        <item>@string/sort_by_name_za</item>
+    </array>
 
     //notification
     <string name="tap_to_open">Tap to open now</string>
