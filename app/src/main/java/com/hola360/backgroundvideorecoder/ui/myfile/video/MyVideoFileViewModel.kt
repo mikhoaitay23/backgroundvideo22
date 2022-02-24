@@ -58,6 +58,47 @@ class MyVideoFileViewModel(val application: Application) : ViewModel() {
         }
     }
 
+    private fun MutableList<MediaFile>.sort() {
+        if (SharedPreferenceUtils.getInstance(application)?.getSortByDate() == true) {
+            if (SharedPreferenceUtils.getInstance(application)?.getSortByASC() == true) {
+                this.sortBy {
+                    it.file.lastModified()
+                }
+            } else {
+                this.sortByDescending {
+                    it.file.lastModified()
+                }
+            }
+        } else if (SharedPreferenceUtils.getInstance(application)?.getSortBySize() == true) {
+            if (SharedPreferenceUtils.getInstance(application)?.getSortByASC() == true) {
+                this.sortBy {
+                    it.file.length()
+                }
+            } else {
+                this.sortByDescending {
+                    it.file.length()
+                }
+            }
+        } else {
+            if (SharedPreferenceUtils.getInstance(application)?.getSortByASC() == true) {
+                this.sortBy {
+                    it.file.name
+                }
+            } else {
+                this.sortByDescending {
+                    it.file.name
+                }
+            }
+        }
+    }
+
+    fun applyNewSort() {
+        if (listMediaFile.isNotEmpty()) {
+            listMediaFile.sort()
+            allFileLiveData.value = DataResponse.DataSuccessResponse(listMediaFile)
+        }
+    }
+
     class Factory(private val application: Application) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

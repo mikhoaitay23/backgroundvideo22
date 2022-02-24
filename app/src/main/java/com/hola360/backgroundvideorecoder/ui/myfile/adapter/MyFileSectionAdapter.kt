@@ -109,6 +109,9 @@ class MyFileSectionAdapter(
             binding.btnSelect.setOnClickListener {
                 onClickListener.onClicked(position, binding.btnSelect)
             }
+            binding.root.setOnClickListener {
+                onClickListener.onClicked(position, binding.mLayoutRoot)
+            }
         }
     }
 

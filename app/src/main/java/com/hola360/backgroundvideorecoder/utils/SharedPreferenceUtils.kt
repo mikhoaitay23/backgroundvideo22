@@ -32,11 +32,11 @@ class SharedPreferenceUtils private constructor(context: Context) {
         return getStringValue("Record_schedule")
     }
 
-    fun putGeneralSetting(value: String){
+    fun putGeneralSetting(value: String) {
         putStringValue("General_setting", value)
     }
 
-    fun getGeneralSetting():String?{
+    fun getGeneralSetting(): String? {
         return getStringValue("General_setting")
     }
 
@@ -96,12 +96,44 @@ class SharedPreferenceUtils private constructor(context: Context) {
         return getStringValue("key_sdcard")
     }
 
-    fun putPasscode(value: String){
+    fun putPasscode(value: String) {
         putStringValue("Login_passcode", value)
     }
 
-    fun getPasscode():String?{
+    fun getPasscode(): String? {
         return getStringValue("Login_passcode")
+    }
+
+    fun setSortByDate(value: Boolean) {
+        putBooleanValue("Sort_by_date", value)
+    }
+
+    fun setSortBySize(value: Boolean) {
+        putBooleanValue("Sort_by_size", value)
+    }
+
+    fun setSortByName(value: Boolean) {
+        putBooleanValue("Sort_by_name", value)
+    }
+
+    fun setSortByASC(value: Boolean) {
+        putBooleanValue("Sort_by_asc", value)
+    }
+
+    fun getSortByDate(): Boolean {
+        return getBooleanValue("Sort_by_date")
+    }
+
+    fun getSortBySize(): Boolean {
+        return getBooleanValue("Sort_by_size")
+    }
+
+    fun getSortByName(): Boolean {
+        return getBooleanValue("Sort_by_name")
+    }
+
+    fun getSortByASC(): Boolean {
+        return getBooleanValue("Sort_by_asc")
     }
 
     companion object {
