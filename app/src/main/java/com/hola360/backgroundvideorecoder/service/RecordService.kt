@@ -7,15 +7,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
 import android.os.*
 import android.provider.Settings
-import android.text.SpannableString
 import android.util.Log
 import android.view.OrientationEventListener
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import com.anggrayudi.storage.extension.launchOnUiThread
 import com.anggrayudi.storage.file.StorageId
 import com.google.gson.Gson
 import com.hola360.backgroundvideorecoder.R
@@ -68,9 +64,7 @@ class RecordService : Service() {
             mTimeCheckStorage = 0L
         }
     }
-    private val generalSetting: SettingGeneralModel by lazy {
-        VideoRecordUtils.getSettingGeneralModel(this)
-    }
+    private var generalSetting: SettingGeneralModel ?= null
     private var showBatteryAlertDialog=false
     private var showStorageAlertDialog=false
 
@@ -80,28 +74,30 @@ class RecordService : Service() {
 
     private inner class ServiceManager {
         fun startRecord() {
+            generalSetting= VideoRecordUtils.getSettingGeneralModel(this@RecordService)
             val notification = mRecordNotificationManager.getNotification(
                 notificationTitle, notificationContent,
-                recordStateLiveData.value == RecordState.VideoRecording, generalSetting.notificationImportance
+                recordStateLiveData.value == RecordState.VideoRecording, generalSetting!!.notificationImportance
             )
-            startForeground(RecordNotificationManager.NOTIFICATION_ID, notification)
+            startForeground(RecordNotificationManager.SOUND_NOTIFICATION_ID, notification)
         }
 
         fun startSchedule(time: Long) {
+            generalSetting= VideoRecordUtils.getSettingGeneralModel(this@RecordService)
             val notification = mRecordNotificationManager.getNotification(
                 notificationTitle, notificationContent,
-                recordStateLiveData.value == RecordState.VideoSchedule, generalSetting.notificationImportance
+                recordStateLiveData.value == RecordState.VideoSchedule, generalSetting!!.notificationImportance
             )
-            startForeground(RecordNotificationManager.NOTIFICATION_ID, notification)
+            startForeground(RecordNotificationManager.SOUND_NOTIFICATION_ID, notification)
         }
 
         fun updateProgress(time: String) {
             val notification = mRecordNotificationManager.getNotification(
                 notificationTitle, time,
-                recordStateLiveData.value == RecordState.VideoRecording, generalSetting.notificationImportance
+                recordStateLiveData.value == RecordState.VideoRecording, generalSetting!!.notificationImportance
             )
             mRecordNotificationManager.notificationManager.notify(
-                RecordNotificationManager.NOTIFICATION_ID,
+                RecordNotificationManager.SOUND_NOTIFICATION_ID,
                 notification
             )
         }
@@ -120,6 +116,7 @@ class RecordService : Service() {
         super.onCreate()
         mServiceManager = ServiceManager()
         recordStateLiveData.value = RecordState.None
+        generalSetting= VideoRecordUtils.getSettingGeneralModel(this@RecordService)
         initReceiver()
     }
 
@@ -160,7 +157,7 @@ class RecordService : Service() {
                             val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
                             val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
                             val mBattery = level * 100 / scale
-                            if (!showBatteryAlertDialog && generalSetting.checkBattery && mBattery <= BATTERY_PERCENT_ALERT) {
+                            if (!showBatteryAlertDialog && generalSetting!!.checkBattery && mBattery <= BATTERY_PERCENT_ALERT) {
                                 showBatteryAlertDialog=true
                                 val state = recordStateLiveData.value
                                 if (state == RecordState.AudioRecording || state == RecordState.VideoRecording) {
@@ -183,7 +180,7 @@ class RecordService : Service() {
                 videoPreviewVideoWindow =
                     PreviewVideoWindow(
                         this,
-                        videoOrientation, generalSetting.storageId== StorageId.PRIMARY,
+                        videoOrientation, generalSetting!!.storageId== StorageId.PRIMARY,
                         object : PreviewVideoWindow.RecordAction {
                             override fun onStartNewInterval() {
                                 checkStoragePercent()
@@ -194,7 +191,7 @@ class RecordService : Service() {
                                     listener?.onUpdateTime("", 0L, recordTime)
                                     notificationContent = VideoRecordUtils.generateRecordTime(recordTime)
                                     val notification = mRecordNotificationManager.getNotification(
-                                        notificationTitle, notificationContent, true, generalSetting.notificationImportance
+                                        notificationTitle, notificationContent, true, generalSetting!!.notificationImportance
                                     )
                                     mRecordNotificationManager.notifyNewStatus(notification)
                                 }
@@ -214,7 +211,7 @@ class RecordService : Service() {
                                 VideoRecordUtils.checkScheduleWhenRecordStop(this@RecordService)
                                 val notification = mRecordNotificationManager.getNotification(
                                     notificationTitle, notificationContent,
-                                    true, generalSetting.notificationImportance
+                                    true, generalSetting!!.notificationImportance
                                 )
                                 listener?.onStopped()
                                 mServiceManager!!.stop()
@@ -403,8 +400,8 @@ class RecordService : Service() {
 
     private fun checkStoragePercent() {
         listener?.let {
-            if (!showStorageAlertDialog && generalSetting.checkStorage) {
-                val percent = SystemUtils.checkStoragePercent(this, generalSetting.storageId)
+            if (!showStorageAlertDialog && generalSetting!!.checkStorage) {
+                val percent = SystemUtils.checkStoragePercent(this, generalSetting!!.storageId)
                 Log.d("abcVideo", "Percent storage: $percent")
                 if (percent <= STORAGE_PERCENT_ALERT) {
                     showStorageAlertDialog=true

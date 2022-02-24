@@ -8,7 +8,6 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
 import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.RemoteViews
@@ -35,50 +34,126 @@ class RecordNotificationManager(private val mService: RecordService) {
         }
     }
 
-    fun getNotification(title: String, des: String, isVideo:Boolean, importance:Int): Notification {
-        val builder = buildNotification(title, des, isVideo, importance)
+    fun getNotification(
+        title: String,
+        des: String,
+        isVideo: Boolean,
+        importance: Int
+    ): Notification {
+        val builder = if(SystemUtils.isAndroidO()){
+            buildAndroidONotification(title, des, isVideo, importance)
+        }else{
+            buildUnderAndroidONotification(title, des, isVideo, importance)
+        }
         return builder.build()
     }
 
-    fun notifyNewStatus(notification: Notification){
-        notificationManager.notify(NOTIFICATION_ID, notification)
+    fun notifyNewStatus(notification: Notification) {
+        notificationManager.notify(SOUND_NOTIFICATION_ID, notification)
     }
 
-    private fun buildNotification(
+    private fun buildAndroidONotification(
         title: String, des: String,
         isVideo: Boolean, importance: Int
     ): NotificationCompat.Builder {
-        val channelId= if(importance==0){
-            SOUND_CHANNEL_ID
-        }else{
-            SILENT_CHANNEL_ID
+        return if (importance == 0) {
+            Log.d("abcVideo", "Android O high")
+            buildAndroidOHighChannel(title, des, isVideo)
+        } else {
+            Log.d("abcVideo", "Android O low")
+            buildAndroidOLowChannel(title, des, isVideo)
         }
-        val builder = NotificationCompat.Builder(mService, channelId)
+    }
+
+    private fun buildAndroidOHighChannel(
+        title: String,
+        des: String,
+        isVideo: Boolean
+    ): NotificationCompat.Builder {
+        val builder = NotificationCompat.Builder(mService, SOUND_CHANNEL_ID)
         builder.apply {
             setContentIntent(createContentIntent())
             setSmallIcon(R.drawable.ic_video_record)
             setCustomContentView(getRemoteViews(title, des, isVideo))
             setOnlyAlertOnce(true)
-            if(importance==0){
-                val soundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                builder.setSound(soundUri)
-            }
+        }
+        return builder
+    }
+
+    private fun buildAndroidOLowChannel(
+        title: String,
+        des: String,
+        isVideo: Boolean
+    ): NotificationCompat.Builder {
+        val builder = NotificationCompat.Builder(mService, SILENT_CHANNEL_ID)
+        builder.apply {
+            setContentIntent(createContentIntent())
+            setSmallIcon(R.drawable.ic_video_record)
+            setCustomContentView(getRemoteViews(title, des, isVideo))
+            setOnlyAlertOnce(true)
+        }
+        return builder
+    }
+
+    private fun buildUnderAndroidONotification(
+        title: String, des: String,
+        isVideo: Boolean, importance: Int
+    ): NotificationCompat.Builder {
+        return if (importance == 0) {
+            buildUnderAndroidOHighChannel(title, des, isVideo)
+        } else {
+            buildUnderAndroidOLowChannel(title, des, isVideo)
+        }
+    }
+
+    private fun buildUnderAndroidOHighChannel(
+        title: String,
+        des: String,
+        isVideo: Boolean
+    ): NotificationCompat.Builder {
+        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val builder = NotificationCompat.Builder(mService, SOUND_CHANNEL_ID)
+        builder.apply {
+            setContentIntent(createContentIntent())
+            setSmallIcon(R.drawable.ic_video_record)
+            setCustomContentView(getRemoteViews(title, des, isVideo))
+            setSound(soundUri)
+            priority= NotificationCompat.PRIORITY_DEFAULT
+            setOnlyAlertOnce(true)
+        }
+        return builder
+    }
+
+    private fun buildUnderAndroidOLowChannel(
+        title: String,
+        des: String,
+        isVideo: Boolean
+    ): NotificationCompat.Builder {
+        val builder = NotificationCompat.Builder(mService, SILENT_CHANNEL_ID)
+        builder.apply {
+            setContentIntent(createContentIntent())
+            setSmallIcon(R.drawable.ic_video_record)
+            setCustomContentView(getRemoteViews(title, des, isVideo))
+            priority= NotificationCompat.PRIORITY_MIN
+            setOnlyAlertOnce(true)
         }
         return builder
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createChannel() {
-        val soundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val audioAttr= AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-            .build()
-        val soundChannel = NotificationChannel(SOUND_CHANNEL_ID, SOUND_CHANNEL_ID, NotificationManager.IMPORTANCE_DEFAULT)
+        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val audioAttr = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION).build()
+        val soundChannel = NotificationChannel(SOUND_CHANNEL_ID, SOUND_CHANNEL_ID,
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
         soundChannel.enableLights(false)
         soundChannel.enableVibration(false)
-        soundChannel.setSound(soundUri, audioAttr)
 
-        val silentChannel = NotificationChannel(SILENT_CHANNEL_ID, SILENT_CHANNEL_ID, NotificationManager.IMPORTANCE_LOW)
+        val silentChannel = NotificationChannel(SILENT_CHANNEL_ID, SILENT_CHANNEL_ID,
+            NotificationManager.IMPORTANCE_LOW
+        )
         silentChannel.enableLights(false)
         silentChannel.enableVibration(false)
         Log.d("abcVideo", "Create channel")
@@ -95,18 +170,22 @@ class RecordNotificationManager(private val mService: RecordService) {
         )
     }
 
-    private fun getRemoteViews(title: String, des: String, isVideo: Boolean):RemoteViews{
-        val drawable: Drawable? = if(isVideo){
+    private fun getRemoteViews(title: String, des: String, isVideo: Boolean): RemoteViews {
+        val drawable: Drawable? = if (isVideo) {
             ContextCompat.getDrawable(mService, R.drawable.ic_video_record)
-        }else{
+        } else {
             ContextCompat.getDrawable(mService, R.drawable.ic_micro)
         }
-        val titlePrefix= if(isVideo){
+        val titlePrefix = if (isVideo) {
             mService.getString(R.string.video_record_notification_prefix)
-        }else{
+        } else {
             mService.getString(R.string.audio_record_notification_prefix)
         }
-        val bitmap= drawable?.toBitmap( drawable.intrinsicWidth.coerceAtLeast(1),  drawable.intrinsicHeight.coerceAtLeast(1), null)
+        val bitmap = drawable?.toBitmap(
+            drawable.intrinsicWidth.coerceAtLeast(1),
+            drawable.intrinsicHeight.coerceAtLeast(1),
+            null
+        )
         return RemoteViews(mService.packageName, R.layout.layout_custom_notification).apply {
             setTextViewText(R.id.titlePrefix, titlePrefix)
             setTextViewText(R.id.des, des)
@@ -118,7 +197,7 @@ class RecordNotificationManager(private val mService: RecordService) {
     companion object {
         const val ACTION_STOP = "stop_record"
         const val ACTION_RECORD_FROM_SCHEDULE = "Action_schedule"
-        const val NOTIFICATION_ID = 234
+        const val SOUND_NOTIFICATION_ID = 234
         private const val SOUND_CHANNEL_ID = "Sound_channel"
         private const val SILENT_CHANNEL_ID = "Silent_channel"
         private const val REQUEST_CODE = 1212
