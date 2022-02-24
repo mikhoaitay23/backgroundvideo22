@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+
         <variable
             name="setting"
             type="com.hola360.backgroundvideorecoder.ui.setting.model.SettingGeneralModel" />
+
         <variable
             name="path"
             type="String" />
@@ -21,107 +22,135 @@
             android:orientation="vertical"
             android:padding="@dimen/home_v_margin">
 
-            <LinearLayout
-                android:id="@+id/freeStorage"
-                style="@style/RecordLayoutStyle1">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <LinearLayout style="@style/RecordLayoutStyle2">
+                <LinearLayout style="@style/RecordLayoutStyle1">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                    <LinearLayout style="@style/RecordLayoutStyle2">
 
-                        <TextView
-                            style="@style/TextSetting1"
-                            android:text="@string/setting_general_free_storage" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/txtFreeStorage"
-                            android:freeStorage="@{setting.storageId}"
-                            style="@style/TextSetting2" />
+                            <TextView
+                                style="@style/TextSetting1"
+                                android:text="@string/setting_general_free_storage" />
 
-                    </LinearLayout>
+                            <TextView
+                                android:id="@+id/txtFreeStorage"
+                                style="@style/TextSetting2"
+                                android:freeStorage="@{setting.storageId}" />
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/storageSwitch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/record_switch_height"
-                        android:checked="@{setting.checkStorage}" />
+                        </LinearLayout>
 
-                </LinearLayout>
-
-                <View style="@style/RecordDivineStyle" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/batteryLevel"
-                style="@style/RecordLayoutStyle1">
-
-                <LinearLayout style="@style/RecordLayoutStyle2">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            style="@style/TextSetting1"
-                            android:text="@string/setting_general_battery_title" />
-
-                        <TextView
-                            style="@style/TextSetting2"
-                            android:text="@string/setting_general_battery_text" />
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/storageSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/record_switch_height"
+                            android:checked="@{setting.checkStorage}" />
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/batterySwitch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/record_switch_height"
-                        android:checked="@{setting.checkBattery}"/>
+                    <View style="@style/RecordDivineStyle" />
 
                 </LinearLayout>
 
-                <View style="@style/RecordDivineStyle" />
+                <View
+                    android:id="@+id/freeStorage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
-            </LinearLayout>
+            </FrameLayout>
 
-            <LinearLayout
-                android:id="@+id/appLock"
-                style="@style/RecordLayoutStyle1">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <LinearLayout style="@style/RecordLayoutStyle2">
+                <LinearLayout style="@style/RecordLayoutStyle1">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                    <LinearLayout style="@style/RecordLayoutStyle2">
 
-                        <TextView
-                            style="@style/TextSetting1"
-                            android:text="@string/setting_general_app_lock_title" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                        <TextView
-                            style="@style/TextSetting2"
-                            android:text="@string/setting_general_app_lock_text" />
+                            <TextView
+                                style="@style/TextSetting1"
+                                android:text="@string/setting_general_battery_title" />
+
+                            <TextView
+                                style="@style/TextSetting2"
+                                android:text="@string/setting_general_battery_text" />
+
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/batterySwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/record_switch_height"
+                            android:checked="@{setting.checkBattery}" />
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/appLockSwitch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/record_switch_height"/>
+                    <View style="@style/RecordDivineStyle" />
 
                 </LinearLayout>
 
-                <View style="@style/RecordDivineStyle" />
+                <View
+                    android:id="@+id/batteryLevel"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
-            </LinearLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout style="@style/RecordLayoutStyle1">
+
+                    <LinearLayout style="@style/RecordLayoutStyle2">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/TextSetting1"
+                                android:text="@string/setting_general_app_lock_title" />
+
+                            <TextView
+                                style="@style/TextSetting2"
+                                android:text="@string/setting_general_app_lock_text" />
+
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/appLockSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/record_switch_height" />
+
+                    </LinearLayout>
+
+                    <View style="@style/RecordDivineStyle" />
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/appLock"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </FrameLayout>
+
 
             <LinearLayout
                 android:id="@+id/storagePath"
@@ -141,8 +170,8 @@
 
                         <TextView
                             android:id="@+id/txtStoragePath"
-                            android:text="@{path}"
-                            style="@style/TextSetting2" />
+                            style="@style/TextSetting2"
+                            android:text="@{path}" />
 
                     </LinearLayout>
 
@@ -177,8 +206,8 @@
                     </LinearLayout>
 
                     <TextView
-                        android:notificationLevel="@{setting.notificationImportance}"
-                        style="@style/TextRecordProperties2" />
+                        style="@style/TextRecordProperties2"
+                        android:notificationLevel="@{setting.notificationImportance}" />
 
                 </LinearLayout>
 

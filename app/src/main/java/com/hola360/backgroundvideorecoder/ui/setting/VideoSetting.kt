@@ -140,12 +140,6 @@ class VideoSetting:BaseRecordVideoFragment<LayoutSettingVideoBinding>(), View.On
         binding!!.previewMode.setOnClickListener(this)
         binding!!.flash.setOnClickListener(this)
         binding!!.sound.setOnClickListener(this)
-        binding!!.previewSwitch.isEnabled = false
-        binding!!.flashSwitch.isEnabled = false
-        binding!!.soundSwitch.isEnabled = false
-    }
-
-    override fun updateSwitchThumb() {
     }
 
     override fun initViewModel() {

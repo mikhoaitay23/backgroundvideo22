@@ -17,6 +17,7 @@
 
         <item name="colorOnBackground">@color/colorOnBackground</item>
         <item name="backgroundColor">@color/colorBackground</item>
+        <item name="colorAccent">@color/colorAccent</item>
         <!--Color-->
         <item name="colorSurface">@color/colorBackground</item>
         <item name="colorError">@color/md_red_500</item>

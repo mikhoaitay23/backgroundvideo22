@@ -46,16 +46,7 @@ class RecordVideo : BaseRecordVideoFragment<LayoutRecordVideoBinding>(), View.On
         binding!!.previewMode.setOnClickListener(this)
         binding!!.flash.setOnClickListener(this)
         binding!!.sound.setOnClickListener(this)
-        binding!!.previewSwitch.isEnabled = false
-        binding!!.flashSwitch.isEnabled = false
-        binding!!.soundSwitch.isEnabled = false
         binding!!.start.setOnClickListener(this)
-    }
-
-    override fun updateSwitchThumb() {
-        binding!!.previewSwitch.setThumbResource(switchThumb)
-        binding!!.flashSwitch.setThumbResource(switchThumb)
-        binding!!.soundSwitch.setThumbResource(switchThumb)
     }
 
     override fun initViewModel() {

@@ -66,13 +66,6 @@ class ScheduleVideo : BaseRecordVideoFragment<LayoutScheduleVideoBinding>(), Vie
         binding!!.sound.setOnClickListener(this)
         binding!!.setSchedule.setOnClickListener(this)
         binding!!.scheduleCard.cancelSchedule.setOnClickListener(this)
-        binding!!.flashSwitch.isEnabled = false
-        binding!!.soundSwitch.isEnabled = false
-    }
-
-    override fun updateSwitchThumb() {
-        binding!!.flashSwitch.setThumbResource(switchThumb)
-        binding!!.soundSwitch.setThumbResource(switchThumb)
     }
 
     override fun initViewModel() {

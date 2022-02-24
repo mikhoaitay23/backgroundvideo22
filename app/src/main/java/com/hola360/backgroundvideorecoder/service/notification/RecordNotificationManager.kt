@@ -4,9 +4,9 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
@@ -16,10 +16,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.navigation.NavDeepLinkBuilder
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.service.RecordService
-import com.hola360.backgroundvideorecoder.utils.SystemUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
 
 
@@ -40,73 +40,25 @@ class RecordNotificationManager(private val mService: RecordService) {
         isVideo: Boolean,
         importance: Int
     ): Notification {
-        val builder = if(SystemUtils.isAndroidO()){
-            buildAndroidONotification(title, des, isVideo, importance)
-        }else{
-            buildUnderAndroidONotification(title, des, isVideo, importance)
-        }
-        return builder.build()
+        return buildNotification(title, des, isVideo, importance).build()
     }
 
     fun notifyNewStatus(notification: Notification) {
         notificationManager.notify(SOUND_NOTIFICATION_ID, notification)
     }
 
-    private fun buildAndroidONotification(
+    private fun buildNotification(
         title: String, des: String,
         isVideo: Boolean, importance: Int
     ): NotificationCompat.Builder {
         return if (importance == 0) {
-            Log.d("abcVideo", "Android O high")
-            buildAndroidOHighChannel(title, des, isVideo)
+            buildHighChannel(title, des, isVideo)
         } else {
-            Log.d("abcVideo", "Android O low")
-            buildAndroidOLowChannel(title, des, isVideo)
+            buildLowChannel(title, des, isVideo)
         }
     }
 
-    private fun buildAndroidOHighChannel(
-        title: String,
-        des: String,
-        isVideo: Boolean
-    ): NotificationCompat.Builder {
-        val builder = NotificationCompat.Builder(mService, SOUND_CHANNEL_ID)
-        builder.apply {
-            setContentIntent(createContentIntent())
-            setSmallIcon(R.drawable.ic_video_record)
-            setCustomContentView(getRemoteViews(title, des, isVideo))
-            setOnlyAlertOnce(true)
-        }
-        return builder
-    }
-
-    private fun buildAndroidOLowChannel(
-        title: String,
-        des: String,
-        isVideo: Boolean
-    ): NotificationCompat.Builder {
-        val builder = NotificationCompat.Builder(mService, SILENT_CHANNEL_ID)
-        builder.apply {
-            setContentIntent(createContentIntent())
-            setSmallIcon(R.drawable.ic_video_record)
-            setCustomContentView(getRemoteViews(title, des, isVideo))
-            setOnlyAlertOnce(true)
-        }
-        return builder
-    }
-
-    private fun buildUnderAndroidONotification(
-        title: String, des: String,
-        isVideo: Boolean, importance: Int
-    ): NotificationCompat.Builder {
-        return if (importance == 0) {
-            buildUnderAndroidOHighChannel(title, des, isVideo)
-        } else {
-            buildUnderAndroidOLowChannel(title, des, isVideo)
-        }
-    }
-
-    private fun buildUnderAndroidOHighChannel(
+    private fun buildHighChannel(
         title: String,
         des: String,
         isVideo: Boolean
@@ -117,14 +69,14 @@ class RecordNotificationManager(private val mService: RecordService) {
             setContentIntent(createContentIntent())
             setSmallIcon(R.drawable.ic_video_record)
             setCustomContentView(getRemoteViews(title, des, isVideo))
-            setSound(soundUri)
             priority= NotificationCompat.PRIORITY_DEFAULT
             setOnlyAlertOnce(true)
+            setSound(soundUri)
         }
         return builder
     }
 
-    private fun buildUnderAndroidOLowChannel(
+    private fun buildLowChannel(
         title: String,
         des: String,
         isVideo: Boolean
@@ -134,17 +86,14 @@ class RecordNotificationManager(private val mService: RecordService) {
             setContentIntent(createContentIntent())
             setSmallIcon(R.drawable.ic_video_record)
             setCustomContentView(getRemoteViews(title, des, isVideo))
-            priority= NotificationCompat.PRIORITY_MIN
             setOnlyAlertOnce(true)
+            priority= NotificationCompat.PRIORITY_MIN
         }
         return builder
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createChannel() {
-        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val audioAttr = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_NOTIFICATION).build()
         val soundChannel = NotificationChannel(SOUND_CHANNEL_ID, SOUND_CHANNEL_ID,
             NotificationManager.IMPORTANCE_DEFAULT
         )
@@ -152,7 +101,7 @@ class RecordNotificationManager(private val mService: RecordService) {
         soundChannel.enableVibration(false)
 
         val silentChannel = NotificationChannel(SILENT_CHANNEL_ID, SILENT_CHANNEL_ID,
-            NotificationManager.IMPORTANCE_LOW
+            NotificationManager.IMPORTANCE_MIN
         )
         silentChannel.enableLights(false)
         silentChannel.enableVibration(false)
@@ -162,6 +111,16 @@ class RecordNotificationManager(private val mService: RecordService) {
     }
 
     private fun createContentIntent(): PendingIntent {
+//        val destination= if(isVideo){
+//            R.id.nav_video_record
+//        }else{
+//            R.id.nav_audio_record
+//        }
+//        return NavDeepLinkBuilder(context)
+//            .setComponentName(MainActivity::class.java)
+//            .setGraph(R.navigation.nav_main_graph)
+//            .setDestination(destination)
+//            .createPendingIntent()
         val openUI = Intent(mService, MainActivity::class.java)
         openUI.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         return PendingIntent.getActivity(
@@ -202,15 +161,6 @@ class RecordNotificationManager(private val mService: RecordService) {
         private const val SILENT_CHANNEL_ID = "Silent_channel"
         private const val REQUEST_CODE = 1212
     }
-
-    private fun createStopIntent(): PendingIntent {
-        val stopIntent = Intent(ACTION_STOP)
-        return PendingIntent.getBroadcast(
-            mService, 0,
-            stopIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-    }
-
 
     init {
         notificationManager.cancelAll()

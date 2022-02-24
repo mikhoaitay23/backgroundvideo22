@@ -99,8 +99,6 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         recordSchedule = VideoRecordUtils.getVideoSchedule(requireContext())
     }
 
-    abstract fun updateSwitchThumb()
-
     abstract fun generateCancelDialogMessages(): String
 
     abstract fun onCancelSchedule()
@@ -167,7 +165,9 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         applyNewVideoConfiguration()
         saveNewVideoConfiguration()
         if (SystemUtils.isAndroidM() && videoConfiguration!!.previewMode) {
-            requestOverlayPermission()
+            if(!Settings.canDrawOverlays(requireContext())){
+                overlayResultLauncher.launch(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+            }
         }
     }
 
@@ -223,19 +223,19 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         if (FilePickerUtils.storagePermissionGrant(requireContext())) {
             setupWhenStoragePermissionGranted()
         } else {
-            requestPermission()
+            requestStoragePermission()
         }
     }
 
-    private fun requestOverlayPermission() {
-        if (SystemUtils.isAndroidM() && !Settings.canDrawOverlays(requireContext())) {
-            val intent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:" + requireContext().packageName)
-            )
-            startActivityForResult(intent, 0)
-        }
-    }
+//    private fun requestOverlayPermission() {
+//        if (SystemUtils.isAndroidM() && !Settings.canDrawOverlays(requireContext())) {
+//            val intent = Intent(
+//                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+//                Uri.parse("package:" + requireContext().packageName)
+//            )
+//            startActivityForResult(intent, 0)
+//        }
+//    }
 
     abstract fun startAction()
 
@@ -259,9 +259,40 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
         }
     }
 
-    private fun requestPermission() {
+    private val overlayCustomContract = object : ActivityResultContract<String, Boolean>() {
+        override fun createIntent(context: Context, input: String): Intent {
+            val intent = Intent(input)
+            intent.addCategory("android.intent.category.DEFAULT")
+            intent.data = Uri.parse(
+                String.format(
+                    "package:%s",
+                    requireActivity().applicationContext.packageName
+                )
+            )
+            return intent
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Boolean =
+            if(SystemUtils.isAndroidM()){
+                Settings.canDrawOverlays(requireContext())
+            }else{
+                true
+            }
+    }
+
+    private val overlayResultLauncher = registerForActivityResult(overlayCustomContract) {
+        if (it) {
+            if(!videoConfiguration!!.previewMode){
+                startAction()
+            }
+        } else {
+            SystemUtils.showAlertPermissionNotGrant(binding!!, requireActivity())
+        }
+    }
+
+    private fun requestStoragePermission() {
         if (SystemUtils.isAndroidR()) {
-            activityResultLauncher.launch(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            storageResultLauncher.launch(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
         } else resultLauncher.launch(
             arrayOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -273,13 +304,13 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
     private fun setupWhenStoragePermissionGranted(){
         PathUtils.setParentPath(requireContext())
         if (SystemUtils.isAndroidM() &&!Settings.canDrawOverlays(requireContext())) {
-            requestOverlayPermission()
+            overlayResultLauncher.launch(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
         } else {
             startAction()
         }
     }
 
-    private val customContract = object : ActivityResultContract<String, Boolean>() {
+    private val storageCustomContract = object : ActivityResultContract<String, Boolean>() {
         override fun createIntent(context: Context, input: String): Intent {
             val intent = Intent(input)
             intent.addCategory("android.intent.category.DEFAULT")
@@ -304,7 +335,7 @@ abstract class BaseRecordVideoFragment<V : ViewDataBinding?> : BaseRecordPageFra
 
     }
 
-    private val activityResultLauncher = registerForActivityResult(customContract) {
+    private val storageResultLauncher = registerForActivityResult(storageCustomContract) {
         if (it) {
             setupWhenStoragePermissionGranted()
         } else {

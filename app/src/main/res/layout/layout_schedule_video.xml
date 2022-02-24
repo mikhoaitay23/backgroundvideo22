@@ -150,53 +150,69 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/flash"
-                style="@style/RecordLayoutStyle1"
-                android:clickable="@{!isRecording}">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <LinearLayout style="@style/RecordLayoutStyle2">
+                <LinearLayout
+                    style="@style/RecordLayoutStyle1"
+                    android:clickable="@{!isRecording}">
 
-                    <TextView
-                        style="@style/TextRecordProperties1"
-                        android:text="@string/video_record_configuration_flash" />
+                    <LinearLayout style="@style/RecordLayoutStyle2">
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/flashSwitch"
-                        android:layout_width="@dimen/record_switch_height"
-                        android:layout_height="@dimen/record_switch_height"
-                        android:checked="@{configuration.flash}"
-                        android:thumb="@drawable/bg_switch_thumb"
-                        app:track="@drawable/bg_switch" />
+                        <TextView
+                            style="@style/TextRecordProperties1"
+                            android:text="@string/video_record_configuration_flash" />
 
-                </LinearLayout>
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/flashSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/record_switch_height"
+                            android:enabled="@{!isRecording}"
+                            android:checked="@{configuration.flash}" />
 
-                <View style="@style/RecordDivineStyle" />
+                    </LinearLayout>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/sound"
-                style="@style/RecordLayoutStyle1"
-                android:clickable="@{!isRecording}">
-
-                <LinearLayout style="@style/RecordLayoutStyle2">
-
-                    <TextView
-                        style="@style/TextRecordProperties1"
-                        android:text="@string/video_record_configuration_sound" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/soundSwitch"
-                        android:layout_width="@dimen/record_switch_height"
-                        android:layout_height="@dimen/record_switch_height"
-                        android:checked="@{configuration.sound}"
-                        android:thumb="@drawable/bg_switch_thumb"
-                        app:track="@drawable/bg_switch" />
+                    <View style="@style/RecordDivineStyle" />
 
                 </LinearLayout>
 
-            </LinearLayout>
+                <View
+                    android:id="@+id/flash"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    style="@style/RecordLayoutStyle1"
+                    android:clickable="@{!isRecording}">
+
+                    <LinearLayout style="@style/RecordLayoutStyle2">
+
+                        <TextView
+                            style="@style/TextRecordProperties1"
+                            android:text="@string/video_record_configuration_sound" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/soundSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/record_switch_height"
+                            android:enabled="@{!isRecording}"
+                            android:checked="@{configuration.sound}"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/sound"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -216,7 +232,6 @@
                     android:visibility="@{schedule ?View.VISIBLE: View.GONE}" />
 
             </FrameLayout>
-
 
         </LinearLayout>
     </ScrollView>
