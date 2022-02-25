@@ -32,6 +32,7 @@ import kotlin.math.ln
 import kotlin.math.pow
 import androidx.core.content.FileProvider
 import com.hola360.backgroundvideorecoder.BuildConfig
+import com.hola360.backgroundvideorecoder.data.model.popup.PopupModel
 
 
 object Utils {
@@ -363,5 +364,25 @@ object Utils {
             ToastUtils.getInstance(context)
                 ?.showToast(context.getString(R.string.cannot_open_mp4))
         }
+    }
+
+    fun getPopupItems(context: Context): MutableList<PopupModel> {
+        val popupItems = mutableListOf<PopupModel>()
+        popupItems.add(
+            PopupModel(R.drawable.ic_check, context.getString(R.string.select))
+        )
+        popupItems.add(
+            PopupModel(R.drawable.ic_open_with, context.getString(R.string.open_with))
+        )
+        popupItems.add(
+            PopupModel(R.drawable.ic_rename, context.getString(R.string.rename))
+        )
+        popupItems.add(
+            PopupModel(R.drawable.ic_delete, context.getString(R.string.delete))
+        )
+        popupItems.add(
+            PopupModel(R.drawable.ic_share, context.getString(R.string.share))
+        )
+        return popupItems
     }
 }

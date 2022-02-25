@@ -3,6 +3,8 @@ package com.hola360.backgroundvideorecoder.ui.myfile.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.anggrayudi.storage.file.mimeType
 import com.bumptech.glide.Glide
@@ -126,4 +128,5 @@ class MyFileSectionAdapter(
         fun onSectionHeaderClick()
         fun onItemClicked(position: Int, view: View)
     }
+
 }

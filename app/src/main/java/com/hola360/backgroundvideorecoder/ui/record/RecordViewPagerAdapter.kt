@@ -43,7 +43,7 @@ class RecordViewPagerAdapter(
                 fragments.add(AboutSetting())
             }
             MY_FILE_PAGER -> {
-                fragments.add(MyFileVideo())
+                fragments.add(MyVideoFileFragment())
                 fragments.add(MyAudioFileFragment())
             }
         }

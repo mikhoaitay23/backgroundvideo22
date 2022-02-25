@@ -1,23 +1,33 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity.">
 
     <item
         android:id="@+id/action_select"
         android:icon="@drawable/ic_check"
-        android:title="@string/select" />
+        android:title="@string/select"
+        app:showAsAction="always|withText" />
     <item
         android:id="@+id/action_open_with"
         android:icon="@drawable/ic_open_with"
-        android:title="@string/open_with" />
+        android:actionLayout="@layout/fragment_app_lock"
+        android:title="@string/open_with"
+        app:showAsAction="always|withText" />
     <item
         android:id="@+id/action_rename"
         android:icon="@drawable/ic_rename"
-        android:title="@string/rename" />
+        android:title="@string/rename"
+        app:showAsAction="always|withText" />
     <item
         android:id="@+id/action_delete"
         android:icon="@drawable/ic_delete"
-        android:title="@string/delete" />
+        android:title="@string/delete"
+        app:showAsAction="always|withText" />
     <item
         android:id="@+id/action_share"
         android:icon="@drawable/ic_share"
-        android:title="@string/share" />
+        android:title="@string/share"
+        app:showAsAction="always|withText" />
 </menu>

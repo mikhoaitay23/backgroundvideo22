@@ -1,15 +1,20 @@
 package com.hola360.backgroundvideorecoder.ui.myfile.video
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
-import android.view.ContextThemeWrapper
-import android.view.View
+import android.view.*
+import android.widget.PopupWindow
+import android.widget.Toast
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 import com.hola360.backgroundvideorecoder.MainActivity
 import com.hola360.backgroundvideorecoder.R
 import com.hola360.backgroundvideorecoder.data.model.LoadDataStatus
-import com.hola360.backgroundvideorecoder.data.model.audio.AudioMode
 import com.hola360.backgroundvideorecoder.data.model.mediafile.MediaFile
 import com.hola360.backgroundvideorecoder.data.response.DataResponse
 import com.hola360.backgroundvideorecoder.databinding.LayoutMyVideoFileBinding
@@ -18,8 +23,8 @@ import com.hola360.backgroundvideorecoder.ui.dialog.OnDialogDismiss
 import com.hola360.backgroundvideorecoder.ui.dialog.input.InputTextDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
+import com.hola360.backgroundvideorecoder.ui.myfile.adapter.MyFilePopupAdapter
 import com.hola360.backgroundvideorecoder.ui.myfile.adapter.MyFileSectionAdapter
-import com.hola360.backgroundvideorecoder.ui.myfile.base.BaseMyFileFragment
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
 import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
@@ -35,6 +40,7 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
     private lateinit var mainActivity: MainActivity
     private var mListSelectionBottomSheet: ListSelectionBotDialog? = null
     private var showBottomSheet = false
+    private var popupWindow: PopupWindow? = null
     private val confirmCancelSchedule: ConfirmDialog by lazy {
         ConfirmDialog(object : ConfirmDialog.OnConfirmOke {
             override fun onConfirm() {
@@ -82,7 +88,8 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
                             if (value != null) {
                                 if (value.size > 0) {
                                     mFileSectionAdapter = MyFileSectionAdapter(
-                                        key, value.toMutableList(), this)
+                                        key, value.toMutableList(), this
+                                    )
                                     mSectionRecyclerViewAdapter.addSection(mFileSectionAdapter)
                                 }
                             }
@@ -112,7 +119,7 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
 //                }
 //            }
 //            binding!!.btnOption -> {
-//                showActionItem(binding!!.btnOption)
+//                showMenuItem(binding!!.btnOption)
 //            }
 //            binding!!.btnSearch -> {
 //
@@ -129,11 +136,11 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
     }
 
     override fun onItemClicked(position: Int, view: View) {
-//        when (view.id) {
-//            R.id.btnOption -> {
-//                showActionItem(position, view)
-//            }
-//            R.id.btnSelect -> {
+        when (view.id) {
+            R.id.btnOption -> {
+                openPopup(view)
+            }
+            R.id.btnSelect -> {
 //                mFileSectionAdapter?.updateSelected(position)
 //                binding!!.tvCount.text =
 //                    mFileSectionAdapter?.countItemSelected().toString().plus(" ")
@@ -141,11 +148,11 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
 //                binding!!.btnSelectAll.isChecked =
 //                    mFileSectionAdapter?.countItemSelected() == mSectionRecyclerViewAdapter.itemCount - 1
 //                mSectionRecyclerViewAdapter.notifyDataSetChanged()
-//            }
-//            R.id.mLayoutRoot -> {
-//                Utils.openMp4File(requireContext(), fileList[position].file)
-//            }
-//        }
+            }
+            R.id.mLayoutRoot -> {
+                Utils.openMp4File(requireContext(), fileList[position].file)
+            }
+        }
     }
 
     private fun showActionItem(position: Int, view: View) {
@@ -210,7 +217,7 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
         inputTextDialog.show(mainActivity.supportFragmentManager, "editName")
     }
 
-    private fun showActionItem(view: View) {
+    private fun showMenuItem(view: View) {
         val popupMenu = PopupMenu(
             ContextThemeWrapper(
                 requireContext(),
@@ -339,5 +346,60 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
 
     }
 
+    private fun showPopupItems(): PopupWindow {
+        val inflater =
+            requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view = inflater.inflate(R.layout.layout_popup_myfile, null)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.rcPopup)
+        val adapter = MyFilePopupAdapter(requireContext())
+        adapter.addItemPopup(Utils.getPopupItems(requireContext()))
+        recyclerView.adapter = adapter
 
+        adapter.setOnClickListener(object : MyFilePopupAdapter.OnClickEvents {
+            override fun onPopupClicked(position: Int) {
+                when (position) {
+                    0 -> {
+                        closePopup()
+                    }
+                    1 -> {
+
+                    }
+                    2 -> {
+
+                    }
+                    3 -> {
+
+                    }
+                    4 -> {
+
+                    }
+                    5 -> {
+
+                    }
+                }
+            }
+        })
+
+        return PopupWindow(
+            view,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    }
+
+    private fun openPopup(view: View) {
+        popupWindow = showPopupItems()
+        popupWindow?.isOutsideTouchable = true
+        popupWindow?.isFocusable = true
+        popupWindow?.showAsDropDown(view)
+    }
+
+    private fun closePopup() {
+        popupWindow?.let {
+            if (it.isShowing) {
+                it.dismiss()
+            }
+            popupWindow = null
+        }
+    }
 }
