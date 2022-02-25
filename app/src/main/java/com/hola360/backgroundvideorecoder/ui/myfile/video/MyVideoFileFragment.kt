@@ -19,6 +19,7 @@ import com.hola360.backgroundvideorecoder.ui.dialog.input.InputTextDialog
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionAdapter
 import com.hola360.backgroundvideorecoder.ui.dialog.listdialog.ListSelectionBotDialog
 import com.hola360.backgroundvideorecoder.ui.myfile.adapter.MyFileSectionAdapter
+import com.hola360.backgroundvideorecoder.ui.myfile.base.BaseMyFileFragment
 import com.hola360.backgroundvideorecoder.ui.record.BaseRecordPageFragment
 import com.hola360.backgroundvideorecoder.utils.SharedPreferenceUtils
 import com.hola360.backgroundvideorecoder.utils.Utils
@@ -50,13 +51,13 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
     override val layoutId = R.layout.layout_my_video_file
 
     override fun initView() {
-        mainActivity = requireActivity() as MainActivity
-
-        binding!!.btnBack.setOnClickListener(this)
-        binding!!.btnOption.setOnClickListener(this)
-        binding!!.btnSearch.setOnClickListener(this)
-        binding!!.btnSelectAll.setOnClickListener(this)
-        binding!!.btnSelectAll.isChecked = false
+//        mainActivity = requireActivity() as MainActivity
+//
+//        binding!!.btnBack.setOnClickListener(this)
+//        binding!!.btnOption.setOnClickListener(this)
+//        binding!!.btnSearch.setOnClickListener(this)
+//        binding!!.btnSelectAll.setOnClickListener(this)
+//        binding!!.btnSelectAll.isChecked = false
 
         binding!!.lifecycleOwner = this
         binding!!.viewModel = viewModel
@@ -65,7 +66,6 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
     override fun initViewModel() {
         val factory = MyVideoFileViewModel.Factory(requireActivity().application)
         viewModel = ViewModelProvider(this, factory)[MyVideoFileViewModel::class.java]
-
         viewModel.fetch()
 
         viewModel.allFileLiveData.observe(this) {
@@ -82,10 +82,7 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
                             if (value != null) {
                                 if (value.size > 0) {
                                     mFileSectionAdapter = MyFileSectionAdapter(
-                                        key,
-                                        value.toMutableList(),
-                                        this
-                                    )
+                                        key, value.toMutableList(), this)
                                     mSectionRecyclerViewAdapter.addSection(mFileSectionAdapter)
                                 }
                             }
@@ -104,51 +101,51 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
     }
 
     override fun onClick(p0: View?) {
-        when (p0) {
-            binding!!.btnBack -> {
-                if (mFileSectionAdapter?.isSelectMode == true) {
-                    mFileSectionAdapter?.isSelectMode = false
-                    mSectionRecyclerViewAdapter.notifyDataSetChanged()
-                    binding!!.isSelectMode = mFileSectionAdapter?.isSelectMode
-                } else {
-                    findNavController().navigateUp()
-                }
-            }
-            binding!!.btnOption -> {
-                showActionItem(binding!!.btnOption)
-            }
-            binding!!.btnSearch -> {
-
-            }
-            binding!!.btnSelectAll -> {
-                binding!!.btnSelectAll.isChecked = !binding!!.btnSelectAll.isChecked
-                mFileSectionAdapter?.updateSelect(binding!!.btnSelectAll.isChecked)
-                binding!!.tvCount.text =
-                    mFileSectionAdapter?.countItemSelected().toString().plus(" ")
-                        .plus(getString(R.string.selected))
-                mSectionRecyclerViewAdapter.notifyDataSetChanged()
-            }
-        }
+//        when (p0) {
+//            binding!!.btnBack -> {
+//                if (mFileSectionAdapter?.isSelectMode == true) {
+//                    mFileSectionAdapter?.isSelectMode = false
+//                    mSectionRecyclerViewAdapter.notifyDataSetChanged()
+//                    binding!!.isSelectMode = mFileSectionAdapter?.isSelectMode
+//                } else {
+//                    findNavController().navigateUp()
+//                }
+//            }
+//            binding!!.btnOption -> {
+//                showActionItem(binding!!.btnOption)
+//            }
+//            binding!!.btnSearch -> {
+//
+//            }
+//            binding!!.btnSelectAll -> {
+//                binding!!.btnSelectAll.isChecked = !binding!!.btnSelectAll.isChecked
+//                mFileSectionAdapter?.updateSelect(binding!!.btnSelectAll.isChecked)
+//                binding!!.tvCount.text =
+//                    mFileSectionAdapter?.countItemSelected().toString().plus(" ")
+//                        .plus(getString(R.string.selected))
+//                mSectionRecyclerViewAdapter.notifyDataSetChanged()
+//            }
+//        }
     }
 
-    override fun onClicked(position: Int, view: View) {
-        when (view.id) {
-            R.id.btnOption -> {
-                showActionItem(position, view)
-            }
-            R.id.btnSelect -> {
-                mFileSectionAdapter?.updateSelected(position)
-                binding!!.tvCount.text =
-                    mFileSectionAdapter?.countItemSelected().toString().plus(" ")
-                        .plus(getString(R.string.selected))
-                binding!!.btnSelectAll.isChecked =
-                    mFileSectionAdapter?.countItemSelected() == mSectionRecyclerViewAdapter.itemCount - 1
-                mSectionRecyclerViewAdapter.notifyDataSetChanged()
-            }
-            R.id.mLayoutRoot -> {
-                Utils.openMp4File(requireContext(), fileList[position].file)
-            }
-        }
+    override fun onItemClicked(position: Int, view: View) {
+//        when (view.id) {
+//            R.id.btnOption -> {
+//                showActionItem(position, view)
+//            }
+//            R.id.btnSelect -> {
+//                mFileSectionAdapter?.updateSelected(position)
+//                binding!!.tvCount.text =
+//                    mFileSectionAdapter?.countItemSelected().toString().plus(" ")
+//                        .plus(getString(R.string.selected))
+//                binding!!.btnSelectAll.isChecked =
+//                    mFileSectionAdapter?.countItemSelected() == mSectionRecyclerViewAdapter.itemCount - 1
+//                mSectionRecyclerViewAdapter.notifyDataSetChanged()
+//            }
+//            R.id.mLayoutRoot -> {
+//                Utils.openMp4File(requireContext(), fileList[position].file)
+//            }
+//        }
     }
 
     private fun showActionItem(position: Int, view: View) {
@@ -168,9 +165,9 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
                             mSectionRecyclerViewAdapter.notifyItemRangeChanged(0, fileList.size + 1)
                         }
                         mFileSectionAdapter?.updateSelected(position)
-                        binding!!.tvCount.text =
-                            mFileSectionAdapter?.countItemSelected().toString().plus(" ")
-                                .plus(getString(R.string.selected))
+//                        binding!!.tvCount.text =
+//                            mFileSectionAdapter?.countItemSelected().toString().plus(" ")
+//                                .plus(getString(R.string.selected))
                         mSectionRecyclerViewAdapter.notifyItemChanged(position)
                         binding!!.isSelectMode = mFileSectionAdapter?.isSelectMode
                     }
@@ -239,13 +236,13 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
     }
 
     private fun onSelectAll() {
-        mFileSectionAdapter?.updateSelect(binding!!.btnSelectAll.isChecked)
-        mFileSectionAdapter?.isSelectMode = true
-        binding!!.isSelectMode = mFileSectionAdapter?.isSelectMode
-        binding!!.tvCount.text =
-            mFileSectionAdapter?.countItemSelected().toString().plus(" ")
-                .plus(getString(R.string.selected))
-        mSectionRecyclerViewAdapter.notifyDataSetChanged()
+//        mFileSectionAdapter?.updateSelect(binding!!.btnSelectAll.isChecked)
+//        mFileSectionAdapter?.isSelectMode = true
+//        binding!!.isSelectMode = mFileSectionAdapter?.isSelectMode
+//        binding!!.tvCount.text =
+//            mFileSectionAdapter?.countItemSelected().toString().plus(" ")
+//                .plus(getString(R.string.selected))
+//        mSectionRecyclerViewAdapter.notifyDataSetChanged()
     }
 
     private fun onSortByBottomSheet() {
@@ -336,6 +333,10 @@ class MyVideoFileFragment : BaseRecordPageFragment<LayoutMyVideoFileBinding>(),
 
     private fun startApplyNewSort() {
         viewModel.applyNewSort()
+    }
+
+    override fun onSectionHeaderClick() {
+
     }
 
 

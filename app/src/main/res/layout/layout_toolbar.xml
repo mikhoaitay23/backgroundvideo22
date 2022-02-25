@@ -15,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         android:background="@color/colorAccent"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <ImageView
@@ -23,53 +24,144 @@
             android:layout_height="@dimen/toolbar_back_icon_height"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="10dp"
-            android:src="@drawable/ic_back" />
-
-        <TextView
-            android:id="@+id/title"
-            style="@style/TextAppearanceToolbar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="20dp"
-            android:textColor="@color/md_white_1000" />
+            android:src="@{menuCode==3 ?@drawable/ic_close:@drawable/ic_back}" />
 
         <FrameLayout
+            android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1">
+            android:layout_height="wrap_content">
 
-            <RelativeLayout
+            <TextView
+                android:id="@+id/title"
+                style="@style/TextAppearanceToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{menuCode==2?View.VISIBLE:View.GONE}">
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:visibility="@{menuCode==4 ?View.GONE: View.VISIBLE}"
+                android:textColor="@color/md_white_1000" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/btnOption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:padding="@dimen/dp_8"
-                    app:srcCompat="@drawable/ic_option" />
+            <EditText
+                style="@style/TextAppearanceToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{menuCode==4 ?View.VISIBLE: View.GONE}"
+                android:background="@null"/>
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/btnSearch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toStartOf="@id/btnOption"
-                    android:padding="@dimen/dp_8"
-                    app:srcCompat="@drawable/ic_search" />
-            </RelativeLayout>
         </FrameLayout>
 
-        <ImageView
-            android:visibility="@{menuCode==1? View.VISIBLE: View.GONE}"
-            android:layout_gravity="center"
-            android:layout_width="30dp"
-            android:layout_height="30dp"/>
+<!--        <FrameLayout-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center_vertical"-->
+<!--            android:layout_weight="1">-->
+
+<!--            <RelativeLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:visibility="@{menuCode==2?View.VISIBLE:View.GONE}">-->
+
+<!--                <androidx.appcompat.widget.AppCompatImageView-->
+<!--                    android:id="@+id/btnOption"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_alignParentEnd="true"-->
+<!--                    android:layout_centerVertical="true"-->
+<!--                    android:padding="@dimen/dp_8"-->
+<!--                    app:srcCompat="@drawable/ic_option" />-->
+
+<!--                <androidx.appcompat.widget.AppCompatImageView-->
+<!--                    android:id="@+id/btnSearch"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_centerVertical="true"-->
+<!--                    android:layout_toStartOf="@id/btnOption"-->
+<!--                    android:padding="@dimen/dp_8"-->
+<!--                    app:srcCompat="@drawable/ic_search" />-->
+<!--            </RelativeLayout>-->
+<!--        </FrameLayout>-->
+
+<!--        <ImageView-->
+<!--            android:visibility="@{menuCode==1? View.VISIBLE: View.GONE}"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:layout_width="30dp"-->
+<!--            android:layout_height="30dp"/>-->
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_marginEnd="@dimen/dp_10"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/recordSetting"
+                android:src="@drawable/ic_record_setting"
+                android:padding="@dimen/dp_4"
+                android:background="?selectableItemBackground"
+                android:layout_width="@dimen/dp_40"
+                android:layout_height="@dimen/dp_40"
+                android:visibility="@{menuCode==1 ?View.VISIBLE: View.GONE}"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="@{menuCode==2 ?View.VISIBLE: View.GONE}">
+
+                <ImageView
+                    android:id="@+id/myFileSearch"
+                    android:src="@drawable/ic_search"
+                    android:padding="@dimen/dp_8"
+                    android:layout_width="@dimen/dp_40"
+                    android:layout_height="@dimen/dp_40"/>
+
+                <ImageView
+                    android:id="@+id/myFileOption"
+                    android:src="@drawable/ic_option"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/dp_40"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="@{menuCode==3 ?View.VISIBLE: View.GONE}">
+
+                <ImageView
+                    android:id="@+id/myFileDelete"
+                    android:src="@drawable/ic_delete"
+                    android:padding="@dimen/dp_8"
+                    android:layout_width="@dimen/dp_40"
+                    android:layout_height="@dimen/dp_40"
+                    app:tint="@color/md_white_1000" />
+
+                <ImageView
+                    android:id="@+id/myFileShare"
+                    android:src="@drawable/ic_share"
+                    android:padding="@dimen/dp_8"
+                    android:layout_width="@dimen/dp_40"
+                    android:layout_height="@dimen/dp_40"
+                    app:tint="@color/md_white_1000" />
+
+                <ImageView
+                    android:id="@+id/myFileSelectAll"
+                    android:src="@drawable/bg_btn_select_all"
+                    android:padding="2dp"
+                    android:layout_width="@dimen/dp_40"
+                    android:layout_height="@dimen/dp_40"/>
+            </LinearLayout>
+
+            <ImageView
+                android:src="@drawable/ic_close"
+                android:layout_width="@dimen/dp_40"
+                android:layout_height="@dimen/dp_40"
+                android:visibility="@{menuCode==4 ?View.VISIBLE: View.GONE}"
+                app:tint="@color/md_white_1000" />
+
+        </FrameLayout>
+
 
     </LinearLayout>
 </layout>

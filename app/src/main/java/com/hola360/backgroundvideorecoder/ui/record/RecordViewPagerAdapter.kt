@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.hola360.backgroundvideorecoder.ui.myfile.audio.MyAudioFileFragment
+import com.hola360.backgroundvideorecoder.ui.myfile.video.MyFileVideo
 import com.hola360.backgroundvideorecoder.ui.myfile.video.MyVideoFileFragment
 import com.hola360.backgroundvideorecoder.ui.record.audio.audiorecord.RecordAudio
 import com.hola360.backgroundvideorecoder.ui.record.audio.audioschedule.ScheduleAudio
@@ -42,7 +43,7 @@ class RecordViewPagerAdapter(
                 fragments.add(AboutSetting())
             }
             MY_FILE_PAGER -> {
-                fragments.add(MyVideoFileFragment())
+                fragments.add(MyFileVideo())
                 fragments.add(MyAudioFileFragment())
             }
         }

@@ -104,13 +104,13 @@ class MyFileSectionAdapter(
             binding.btnSelect.isChecked = files[position].isSelect
 
             binding.btnOption.setOnClickListener {
-                onClickListener.onClicked(position, binding.btnOption)
+                onClickListener.onItemClicked(position, binding.btnOption)
             }
             binding.btnSelect.setOnClickListener {
-                onClickListener.onClicked(position, binding.btnSelect)
+                onClickListener.onItemClicked(position, binding.btnSelect)
             }
             binding.root.setOnClickListener {
-                onClickListener.onClicked(position, binding.mLayoutRoot)
+                onClickListener.onItemClicked(position, binding.mLayoutRoot)
             }
         }
     }
@@ -123,6 +123,7 @@ class MyFileSectionAdapter(
     }
 
     interface OnClickListener {
-        fun onClicked(position: Int, view: View)
+        fun onSectionHeaderClick()
+        fun onItemClicked(position: Int, view: View)
     }
 }

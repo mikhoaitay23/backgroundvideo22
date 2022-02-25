@@ -135,7 +135,7 @@
         <item>Low</item>
     </array>
 
-    <string name="my_file_title">My File</string>
+
 
 
     //app lock
@@ -184,6 +184,7 @@
     <string name="extra_text">Hi! Developer. In the process of using the application, I have comments about the application:</string>
 
     //My file
+    <string name="my_file_title">My File</string>
     <string name="video">Video</string>
     <string name="audio">Audio</string>
     <string name="empty_file">There\'s nothing here.</string>

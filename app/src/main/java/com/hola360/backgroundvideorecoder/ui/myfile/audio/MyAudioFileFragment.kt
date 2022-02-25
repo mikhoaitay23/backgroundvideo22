@@ -22,7 +22,6 @@ class MyAudioFileFragment : BaseRecordPageFragment<LayoutMyAudioFileBinding>(),
     override val layoutId = R.layout.layout_my_audio_file
 
     override fun initView() {
-
         binding!!.lifecycleOwner = this
         binding!!.viewModel = viewModel
     }
@@ -68,7 +67,7 @@ class MyAudioFileFragment : BaseRecordPageFragment<LayoutMyAudioFileBinding>(),
         }
     }
 
-    override fun onClicked(position: Int, view: View) {
+    override fun onItemClicked(position: Int, view: View) {
         showActionItem(view)
     }
 
@@ -103,5 +102,9 @@ class MyAudioFileFragment : BaseRecordPageFragment<LayoutMyAudioFileBinding>(),
             }
             show()
         }
+    }
+
+    override fun onSectionHeaderClick() {
+
     }
 }
